@@ -28,27 +28,7 @@ import { ReflectionModel } from "../src/reflection/model/ReflectionModel.js";
 import { StandingWavesModel } from "../src/standing-waves/model/StandingWavesModel.js";
 import { NodeMarkersNode } from "../src/standing-waves/view/NodeMarkersNode.js";
 import { OvertoneLadderNode } from "../src/standing-waves/view/OvertoneLadderNode.js";
-
-/**
- * Force garbage collection with multiple passes. When `earlyExitRefs` is supplied
- * the loop bails as soon as every referenced object is confirmed collected. The
- * setTimeout(0) yield after a live deref() avoids the WeakRef macrotask-liveness pin.
- * Without early-exit refs the loop always runs all passes, which on a slow `gc()`
- * can exceed the Vitest testTimeout — always pass refs when you have them.
- */
-async function forceGC(earlyExitRefs?: WeakRef<object> | readonly WeakRef<object>[]): Promise<void> {
-  const refs = earlyExitRefs === undefined ? [] : Array.isArray(earlyExitRefs) ? earlyExitRefs : [earlyExitRefs];
-  for (let i = 0; i < 15; i++) {
-    globalThis.gc?.();
-    await new Promise<void>((r) => setTimeout(r, 50));
-    if (refs.length > 0 && refs.every((ref) => ref.deref() === undefined)) {
-      return;
-    }
-    if (refs.length > 0) {
-      await new Promise<void>((r) => setTimeout(r, 0));
-    }
-  }
-}
+import { describeDisposalLeaks, forceGC } from "./helpers/memoryLeak.js";
 
 function createAndDisposeTimeModel(): WeakRef<object> {
   const model = new TimeModel();
@@ -78,16 +58,6 @@ function createAndDispose(factory: () => { dispose(): void }): WeakRef<object> {
 }
 
 describe("Memory leak regression", () => {
-  it("global.gc is available (--expose-gc)", () => {
-    expect(globalThis.gc).toBeDefined();
-  });
-
-  it("sanity: plain object is collected", async () => {
-    const ref = (() => new WeakRef({ hello: "world" }))();
-    await forceGC(ref);
-    expect(ref.deref()).toBeUndefined();
-  });
-
   it("TimeModel is collected after dispose", async () => {
     const ref = createAndDisposeTimeModel();
     await forceGC(ref);
@@ -208,3 +178,12 @@ describe("View nodes release the model Properties they linked", () => {
     model.dispose();
   });
 });
+
+describeDisposalLeaks([
+  { name: "InstrumentsModel", create: () => new InstrumentsModel() },
+  { name: "PhaseModel", create: () => new PhaseModel() },
+  { name: "ReflectionModel", create: () => new ReflectionModel() },
+  { name: "StandingWavesModel", create: () => new StandingWavesModel() },
+  { name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true },
+  { name: "PipeModalModel", create: () => new PipeModalModel() },
+]);

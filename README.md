@@ -53,17 +53,18 @@ Use `?screens=1` … `?screens=4` to open a single screen directly, and
 |---|---|
 | `npm start` / `npm run dev` | Start Vite dev server |
 | `npm run build` | Type-check + production build → `dist/` |
-| `npm run build:single` | Single-file build |
 | `npm run preview` | Preview the production build locally |
 | `npm test` | Run Vitest unit tests (includes memory-leak suite) |
-| `npm run test:fuzz` | Optional Playwright fuzz smoke (`?fuzz`, default 15s) |
+| `npm run test:fuzz` | Optional Playwright fuzz smoke: pointer (`?fuzz`) + keyboard (`?fuzzBoard`), with `?ea`, 30s each |
+| `npm run test:fuzz -- 90` | Same fuzz for 90 seconds (`--duration 90` or `FUZZ_DURATION=90` also work) |
 | `npm run test:fuzz:quick` | Shorter fuzz smoke (10s) |
+| `npm run test:fuzz:long` | Longer fuzz smoke (300s) |
 | `npm run check` | TypeScript type check |
 | `npm run lint` | Biome lint check |
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
 | `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
-| `npm run release` | `check && lint && build`, then version patch + push tags |
+| `npm run release` | `check && lint && build && test`, then version patch + push tags |
 | `npm run clean` | Remove `dist/` |
 
 `npm run release` does not run `npm test`; append `&& npm test` before the version bump so a release

@@ -16,7 +16,7 @@ Read [`doc/model.md`](doc/model.md) before changing any physics and
 [`doc/implementation-notes.md`](doc/implementation-notes.md) before changing the view layer. Both are
 current and specific; neither is a stub.
 
-## The three abstractions to understand first
+### The three abstractions to understand first
 
 | File | Why it matters |
 |---|---|
@@ -42,40 +42,9 @@ current and specific; neither is a stub.
 | Constants (SI + layout px) | `src/StandingWavesConstants.ts` |
 | Colors | `src/StandingWavesColors.ts` |
 
-## Things that will bite you
+## Model
 
-- **Do not lay out the pipe and its trace strips with a `VBox`.** Both put model x = 0 at their own
-  local x = 0, but their *bounds* start in different places (a closed end's cap juts to negative x, a
-  tick label straddles the origin, a rotated axis title reaches left of its plot). Aligning bounds
-  slides the traces out of register with the pipe — and by a different amount when the termination
-  changes. Position by `.x`/`.y` against a shared origin.
-- **Do not scale `c` or `fₕ` to slow the animation down.** Slow motion is applied to the *clock*, per
-  screen (`REFLECTION_TIME_SCALE`, `HARMONIC_TIME_SCALE`). Every frequency in the model is a true SI
-  value and the readouts say so.
-- **The two integrators are different on purpose.** The lattice is conservative and needs a symplectic
-  method (velocity Verlet); the modal bank is damped and driven and needs accuracy over thousands of
-  cycles (RK4). Don't unify them.
-- **On resonance a mode lags the drive by π/2.** Straight after `settleToSteadyState()` (Θ = 0) the
-  resonant mode is at its *zero crossing*, and a snapshot of the pipe is dominated by the small
-  off-resonant modes. Any shape assertion must first advance to the mode's extremum — see
-  `settleAtPeak()` in `tests/PipeModalModel.test.ts`. Two tests failed this way before that helper.
-- **Pressure needs its own trace scale**, not a multiple of the displacement scale: p carries a factor
-  of kₕ, so resonant pressure falls as 1/h while resonant displacement falls as 1/h². Hence
-  `resonantPressureAmplitude`.
-- **Trace scales are the *resonant* amplitude, not the current peak.** Normalising to the instantaneous
-  peak would make off-resonance, building-up and at-resonance all look identical and destroy the point
-  of the frequency slider.
-- **Drawn particle amplitudes are exaggerated** (`PARTICLE_AMPLITUDE_SPACINGS > 1`) because the eye
-  reads the *gradient*, not the displacement. The system is linear; this touches no physics.
-
-## Colour is a contract
-
-`displacement = grey/black`, `velocity = red`, `pressure = blue` — on every screen, in every trace,
-arrow and marker. This is Dan Russell's palette, where many learners first meet these curves.
-
-Russell's own mass-spring page uses a different pair of colours from his phase pages; the sim
-deliberately does **not** reproduce that, because a palette that changes between screens teaches that
-colour carries no meaning. Never colour one of the three quantities by anything else.
+Physics and behavior: `doc/model.md`.
 
 ## Accessibility
 
@@ -130,3 +99,40 @@ npm run lint && npm run check && npm run build && npm test
 
 Use `?screens=1` … `?screens=4` to open one screen directly — much faster than clicking through the
 home screen. `?showVelocityTrace=true` adds the velocity curve where it is optional.
+
+## Development notes
+
+### Things that will bite you
+
+- **Do not lay out the pipe and its trace strips with a `VBox`.** Both put model x = 0 at their own
+  local x = 0, but their *bounds* start in different places (a closed end's cap juts to negative x, a
+  tick label straddles the origin, a rotated axis title reaches left of its plot). Aligning bounds
+  slides the traces out of register with the pipe — and by a different amount when the termination
+  changes. Position by `.x`/`.y` against a shared origin.
+- **Do not scale `c` or `fₕ` to slow the animation down.** Slow motion is applied to the *clock*, per
+  screen (`REFLECTION_TIME_SCALE`, `HARMONIC_TIME_SCALE`). Every frequency in the model is a true SI
+  value and the readouts say so.
+- **The two integrators are different on purpose.** The lattice is conservative and needs a symplectic
+  method (velocity Verlet); the modal bank is damped and driven and needs accuracy over thousands of
+  cycles (RK4). Don't unify them.
+- **On resonance a mode lags the drive by π/2.** Straight after `settleToSteadyState()` (Θ = 0) the
+  resonant mode is at its *zero crossing*, and a snapshot of the pipe is dominated by the small
+  off-resonant modes. Any shape assertion must first advance to the mode's extremum — see
+  `settleAtPeak()` in `tests/PipeModalModel.test.ts`. Two tests failed this way before that helper.
+- **Pressure needs its own trace scale**, not a multiple of the displacement scale: p carries a factor
+  of kₕ, so resonant pressure falls as 1/h while resonant displacement falls as 1/h². Hence
+  `resonantPressureAmplitude`.
+- **Trace scales are the *resonant* amplitude, not the current peak.** Normalising to the instantaneous
+  peak would make off-resonance, building-up and at-resonance all look identical and destroy the point
+  of the frequency slider.
+- **Drawn particle amplitudes are exaggerated** (`PARTICLE_AMPLITUDE_SPACINGS > 1`) because the eye
+  reads the *gradient*, not the displacement. The system is linear; this touches no physics.
+
+### Colour is a contract
+
+`displacement = grey/black`, `velocity = red`, `pressure = blue` — on every screen, in every trace,
+arrow and marker. This is Dan Russell's palette, where many learners first meet these curves.
+
+Russell's own mass-spring page uses a different pair of colours from his phase pages; the sim
+deliberately does **not** reproduce that, because a palette that changes between screens teaches that
+colour carries no meaning. Never colour one of the three quantities by anything else.

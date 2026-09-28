@@ -38,21 +38,25 @@ onReadyToLaunch(() => {
 
   const screens = [
     new ReflectionScreen(simPreferences, {
+      // The screen name Property updates automatically when the locale changes
       name: stringManager.getScreenNames().reflectionStringProperty,
       tandem: Tandem.ROOT.createTandem("reflectionScreen"),
       backgroundColorProperty: StandingWavesColors.backgroundColorProperty,
     }),
     new PhaseScreen({
+      // The screen name Property updates automatically when the locale changes
       name: stringManager.getScreenNames().phaseRelationshipsStringProperty,
       tandem: Tandem.ROOT.createTandem("phaseRelationshipsScreen"),
       backgroundColorProperty: StandingWavesColors.backgroundColorProperty,
     }),
     new StandingWavesScreen(simPreferences, {
+      // The screen name Property updates automatically when the locale changes
       name: stringManager.getScreenNames().standingWavesStringProperty,
       tandem: Tandem.ROOT.createTandem("standingWavesScreen"),
       backgroundColorProperty: StandingWavesColors.backgroundColorProperty,
     }),
     new InstrumentsScreen({
+      // The screen name Property updates automatically when the locale changes
       name: stringManager.getScreenNames().instrumentsStringProperty,
       tandem: Tandem.ROOT.createTandem("instrumentsScreen"),
       backgroundColorProperty: StandingWavesColors.backgroundColorProperty,

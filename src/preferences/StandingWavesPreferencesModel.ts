@@ -4,9 +4,6 @@
  * Model for the simulation-specific preferences shown in Preferences →
  * Simulation. Each preference Property takes its initial value from the
  * corresponding query parameter in standingWavesQueryParameters.
- *
- * Remove the example preference (and its query parameter / UI control) if the
- * sim has no sim-specific preferences.
  */
 
 import { BooleanProperty } from "scenerystack/axon";
@@ -15,7 +12,7 @@ import StandingWavesNamespace from "../StandingWavesNamespace.js";
 import standingWavesQueryParameters from "./standingWavesQueryParameters.js";
 
 export class StandingWavesPreferencesModel {
-  /** Example preference; initial value comes from the `showVelocityTrace` query parameter. */
+  /** Whether the velocity trace is shown. Initial value comes from `showVelocityTrace`. */
   public readonly showVelocityTraceProperty: BooleanProperty;
 
   public constructor(tandem?: Tandem) {

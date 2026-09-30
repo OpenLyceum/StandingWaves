@@ -18,6 +18,7 @@
 
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Shape } from "scenerystack/kite";
+import { StringUtils } from "scenerystack/phetcommon";
 import { HBox, Node, Path, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { RectangularPushButton } from "scenerystack/sun";
@@ -106,7 +107,9 @@ class LadderRung extends RectangularPushButton {
     const frequencyProperty = new DerivedProperty(
       [pipe.terminationProperty, pipe.pipeLengthProperty, hertzPattern, isAllowedProperty],
       (termination: PipeTermination, length: number, pattern: string, isAllowed: boolean) =>
-        isAllowed ? pattern.replace("{{value}}", modeFrequency(harmonic, termination, length).toFixed(0)) : "—",
+        isAllowed
+          ? pattern.replace("{{value}}", StringUtils.toFixedLTR(modeFrequency(harmonic, termination, length), 0))
+          : "—",
     );
 
     const numberText = new Text(`${harmonic}`, {

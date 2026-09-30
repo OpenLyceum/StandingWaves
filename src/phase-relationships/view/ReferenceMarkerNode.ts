@@ -21,7 +21,7 @@
 import type { NumberProperty, TReadOnlyProperty } from "scenerystack/axon";
 import type { Range } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
-import { Circle, DragListener, KeyboardListener, Node, Path, Text } from "scenerystack/scenery";
+import { Circle, DragListener, KeyboardDragListener, Node, Path, Text } from "scenerystack/scenery";
 import { ArrowNode, PhetFont } from "scenerystack/scenery-phet";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import { PIPE_BORE_HEIGHT } from "../../StandingWavesConstants.js";
@@ -135,25 +135,26 @@ export class ReferenceMarkerNode extends Node {
     });
     this.addInputListener(dragListener);
 
-    // Keyboard: arrows walk the marker along the pipe, shift-arrows for fine steps.
-    // A KeyboardListener rather than a KeyboardDragListener because that class works
-    // in Vector2 and this marker has a single scalar coordinate.
+    // Keyboard drag on the same scalar the pointer writes. dragDelta is one abstract
+    // step (a twentieth of the pipe); shift is a fifth of that. Left/right only —
+    // the pipe has one dimension, so up/down are not bound.
     const coarseStep = options.positionRange.getLength() / 20;
-    const keyboardListener = new KeyboardListener({
-      keys: ["arrowLeft", "arrowRight", "shift+arrowLeft", "shift+arrowRight"] as const,
-      fire: (_event, keysPressed) => {
-        const isFine = keysPressed.includes("shift");
-        const sign = keysPressed.endsWith("arrowLeft") ? -1 : 1;
-        const delta = sign * (isFine ? coarseStep / 5 : coarseStep);
-        options.positionProperty.value = options.positionRange.constrainValue(options.positionProperty.value + delta);
+    const keyboardDragListener = new KeyboardDragListener({
+      keyboardDragDirection: "leftRight",
+      dragDelta: 1,
+      shiftDragDelta: 0.2,
+      drag: (_event, listener) => {
+        options.positionProperty.value = options.positionRange.constrainValue(
+          options.positionProperty.value + listener.modelDelta.x * coarseStep,
+        );
       },
     });
-    this.addInputListener(keyboardListener);
+    this.addInputListener(keyboardDragListener);
 
     this.disposeReferenceMarkerNode = () => {
       options.positionProperty.unlink(onPosition);
       dragListener.dispose();
-      keyboardListener.dispose();
+      keyboardDragListener.dispose();
     };
   }
 

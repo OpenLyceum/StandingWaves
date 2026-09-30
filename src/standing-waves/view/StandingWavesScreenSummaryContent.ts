@@ -10,6 +10,7 @@
  * named the frequency would hide it.
  */
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
@@ -44,7 +45,7 @@ export class StandingWavesScreenSummaryContent extends ScreenSummaryContent {
         if (!isDriving) {
           return silent;
         }
-        const hertz = frequency.toFixed(0);
+        const hertz = StringUtils.toFixedLTR(frequency, 0);
         if (atResonance) {
           return atPattern.replace("{{harmonic}}", `${harmonic}`).replace("{{frequency}}", hertz);
         }

@@ -10,6 +10,7 @@
  * stated rather than left to be inferred from two numbers read minutes apart.
  */
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { isSymmetric, type PipeTermination } from "../../common/model/PipeTermination.js";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -57,7 +58,7 @@ export class InstrumentsScreenSummaryContent extends ScreenSummaryContent {
         }[preset];
 
         const pattern = isSymmetric(termination) ? allPattern : oddPattern;
-        return pattern.replace("{{instrument}}", name).replace("{{frequency}}", fundamental.toFixed(0));
+        return pattern.replace("{{instrument}}", name).replace("{{frequency}}", StringUtils.toFixedLTR(fundamental, 0));
       },
     );
 

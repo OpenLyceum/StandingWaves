@@ -19,6 +19,7 @@
 import { DerivedProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
+import { StringUtils } from "scenerystack/phetcommon";
 import { Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
@@ -185,11 +186,11 @@ export class InstrumentsScreenView extends ScreenView {
     // ── The two facts, in words ───────────────────────────────────────────────
     const fundamentalProperty = new DerivedProperty(
       [pipe.fundamentalFrequencyProperty, instruments.fundamentalLabelStringProperty],
-      (frequency: number, pattern: string) => pattern.replace("{{value}}", frequency.toFixed(0)),
+      (frequency: number, pattern: string) => pattern.replace("{{value}}", StringUtils.toFixedLTR(frequency, 0)),
     );
     const lengthProperty = new DerivedProperty(
       [pipe.pipeLengthProperty, instruments.lengthLabelStringProperty],
-      (length: number, pattern: string) => pattern.replace("{{value}}", length.toFixed(2)),
+      (length: number, pattern: string) => pattern.replace("{{value}}", StringUtils.toFixedLTR(length, 2)),
     );
     const seriesProperty = createHarmonicSeriesLabelProperty(pipe);
 

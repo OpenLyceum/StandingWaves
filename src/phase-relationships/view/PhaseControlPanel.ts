@@ -10,6 +10,7 @@
  */
 
 import { DerivedProperty, type Property, type TReadOnlyProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { type Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
@@ -107,7 +108,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
     // relation the whole screen is about, so it should be a number on screen and
     // not only a symbol in an equation.
     const impedanceValueProperty = new DerivedProperty([phase.impedanceValueStringProperty], (pattern: string) =>
-      pattern.replace("{{value}}", CHARACTERISTIC_IMPEDANCE.toFixed(0)),
+      pattern.replace("{{value}}", toFixed(CHARACTERISTIC_IMPEDANCE, 0)),
     );
     const impedanceNote = new VBox({
       align: "left",

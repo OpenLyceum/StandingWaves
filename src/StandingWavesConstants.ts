@@ -82,23 +82,25 @@ export const PIPE_LENGTH_RANGE_M = new Range(0.2, 1.0);
 // So the *clock* is slowed and the physics is left alone — every frequency,
 // length and speed in the model is a true SI value, and each screen advances
 // model time at a fraction of wall-clock time. That keeps the readouts honest
-// (the sim really does say 343 Hz) and confines the compromise to one number
-// per screen. Do not "fix" this by scaling c or fₙ instead.
+// (the sim really does say 343 Hz). TimeModel's Slow motion toggle multiplies
+// these base rates by 0.4 by default. Do not "fix" this by scaling c or fₙ.
 
 /**
- * Model seconds per wall-clock second on the Reflection screen. A pulse crosses
+ * Normal-speed model seconds per wall-clock second on Reflection. A pulse crosses
  * the default 0.5 m pipe in L/c = 1.46 ms, so this stretches one crossing to
- * about 2.9 s — slow enough to watch the reflection form at the wall.
+ * about 2.9 s, or about 7.3 s with Slow motion selected.
  */
 export const REFLECTION_TIME_SCALE = 1 / 2000;
 
 /**
- * Model seconds per wall-clock second on the Phase, Standing Waves and
+ * Normal-speed model seconds per wall-clock second on Phase, Standing Waves and
  * Instruments screens. The 343 Hz fundamental then oscillates at an apparent
- * 1.7 Hz: fast enough to read as vibration, slow enough to follow a single
- * particle through one cycle.
+ * 1.7 Hz, or 0.69 Hz with Slow motion selected by default.
  */
 export const HARMONIC_TIME_SCALE = 1 / 200;
+
+/** Default Slow motion rate relative to each screen's normal clock rate. */
+export const SLOW_MOTION_MULTIPLIER = 0.4;
 
 // ── Reflection screen: the mass-spring chain ──────────────────────────────────
 
@@ -153,6 +155,9 @@ export const MODE_QUALITY_FACTOR = 20;
 
 /** Selectable driving-frequency range (Hz), as a multiple of the open-pipe f₁. */
 export const DRIVE_FREQUENCY_RANGE_HARMONICS = new Range(0.5, 6.5);
+
+/** Fine adjustment around the frequency last selected with the broad control (Hz). */
+export const DRIVE_FINE_TUNE_RANGE_HZ = new Range(-50, 50);
 
 /**
  * Fraction of a mode's half-power bandwidth within which the sim reports that
@@ -215,6 +220,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   PIPE_LENGTH_RANGE_M,
   REFLECTION_TIME_SCALE,
   HARMONIC_TIME_SCALE,
+  SLOW_MOTION_MULTIPLIER,
   CHAIN_MASS_COUNT,
   PULSE_WIDTH_FRACTION,
   PULSE_AMPLITUDE_CELLS,
@@ -222,6 +228,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   MODE_COUNT,
   MODE_QUALITY_FACTOR,
   DRIVE_FREQUENCY_RANGE_HARMONICS,
+  DRIVE_FINE_TUNE_RANGE_HZ,
   RESONANCE_BANDWIDTH_FRACTION,
   PARTICLE_COUNT,
   PARTICLE_AMPLITUDE_SPACINGS,

@@ -32,6 +32,7 @@ import {
 } from "../../common/StandingWavesButtonOptions.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
+import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesPreferencesModel } from "../../preferences/StandingWavesPreferencesModel.js";
@@ -242,6 +243,10 @@ export class StandingWavesScreenView extends ScreenView {
 
     timeControl.left = stack.left;
     timeControl.bottom = this.layoutBounds.maxY - SCREEN_VIEW_MARGIN;
+    const slowMotionControl = new SlowMotionControl(model.timer);
+    slowMotionControl.centerX = timeControl.centerX;
+    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
+    this.addChild(slowMotionControl);
 
     // ── Termination → which pipe drawing shows ────────────────────────────────
     const onTermination = (termination: string): void => {
@@ -256,10 +261,12 @@ export class StandingWavesScreenView extends ScreenView {
         pdomOrder: [
           controlPanel.terminationRadioButtons,
           controlPanel.frequencyControl,
+          controlPanel.fineTuneControl,
           ladder,
           controlPanel.lengthControl,
           controlPanel.driverCheckbox,
           controlPanel.nodesCheckbox,
+          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

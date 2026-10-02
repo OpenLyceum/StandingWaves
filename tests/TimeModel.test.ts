@@ -48,4 +48,15 @@ describe("TimeModel", () => {
     expect(model.timeProperty.value).toBe(0);
     model.dispose();
   });
+
+  it("starts in slow motion and restores it on reset", () => {
+    const model = new TimeModel(true);
+    expect(model.slowMotionProperty.value).toBe(true);
+    expect(model.speedMultiplier).toBe(0.4);
+    model.slowMotionProperty.value = false;
+    expect(model.speedMultiplier).toBe(1);
+    model.reset();
+    expect(model.slowMotionProperty.value).toBe(true);
+    model.dispose();
+  });
 });

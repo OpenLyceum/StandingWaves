@@ -66,6 +66,9 @@ Each screen model converts a frame's wall-clock `dt` into model seconds
 backgrounded tab cannot hand over one enormous `dt`. **Do not** "fix" the animation speed by scaling
 `c` or `fₕ` instead: every readout in the sim would start lying.
 
+`TimeModel.speedMultiplier` applies the default 0.4 Slow motion rate. A checkbox beside each
+screen's playback controls restores the normal rate.
+
 ## View layer
 
 ```
@@ -108,6 +111,12 @@ Standing Waves screen earns its frequency slider:
 > strip. Normalising to the instantaneous peak would make all three look identical and destroy the
 > point of having a slider at all.
 
+The broad slider spans all pipe geometries, so its resonances are too narrow for pointer
+adjustment by itself. The ±50 Hz fine-tune slider is centred on the last broad frequency choice.
+When that choice crosses into another harmonic's region, `PipeModalModel` clears the old modal
+state and lets the new mode build from rest; otherwise a low harmonic can clip a high harmonic's
+trace for several seconds.
+
 Pressure needs its own scale, not a multiple of the displacement one: p carries a factor of kₕ, so
 the resonant pressure falls only as 1/h while the resonant displacement falls as 1/h². Hence
 `PipeModalModel.resonantPressureAmplitude`.
@@ -145,7 +154,7 @@ nothing is happening.
 
 ## Testing
 
-114 vitest specs; `happy-dom`, template `tests/setup.ts`.
+145 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|

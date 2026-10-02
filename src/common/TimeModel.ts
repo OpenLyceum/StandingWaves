@@ -45,17 +45,26 @@
  */
 
 import { BooleanProperty, NumberProperty } from "scenerystack/axon";
+import { SLOW_MOTION_MULTIPLIER } from "../StandingWavesConstants.js";
 
 export class TimeModel {
   /** Whether the simulation clock is running. Bind to TimeControlNode. */
   public readonly isPlayingProperty: BooleanProperty;
+
+  /** Slows animation to 40% of the usual rate without changing model units. */
+  public readonly slowMotionProperty: BooleanProperty;
 
   /** Elapsed simulation time in seconds. Resets to 0 on reset(). */
   public readonly timeProperty: NumberProperty;
 
   public constructor(initiallyPlaying = false) {
     this.isPlayingProperty = new BooleanProperty(initiallyPlaying);
+    this.slowMotionProperty = new BooleanProperty(true);
     this.timeProperty = new NumberProperty(0, { units: "s" });
+  }
+
+  public get speedMultiplier(): number {
+    return this.slowMotionProperty.value ? SLOW_MOTION_MULTIPLIER : 1;
   }
 
   /**
@@ -81,12 +90,14 @@ export class TimeModel {
   /** Resets clock and playback state to their initial values. */
   public reset(): void {
     this.isPlayingProperty.reset();
+    this.slowMotionProperty.reset();
     this.timeProperty.reset();
   }
 
   /** Call when the model is no longer needed to free AXON listeners. */
   public dispose(): void {
     this.isPlayingProperty.dispose();
+    this.slowMotionProperty.dispose();
     this.timeProperty.dispose();
   }
 }

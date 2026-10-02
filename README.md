@@ -21,13 +21,13 @@ displacement has a node. This simulation makes all three something you manipulat
 - **Phase** — a travelling sinusoid with a draggable reference point carrying displacement and
   velocity arrows. Reverse the direction and velocity and pressure go from in phase to 180° out of
   phase, which is the whole content of `p = ±ρc·u`.
-- **Standing Waves** — pick Closed–Closed, Open–Open or Closed–Open, then sweep the drive frequency
-  to hunt for a resonance or snap straight to a harmonic. Node markers name both of each point's
-  identities, so the quarter-wave displacement/pressure offset is unmissable.
+- **Standing Waves** — pick Closed–Closed, Open–Open or Closed–Open, then sweep and fine tune the drive
+  frequency to hunt for a resonance or snap straight to a harmonic. Node markers name both of each
+  point's identities, so the quarter-wave displacement/pressure offset is unmissable.
 - **Instruments** — open and stopped organ pipes, flute and clarinet, with the harmonic series as a
   bar chart. The flute and clarinet share a bore length, so the octave and the missing even
   harmonics are visibly the termination's doing.
-- Real SI units throughout, with slow motion applied to the clock rather than to the physics
+- Real SI units throughout, with Slow motion selected by default beside each screen's playback controls
 - Full keyboard and screen-reader support, with live state descriptions per screen
 - English, Spanish, and French localization via `StringManager`
 - Default and projector color profiles

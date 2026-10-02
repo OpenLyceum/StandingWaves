@@ -224,6 +224,36 @@ describe("build-up and ring-down timing", () => {
   });
 });
 
+describe("retuning", () => {
+  it("clears an old mode when a frequency sweep selects a new harmonic", () => {
+    const model = new PipeModalModel();
+    model.jumpToHarmonic(1);
+    const period = 1 / model.driveFrequencyProperty.value;
+    model.step(period / 4);
+    expect(Math.abs(model.modalAmplitude(1))).toBeGreaterThan(0.5 * model.resonantAmplitude(1));
+
+    model.driveFrequencyProperty.value = model.getModeFrequency(6);
+    expect(model.nearestHarmonicProperty.value).toBe(6);
+    expect(model.modalAmplitude(1)).toBe(0);
+    expect(model.modalAmplitude(6)).toBe(0);
+
+    model.step(1 / model.driveFrequencyProperty.value);
+    expect(Math.abs(model.modalAmplitude(6))).toBeGreaterThan(0);
+    model.dispose();
+  });
+
+  it("preserves a mode while fine tuning within that harmonic", () => {
+    const model = new PipeModalModel();
+    model.jumpToHarmonic(1);
+    model.step(1 / (4 * model.driveFrequencyProperty.value));
+    const before = model.modalAmplitude(1);
+    model.driveFrequencyProperty.value += 3;
+    expect(model.nearestHarmonicProperty.value).toBe(1);
+    expect(model.modalAmplitude(1)).toBe(before);
+    model.dispose();
+  });
+});
+
 describe("a stopped pipe never rings in an even harmonic", () => {
   it("stays silent in mode 2 even when driven exactly at 2f₁", () => {
     const model = new PipeModalModel({ termination: PipeTermination.CLOSED_OPEN });

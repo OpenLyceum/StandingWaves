@@ -146,11 +146,16 @@ perfect standing wave at *any* frequency, which is precisely the thing that is n
 pipe. This way two behaviours come out for free rather than being animated by hand:
 
 - the **steady-state response is a Lorentzian**, so resonance is something to hunt for;
-- the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 3 s of wall clock at the
-  default pipe.
+- the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 9 s of wall clock at the
+  default pipe in Slow motion, or about 4 s at normal speed.
 
 Q = 20 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
 dragging a slider and the build-up is watchable rather than tens of seconds long.
+
+The broad frequency slider covers every available pipe length and termination. A second slider
+adjusts the drive by ±50 Hz around the last broad choice, making narrow resonance peaks reachable
+by pointer. Crossing to a different harmonic starts its modal build-up from rest so the old mode
+does not obscure the new pattern on the higher harmonic's smaller display scale.
 
 The driver sits at the left end and is whatever kind of source that end admits: a pressure source (a
 reed) against a closed end, a volume-velocity source (a jet) at an open one. Each couples to the
@@ -178,9 +183,11 @@ Audible sound is far too fast to animate: the default pipe's 343 Hz fundamental 
 and a pulse crosses the pipe in 1.5 ms. Both would alias into meaningless flicker.
 
 So the **clock** is slowed and the physics is left alone. Every frequency, length and speed in the
-model is a true SI value; each screen simply advances model time at a fraction of wall-clock time —
-1/2000 on Reflection (a crossing takes ~3 s), 1/200 elsewhere (the fundamental oscillates at an
-apparent 1.7 Hz). The readouts stay honest: the sim really does say 343 Hz.
+model is a true SI value. Normal speed advances model time at 1/2000 of wall time on Reflection
+(a crossing takes ~3 s) and 1/200 elsewhere (the fundamental appears to oscillate at 1.7 Hz).
+Slow motion is selected by default and multiplies those rates by 0.4: a Reflection crossing takes
+about 7 s, and the default fundamental appears to oscillate at 0.69 Hz. The readouts still report
+the true frequencies; the default pipe says 343 Hz in either speed mode.
 
 ## Where the numbers come from
 

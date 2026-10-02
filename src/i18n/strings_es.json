@@ -28,6 +28,7 @@
   },
   "controls": {
     "pipeLength": "Longitud del tubo",
+    "slowMotion": "Cámara lenta",
     "reset": "Reiniciar"
   },
   "reflection": {
@@ -61,6 +62,7 @@
     "termination": "Terminación",
     "harmonic": "Armónico",
     "driveFrequency": "Frecuencia de excitación",
+    "fineTune": "Ajuste fino (±50 Hz)",
     "driverOn": "Excitación activa",
     "atResonance": "En resonancia",
     "buildingUp": "Estableciéndose…",
@@ -94,13 +96,14 @@
     "reflection": {
       "screenSummary": {
         "playArea": "Un tubo cruza el área de juego, con una cadena de partículas de aire en su interior. Debajo del tubo, dos gráficas trazan el desplazamiento de las partículas y la presión acústica a lo largo de toda su longitud. El extremo cercano del tubo es rígido; el extremo lejano está cerrado o abierto.",
-        "controlArea": "El área de control tiene un botón que lanza un pulso, un control para el extremo lejano del tubo, una casilla que muestra ambos extremos a la vez para comparar, los controles de reproducción y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un botón que lanza un pulso, un control para el extremo lejano del tubo, una casilla que muestra ambos extremos a la vez para comparar, controles de reproducción con cámara lenta y un botón Reiniciar todo.",
         "interactionHint": "Lance un pulso y observe qué le hace el extremo lejano."
       },
       "currentDetails": {
         "atRest": "El tubo está en reposo. No se ha lanzado ningún pulso.",
         "travellingToward": "Un pulso viaja hacia el extremo lejano del tubo.",
         "reflecting": "El pulso se refleja en el extremo lejano.",
+        "nearReflecting": "El pulso se refleja en el extremo cercano rígido.",
         "travellingBack": "El pulso reflejado viaja de vuelta hacia el extremo cercano.",
         "closedResult": "Reflejado en el extremo cerrado, el pulso de desplazamiento se ha invertido mientras que el de presión no.",
         "openResult": "Reflejado en el extremo abierto, el pulso de desplazamiento sigue en el mismo sentido mientras que el de presión se ha invertido."
@@ -114,7 +117,7 @@
     "phaseRelationships": {
       "screenSummary": {
         "playArea": "Un tubo de partículas de aire que oscilan de un lado a otro según su eje, con un punto de referencia móvil que porta una flecha de desplazamiento y una flecha de velocidad. Debajo del tubo, las gráficas trazan el desplazamiento, la velocidad y la presión a lo largo de toda su longitud.",
-        "controlArea": "El área de control tiene un control de sentido de propagación, un control de longitud de onda, una casilla que muestra las ecuaciones, los controles de reproducción y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un control de sentido de propagación, un control de longitud de onda, una casilla que muestra las ecuaciones, controles de reproducción con cámara lenta y un botón Reiniciar todo.",
         "interactionHint": "Invierta el sentido de propagación y observe qué les ocurre a las curvas de velocidad y presión."
       },
       "currentDetails": {
@@ -131,7 +134,7 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tubo cuyos dos extremos pueden estar cerrados o abiertos, excitado en un extremo. En su interior, una onda estacionaria en desplazamiento y en presión, con marcas en los nodos y antinodos. Al lado, la escalera de armónicos que este tubo puede sonar.",
-        "controlArea": "El área de control tiene un control de terminación de los extremos, un deslizador de frecuencia de excitación, una escalera de armónicos a los que ajustarse, un control de longitud del tubo, una casilla para las marcas de nodos, los controles de reproducción y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un control de terminación de los extremos, deslizadores de ajuste general y fino de la frecuencia de excitación, una escalera de armónicos, un control de longitud del tubo, una casilla para las marcas de nodos, controles de reproducción con cámara lenta y un botón Reiniciar todo.",
         "interactionHint": "Elija una terminación y luego barra la frecuencia para encontrar una resonancia — o ajústese directamente a un armónico."
       },
       "currentDetails": {
@@ -142,6 +145,7 @@
       "controls": {
         "termination": "Terminación del tubo",
         "driveFrequency": "Frecuencia de excitación",
+        "fineTune": "Ajuste fino de la frecuencia de excitación",
         "harmonicLadder": "Armónico objetivo",
         "pipeLength": "Longitud del tubo",
         "driverOn": "Excitación activa",
@@ -151,7 +155,7 @@
     "instruments": {
       "screenSummary": {
         "playArea": "Un tubo configurado como uno de cuatro instrumentos, con su onda estacionaria en el interior, junto a un diagrama de barras de los armónicos que ese tubo puede sonar.",
-        "controlArea": "El área de control tiene un control que selecciona el instrumento, los controles de reproducción y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un control que selecciona el instrumento, controles de reproducción con cámara lenta y un botón Reiniciar todo.",
         "interactionHint": "Compare la flauta con el clarinete: misma longitud, pero no los mismos armónicos."
       },
       "currentDetails": {

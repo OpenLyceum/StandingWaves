@@ -201,6 +201,19 @@ export class PipeModalModel {
     // A pipe whose ladder moved out from under the drive, or whose modes no
     // longer exist, must not keep ringing in a mode it no longer has.
     this.terminationProperty.link(() => this.clearForbiddenModes());
+
+    // A broad frequency sweep changes which mode the learner is inspecting.
+    // Start that mode's build-up from rest; otherwise a low mode keeps ringing
+    // against the much smaller scale of a high mode for many seconds.
+    let selectedHarmonic = this.nearestHarmonicProperty.value;
+    this.nearestHarmonicProperty.link((harmonic: number) => {
+      if (harmonic !== selectedHarmonic) {
+        selectedHarmonic = harmonic;
+        this.amplitudes.fill(0);
+        this.rates.fill(0);
+        this.stateChangeCountProperty.value++;
+      }
+    });
   }
 
   /** Harmonic numbers the current pipe supports, ascending. */

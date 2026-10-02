@@ -23,6 +23,7 @@ import {
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
   FLAT_RESET_ALL_BUTTON_OPTIONS,
 } from "../../common/StandingWavesButtonOptions.js";
+import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesPreferencesModel } from "../../preferences/StandingWavesPreferencesModel.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -154,6 +155,10 @@ export class ReflectionScreenView extends ScreenView {
     controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
     timeControl.centerX = controlPanel.centerX;
     timeControl.bottom = resetAllButton.top - SCREEN_VIEW_MARGIN;
+    const slowMotionControl = new SlowMotionControl(model.timer);
+    slowMotionControl.centerX = timeControl.centerX;
+    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
+    this.addChild(slowMotionControl);
 
     // ── Accessibility: reading and tab order ──────────────────────────────────
     this.addChild(
@@ -162,6 +167,7 @@ export class ReflectionScreenView extends ScreenView {
           controlPanel.launchButton,
           controlPanel.farEndRadioButtons,
           controlPanel.compareCheckbox,
+          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

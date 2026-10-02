@@ -39,6 +39,7 @@ const PANEL_WIDTH = 200;
 export class StandingWavesControlPanel extends StandingWavesPanel {
   public readonly terminationRadioButtons: Node;
   public readonly frequencyControl: Node;
+  public readonly fineTuneControl: Node;
   public readonly lengthControl: Node;
   public readonly driverCheckbox: Node;
   public readonly nodesCheckbox: Node;
@@ -121,6 +122,24 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       },
     );
 
+    // The broad track spans every pipe setup. Its subpixel resonance bands are
+    // explored with this local ±50 Hz track after choosing a nearby frequency.
+    const fineTuneControl = new StandingWavesNumberControl(
+      standingWaves.fineTuneStringProperty,
+      model.fineTuneOffsetProperty,
+      model.fineTuneOffsetProperty.range,
+      {
+        accessibleName: a11y.controls.fineTuneStringProperty,
+        valuePattern: units.hertzStringProperty,
+        decimals: 1,
+        delta: 0.1,
+        keyboardStep: 1,
+        shiftKeyboardStep: 0.1,
+        pageKeyboardStep: 10,
+        trackWidth: PANEL_WIDTH - 70,
+      },
+    );
+
     const lengthControl = new StandingWavesNumberControl(
       shared.pipeLengthStringProperty,
       pipe.pipeLengthProperty,
@@ -199,6 +218,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
           terminationLabel,
           terminationRadioButtons,
           frequencyControl,
+          fineTuneControl,
           badge,
           lengthControl,
           driverCheckbox,
@@ -209,6 +229,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
 
     this.terminationRadioButtons = terminationRadioButtons;
     this.frequencyControl = frequencyControl;
+    this.fineTuneControl = fineTuneControl;
     this.lengthControl = lengthControl;
     this.driverCheckbox = driverCheckbox;
     this.nodesCheckbox = nodesCheckbox;

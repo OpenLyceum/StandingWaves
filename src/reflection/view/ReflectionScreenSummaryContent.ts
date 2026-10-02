@@ -34,6 +34,7 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         details.atRestStringProperty,
         details.travellingTowardStringProperty,
         details.reflectingStringProperty,
+        details.nearReflectingStringProperty,
         details.travellingBackStringProperty,
         details.closedResultStringProperty,
         details.openResultStringProperty,
@@ -45,6 +46,7 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         atRest: string,
         travellingToward: string,
         reflecting: string,
+        nearReflecting: string,
         travellingBack: string,
         closedResult: string,
         openResult: string,
@@ -57,6 +59,9 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         }
         if (stage === PulseStage.REFLECTING) {
           return reflecting;
+        }
+        if (stage === PulseStage.NEAR_REFLECTING) {
+          return nearReflecting;
         }
         // Returning: say what happened. While comparing, both ends are on screen,
         // so report both results rather than picking one.

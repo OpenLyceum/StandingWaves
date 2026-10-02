@@ -38,6 +38,8 @@ export const PulseStage = {
   OUTBOUND: "outbound",
   /** Interacting with the far end. */
   REFLECTING: "reflecting",
+  /** Interacting with the rigid near end on a later round trip. */
+  NEAR_REFLECTING: "nearReflecting",
   /** Heading back, having reflected at least once. */
   RETURNING: "returning",
 } as const;
@@ -115,10 +117,15 @@ export class ReflectionModel implements TModel {
         if (travelled < toFarEnd - zone) {
           return PulseStage.OUTBOUND;
         }
-        if (travelled < toFarEnd + zone) {
+        const cycleDistance = (travelled - toFarEnd) % (2 * this.pipeLength);
+        const distanceToFarEnd = Math.min(Math.abs(cycleDistance), Math.abs(cycleDistance - 2 * this.pipeLength));
+        if (distanceToFarEnd < zone) {
           return PulseStage.REFLECTING;
         }
-        return PulseStage.RETURNING;
+        if (Math.abs(cycleDistance - this.pipeLength) < zone) {
+          return PulseStage.NEAR_REFLECTING;
+        }
+        return cycleDistance < this.pipeLength ? PulseStage.RETURNING : PulseStage.OUTBOUND;
       },
     );
   }
@@ -182,7 +189,7 @@ export class ReflectionModel implements TModel {
    * which the lattice would answer by taking thousands of sub-steps at once.
    */
   private toModelTime(dt: number): number {
-    return Math.min(dt, MAX_FRAME_DT_S) * REFLECTION_TIME_SCALE;
+    return Math.min(dt, MAX_FRAME_DT_S) * REFLECTION_TIME_SCALE * this.timer.speedMultiplier;
   }
 
   private advance(modelDt: number): void {

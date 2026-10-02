@@ -29,6 +29,7 @@ import {
 } from "../../common/StandingWavesButtonOptions.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
+import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -222,6 +223,10 @@ export class PhaseScreenView extends ScreenView {
 
     timeControl.centerX = controlPanel.centerX;
     timeControl.bottom = resetAllButton.top - SCREEN_VIEW_MARGIN;
+    const slowMotionControl = new SlowMotionControl(model.timer);
+    slowMotionControl.centerX = timeControl.centerX;
+    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
+    this.addChild(slowMotionControl);
 
     this.addChild(
       new Node({
@@ -230,6 +235,7 @@ export class PhaseScreenView extends ScreenView {
           controlPanel.wavelengthControl,
           controlPanel.equationsCheckbox,
           this.marker,
+          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

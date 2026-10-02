@@ -82,6 +82,6 @@ export class InstrumentsModel implements TModel {
   }
 
   private toModelTime(dt: number): number {
-    return Math.min(dt, MAX_FRAME_DT_S) * HARMONIC_TIME_SCALE;
+    return Math.min(dt, MAX_FRAME_DT_S) * HARMONIC_TIME_SCALE * this.timer.speedMultiplier;
   }
 }

@@ -28,7 +28,6 @@
   },
   "controls": {
     "pipeLength": "Longueur du tuyau",
-    "slowMotion": "Ralenti",
     "reset": "Réinitialiser"
   },
   "reflection": {
@@ -96,7 +95,7 @@
     "reflection": {
       "screenSummary": {
         "playArea": "Un tuyau traverse la zone de jeu, avec à l'intérieur une chaîne de particules d'air. Sous le tuyau, deux graphiques tracent le déplacement des particules et la pression acoustique sur toute sa longueur. L'extrémité proche du tuyau est rigide ; l'extrémité éloignée est soit fermée, soit ouverte.",
-        "controlArea": "La zone de commande comporte un bouton qui lance une impulsion, une commande pour l'extrémité éloignée du tuyau, une case à cocher qui affiche les deux extrémités à la fois pour comparaison, des commandes de lecture avec ralenti et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte un bouton qui lance une impulsion, une commande pour l'extrémité éloignée du tuyau, une case à cocher qui affiche les deux extrémités à la fois pour comparaison, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Lancez une impulsion et observez ce que l'extrémité éloignée lui fait."
       },
       "currentDetails": {
@@ -117,7 +116,7 @@
     "phaseRelationships": {
       "screenSummary": {
         "playArea": "Un tuyau rempli de particules d'air qui oscillent d'avant en arrière selon son axe, avec un point de référence déplaçable portant une flèche de déplacement et une flèche de vitesse. Sous le tuyau, des graphiques tracent le déplacement, la vitesse et la pression sur toute sa longueur.",
-        "controlArea": "La zone de commande comporte une commande de sens de propagation, une commande de longueur d'onde, une case à cocher affichant les équations, des commandes de lecture avec ralenti et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte une commande de sens de propagation, une commande de longueur d'onde, une case à cocher affichant les équations, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Inversez le sens de propagation et observez ce qui arrive aux courbes de vitesse et de pression."
       },
       "currentDetails": {
@@ -134,7 +133,7 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tuyau dont chacune des deux extrémités peut être fermée ou ouverte, excité à une extrémité. À l'intérieur, une onde stationnaire en déplacement et en pression, avec des repères sur les nœuds et les ventres. À côté, l'échelle des harmoniques que ce tuyau peut produire.",
-        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, des curseurs de réglage général et fin de la fréquence d'excitation, une échelle d'harmoniques, une commande de longueur du tuyau, une case à cocher pour les repères de nœuds, des commandes de lecture avec ralenti et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, des curseurs de réglage général et fin de la fréquence d'excitation, une échelle d'harmoniques, une commande de longueur du tuyau, une case à cocher pour les repères de nœuds, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Choisissez une terminaison, puis balayez la fréquence pour trouver une résonance — ou alignez-vous directement sur une harmonique."
       },
       "currentDetails": {
@@ -155,7 +154,7 @@
     "instruments": {
       "screenSummary": {
         "playArea": "Un tuyau configuré comme l'un des quatre instruments, avec son onde stationnaire à l'intérieur, à côté d'un diagramme en barres des harmoniques que ce tuyau peut produire.",
-        "controlArea": "La zone de commande comporte une commande qui sélectionne l'instrument, des commandes de lecture avec ralenti et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte une commande qui sélectionne l'instrument, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Comparez la flûte et la clarinette : même longueur, mais pas les mêmes harmoniques."
       },
       "currentDetails": {

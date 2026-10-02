@@ -147,7 +147,7 @@ pipe. This way two behaviours come out for free rather than being animated by ha
 
 - the **steady-state response is a Lorentzian**, so resonance is something to hunt for;
 - the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 9 s of wall clock at the
-  default pipe in Slow motion, or about 4 s at normal speed.
+  default pipe on Slow, or about 4 s at Normal speed.
 
 Q = 20 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
 dragging a slider and the build-up is watchable rather than tens of seconds long.
@@ -184,10 +184,13 @@ and a pulse crosses the pipe in 1.5 ms. Both would alias into meaningless flicke
 
 So the **clock** is slowed and the physics is left alone. Every frequency, length and speed in the
 model is a true SI value. Normal speed advances model time at 1/2000 of wall time on Reflection
-(a crossing takes ~3 s) and 1/200 elsewhere (the fundamental appears to oscillate at 1.7 Hz).
-Slow motion is selected by default and multiplies those rates by 0.4: a Reflection crossing takes
-about 7 s, and the default fundamental appears to oscillate at 0.69 Hz. The readouts still report
-the true frequencies; the default pipe says 343 Hz in either speed mode.
+(a crossing takes ~3 s), 1/400 on Phase, and 1/200 on Standing Waves and Instruments (the 343 Hz
+fundamental appears to oscillate at 1.7 Hz). Phase is slower because its default wave is one
+wavelength long (f = c/L = 686 Hz); the extra factor of two puts that wave at the same apparent
+rate as the fundamental on the other screens. Slow, selected by default on the playback radios,
+multiplies those rates by 0.4: a Reflection crossing takes about 7 s, and the default fundamental
+appears to oscillate at 0.69 Hz. The readouts still report the true frequencies; the default pipe
+says 343 Hz in either speed mode.
 
 ## Where the numbers come from
 

@@ -23,16 +23,13 @@
 import { Range } from "scenerystack/dot";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
-import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { leftEnd, rightEnd } from "../../common/model/PipeTermination.js";
-import {
-  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RESET_ALL_BUTTON_OPTIONS,
-} from "../../common/StandingWavesButtonOptions.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
+import { createTimeControl } from "../../common/view/createTimeControl.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
-import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesPreferencesModel } from "../../preferences/StandingWavesPreferencesModel.js";
@@ -216,17 +213,9 @@ export class StandingWavesScreenView extends ScreenView {
     controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
     this.addChild(controlPanel);
 
-    const timeControl = new TimeControlNode(model.timer.isPlayingProperty, {
-      playPauseStepButtonOptions: {
-        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-        stepForwardButtonOptions: {
-          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
-          listener: () => {
-            model.stepForward();
-            this.updatePipe();
-          },
-        },
-      },
+    const timeControl = createTimeControl(model.timer, () => {
+      model.stepForward();
+      this.updatePipe();
     });
     this.addChild(timeControl);
 
@@ -243,10 +232,6 @@ export class StandingWavesScreenView extends ScreenView {
 
     timeControl.left = stack.left;
     timeControl.bottom = this.layoutBounds.maxY - SCREEN_VIEW_MARGIN;
-    const slowMotionControl = new SlowMotionControl(model.timer);
-    slowMotionControl.centerX = timeControl.centerX;
-    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
-    this.addChild(slowMotionControl);
 
     // ── Termination → which pipe drawing shows ────────────────────────────────
     const onTermination = (termination: string): void => {
@@ -266,7 +251,6 @@ export class StandingWavesScreenView extends ScreenView {
           controlPanel.lengthControl,
           controlPanel.driverCheckbox,
           controlPanel.nodesCheckbox,
-          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

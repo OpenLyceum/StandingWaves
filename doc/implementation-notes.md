@@ -66,8 +66,10 @@ Each screen model converts a frame's wall-clock `dt` into model seconds
 backgrounded tab cannot hand over one enormous `dt`. **Do not** "fix" the animation speed by scaling
 `c` or `fₕ` instead: every readout in the sim would start lying.
 
-`TimeModel.speedMultiplier` applies the default 0.4 Slow motion rate. A checkbox beside each
-screen's playback controls restores the normal rate.
+`TimeModel.speedMultiplier` applies the default 0.4 Slow rate. Each screen's `TimeControlNode`
+includes SceneryStack's Normal / Slow radios; Slow is selected by default. Phase uses
+`PHASE_TIME_SCALE` (half of `HARMONIC_TIME_SCALE`) because its default wave is one wavelength
+long and would otherwise oscillate twice as fast as the other screens' fundamental.
 
 ## View layer
 

@@ -27,7 +27,7 @@ displacement has a node. This simulation makes all three something you manipulat
 - **Instruments** — open and stopped organ pipes, flute and clarinet, with the harmonic series as a
   bar chart. The flute and clarinet share a bore length, so the octave and the missing even
   harmonics are visibly the termination's doing.
-- Real SI units throughout, with Slow motion selected by default beside each screen's playback controls
+- Real SI units throughout, with Slow speed selected by default on each screen's playback controls
 - Full keyboard and screen-reader support, with live state descriptions per screen
 - English, Spanish, and French localization via `StringManager`
 - Default and projector color profiles

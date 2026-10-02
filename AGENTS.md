@@ -110,8 +110,9 @@ home screen. `?showVelocityTrace=true` adds the velocity curve where it is optio
   slides the traces out of register with the pipe — and by a different amount when the termination
   changes. Position by `.x`/`.y` against a shared origin.
 - **Do not scale `c` or `fₕ` to slow the animation down.** Slow motion is applied to the *clock*, per
-  screen (`REFLECTION_TIME_SCALE`, `HARMONIC_TIME_SCALE`) and defaults to 0.4 times those rates.
-  Every frequency in the model is a true SI value and the readouts say so.
+  screen (`REFLECTION_TIME_SCALE`, `PHASE_TIME_SCALE`, `HARMONIC_TIME_SCALE`). TimeControlNode's
+  Slow speed, selected by default, multiplies those rates by 0.4. Every frequency in the model is a
+  true SI value and the readouts say so.
 - **The two integrators are different on purpose.** The lattice is conservative and needs a symplectic
   method (velocity Verlet); the modal bank is damped and driven and needs accuracy over thousands of
   cycles (RK4). Don't unify them.

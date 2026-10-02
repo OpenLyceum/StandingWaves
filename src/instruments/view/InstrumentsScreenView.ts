@@ -21,16 +21,13 @@ import { Range } from "scenerystack/dot";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { StringUtils } from "scenerystack/phetcommon";
 import { Node, Text, VBox } from "scenerystack/scenery";
-import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { leftEnd, type PipeTermination, rightEnd } from "../../common/model/PipeTermination.js";
-import {
-  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RESET_ALL_BUTTON_OPTIONS,
-} from "../../common/StandingWavesButtonOptions.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
+import { createTimeControl } from "../../common/view/createTimeControl.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
-import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -225,25 +222,13 @@ export class InstrumentsScreenView extends ScreenView {
     readout.y = spectrum.y + SPECTRUM_SIZE.height + SCREEN_VIEW_MARGIN * 2 + 14;
     this.addChild(readout);
 
-    const timeControl = new TimeControlNode(model.timer.isPlayingProperty, {
-      playPauseStepButtonOptions: {
-        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-        stepForwardButtonOptions: {
-          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
-          listener: () => {
-            model.stepForward();
-            this.updatePipe();
-          },
-        },
-      },
+    const timeControl = createTimeControl(model.timer, () => {
+      model.stepForward();
+      this.updatePipe();
     });
     timeControl.left = SCREEN_VIEW_MARGIN;
     timeControl.bottom = this.layoutBounds.maxY - SCREEN_VIEW_MARGIN;
     this.addChild(timeControl);
-    const slowMotionControl = new SlowMotionControl(model.timer);
-    slowMotionControl.centerX = timeControl.centerX;
-    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
-    this.addChild(slowMotionControl);
 
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
@@ -265,7 +250,7 @@ export class InstrumentsScreenView extends ScreenView {
 
     this.addChild(
       new Node({
-        pdomOrder: [presetPanel.presetRadioButtons, slowMotionControl, timeControl, resetAllButton],
+        pdomOrder: [presetPanel.presetRadioButtons, timeControl, resetAllButton],
       }),
     );
 

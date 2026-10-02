@@ -28,7 +28,6 @@
   },
   "controls": {
     "pipeLength": "Pipe length",
-    "slowMotion": "Slow motion",
     "reset": "Reset"
   },
   "reflection": {
@@ -96,7 +95,7 @@
     "reflection": {
       "screenSummary": {
         "playArea": "A pipe lies across the play area with a chain of air particles inside it. Below the pipe, two graphs trace the particle displacement and the acoustic pressure along its length. The near end of the pipe is rigid; the far end is either closed or open.",
-        "controlArea": "The control area has a button that launches a pulse, a control for the far end of the pipe, a checkbox that shows both far ends at once for comparison, playback controls with slow motion, and a Reset All button.",
+        "controlArea": "The control area has a button that launches a pulse, a control for the far end of the pipe, a checkbox that shows both far ends at once for comparison, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Launch a pulse and watch what the far end does to it."
       },
       "currentDetails": {
@@ -117,7 +116,7 @@
     "phaseRelationships": {
       "screenSummary": {
         "playArea": "A pipe of air particles oscillating back and forth along its axis, with a movable reference point carrying a displacement arrow and a velocity arrow. Below the pipe, graphs trace displacement, velocity and pressure along its length.",
-        "controlArea": "The control area has a direction control for the wave, a wavelength control, a checkbox showing the equations, playback controls with slow motion, and a Reset All button.",
+        "controlArea": "The control area has a direction control for the wave, a wavelength control, a checkbox showing the equations, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Reverse the direction of travel and watch what happens to the velocity and pressure curves."
       },
       "currentDetails": {
@@ -134,7 +133,7 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "A pipe whose two ends can each be closed or open, driven at one end. Inside, a standing wave in displacement and pressure, with markers on the nodes and antinodes. Beside it, a ladder of the harmonics this pipe can sound.",
-        "controlArea": "The control area has a termination control for the pipe ends, broad and fine drive frequency sliders, a ladder of harmonics to snap to, a pipe length control, a checkbox for the node markers, playback controls with slow motion, and a Reset All button.",
+        "controlArea": "The control area has a termination control for the pipe ends, broad and fine drive frequency sliders, a ladder of harmonics to snap to, a pipe length control, a checkbox for the node markers, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Choose a termination, then sweep the frequency to find a resonance — or snap straight to a harmonic."
       },
       "currentDetails": {
@@ -155,7 +154,7 @@
     "instruments": {
       "screenSummary": {
         "playArea": "A pipe set up as one of four instruments, with its standing wave inside, beside a bar chart of the harmonics that pipe can sound.",
-        "controlArea": "The control area has a control that selects the instrument, playback controls with slow motion, and a Reset All button.",
+        "controlArea": "The control area has a control that selects the instrument, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Compare the flute with the clarinet: same length, but not the same harmonics."
       },
       "currentDetails": {

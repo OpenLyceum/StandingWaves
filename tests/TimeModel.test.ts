@@ -7,6 +7,7 @@
  * fleet-wide CI "test" step has something to run.
  */
 
+import { TimeSpeed } from "scenerystack/scenery-phet";
 import { describe, expect, it } from "vitest";
 import { TimeModel } from "../src/common/TimeModel.js";
 
@@ -49,14 +50,14 @@ describe("TimeModel", () => {
     model.dispose();
   });
 
-  it("starts in slow motion and restores it on reset", () => {
+  it("starts at Slow speed and restores it on reset", () => {
     const model = new TimeModel(true);
-    expect(model.slowMotionProperty.value).toBe(true);
+    expect(model.timeSpeedProperty.value).toBe(TimeSpeed.SLOW);
     expect(model.speedMultiplier).toBe(0.4);
-    model.slowMotionProperty.value = false;
+    model.timeSpeedProperty.value = TimeSpeed.NORMAL;
     expect(model.speedMultiplier).toBe(1);
     model.reset();
-    expect(model.slowMotionProperty.value).toBe(true);
+    expect(model.timeSpeedProperty.value).toBe(TimeSpeed.SLOW);
     model.dispose();
   });
 });

@@ -82,8 +82,8 @@ export const PIPE_LENGTH_RANGE_M = new Range(0.2, 1.0);
 // So the *clock* is slowed and the physics is left alone — every frequency,
 // length and speed in the model is a true SI value, and each screen advances
 // model time at a fraction of wall-clock time. That keeps the readouts honest
-// (the sim really does say 343 Hz). TimeModel's Slow motion toggle multiplies
-// these base rates by 0.4 by default. Do not "fix" this by scaling c or fₙ.
+// (the sim really does say 343 Hz). TimeControlNode's Slow speed multiplies
+// these base rates by 0.4 and is selected by default. Do not "fix" this by scaling c or fₙ.
 
 /**
  * Normal-speed model seconds per wall-clock second on Reflection. A pulse crosses
@@ -93,11 +93,19 @@ export const PIPE_LENGTH_RANGE_M = new Range(0.2, 1.0);
 export const REFLECTION_TIME_SCALE = 1 / 2000;
 
 /**
- * Normal-speed model seconds per wall-clock second on Phase, Standing Waves and
- * Instruments screens. The 343 Hz fundamental then oscillates at an apparent
- * 1.7 Hz, or 0.69 Hz with Slow motion selected by default.
+ * Normal-speed model seconds per wall-clock second on Standing Waves and
+ * Instruments. The 343 Hz fundamental then oscillates at an apparent 1.7 Hz,
+ * or 0.69 Hz with Slow selected by default.
  */
 export const HARMONIC_TIME_SCALE = 1 / 200;
+
+/**
+ * Normal-speed model seconds per wall-clock second on Phase. The default wave
+ * is one wavelength long, so f = c/L = 686 Hz — twice the 343 Hz fundamental
+ * of the other screens. Half of {@link HARMONIC_TIME_SCALE} puts that wave at
+ * the same apparent 1.7 Hz, or 0.69 Hz with Slow selected.
+ */
+export const PHASE_TIME_SCALE = 1 / 400;
 
 /** Default Slow motion rate relative to each screen's normal clock rate. */
 export const SLOW_MOTION_MULTIPLIER = 0.4;
@@ -220,6 +228,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   PIPE_LENGTH_RANGE_M,
   REFLECTION_TIME_SCALE,
   HARMONIC_TIME_SCALE,
+  PHASE_TIME_SCALE,
   SLOW_MOTION_MULTIPLIER,
   CHAIN_MASS_COUNT,
   PULSE_WIDTH_FRACTION,

@@ -39,8 +39,8 @@ import {
 } from "../../common/model/acoustics.js";
 import { TimeModel } from "../../common/TimeModel.js";
 import {
-  HARMONIC_TIME_SCALE,
   MAX_FRAME_DT_S,
+  PHASE_TIME_SCALE,
   PHASE_WAVELENGTH_RANGE_FRACTION,
   PIPE_LENGTH_DEFAULT_M,
 } from "../../StandingWavesConstants.js";
@@ -181,7 +181,7 @@ export class PhaseModel implements TModel {
   }
 
   private toModelTime(dt: number): number {
-    return Math.min(dt, MAX_FRAME_DT_S) * HARMONIC_TIME_SCALE * this.timer.speedMultiplier;
+    return Math.min(dt, MAX_FRAME_DT_S) * PHASE_TIME_SCALE * this.timer.speedMultiplier;
   }
 
   private advancePhase(modelDt: number): void {

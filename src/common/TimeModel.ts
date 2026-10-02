@@ -31,6 +31,7 @@
  *   import { TimeControlNode } from "scenerystack/scenery-phet";
  *
  *   const timeControl = new TimeControlNode( model.timer.isPlayingProperty, {
+ *     timeSpeedProperty: model.timer.timeSpeedProperty,
  *     playPauseStepButtonOptions: {
  *       stepForwardButtonOptions: {
  *         listener: () => model.step( 1 / 60 ),
@@ -44,27 +45,33 @@
  *   new TimeModel( true )     // starts playing  (continuous animations)
  */
 
-import { BooleanProperty, NumberProperty } from "scenerystack/axon";
+import { BooleanProperty, EnumerationProperty, NumberProperty } from "scenerystack/axon";
+import { TimeSpeed } from "scenerystack/scenery-phet";
 import { SLOW_MOTION_MULTIPLIER } from "../StandingWavesConstants.js";
 
 export class TimeModel {
   /** Whether the simulation clock is running. Bind to TimeControlNode. */
   public readonly isPlayingProperty: BooleanProperty;
 
-  /** Slows animation to 40% of the usual rate without changing model units. */
-  public readonly slowMotionProperty: BooleanProperty;
+  /**
+   * Playback speed for TimeControlNode's Normal / Slow radios. Slow is the
+   * initial value: audible frequencies are still quick at the screen's normal
+   * clock rate.
+   */
+  public readonly timeSpeedProperty: EnumerationProperty<TimeSpeed>;
 
   /** Elapsed simulation time in seconds. Resets to 0 on reset(). */
   public readonly timeProperty: NumberProperty;
 
   public constructor(initiallyPlaying = false) {
     this.isPlayingProperty = new BooleanProperty(initiallyPlaying);
-    this.slowMotionProperty = new BooleanProperty(true);
+    this.timeSpeedProperty = new EnumerationProperty(TimeSpeed.SLOW);
     this.timeProperty = new NumberProperty(0, { units: "s" });
   }
 
+  /** Slow is 40% of the screen's normal clock rate. */
   public get speedMultiplier(): number {
-    return this.slowMotionProperty.value ? SLOW_MOTION_MULTIPLIER : 1;
+    return this.timeSpeedProperty.value === TimeSpeed.SLOW ? SLOW_MOTION_MULTIPLIER : 1;
   }
 
   /**
@@ -90,14 +97,14 @@ export class TimeModel {
   /** Resets clock and playback state to their initial values. */
   public reset(): void {
     this.isPlayingProperty.reset();
-    this.slowMotionProperty.reset();
+    this.timeSpeedProperty.reset();
     this.timeProperty.reset();
   }
 
   /** Call when the model is no longer needed to free AXON listeners. */
   public dispose(): void {
     this.isPlayingProperty.dispose();
-    this.slowMotionProperty.dispose();
+    this.timeSpeedProperty.dispose();
     this.timeProperty.dispose();
   }
 }

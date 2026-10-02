@@ -16,14 +16,11 @@
 import { DerivedProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
-import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { EndCondition } from "../../common/model/PipeTermination.js";
-import {
-  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RESET_ALL_BUTTON_OPTIONS,
-} from "../../common/StandingWavesButtonOptions.js";
-import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
+import { createTimeControl } from "../../common/view/createTimeControl.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesPreferencesModel } from "../../preferences/StandingWavesPreferencesModel.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -97,17 +94,9 @@ export class ReflectionScreenView extends ScreenView {
     const controlPanel = new ReflectionControlPanel(model);
     this.addChild(controlPanel);
 
-    const timeControl = new TimeControlNode(model.timer.isPlayingProperty, {
-      playPauseStepButtonOptions: {
-        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-        stepForwardButtonOptions: {
-          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
-          listener: () => {
-            model.stepForward();
-            this.updatePipes();
-          },
-        },
-      },
+    const timeControl = createTimeControl(model.timer, () => {
+      model.stepForward();
+      this.updatePipes();
     });
     this.addChild(timeControl);
 
@@ -153,12 +142,8 @@ export class ReflectionScreenView extends ScreenView {
 
     controlPanel.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
     controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
-    timeControl.centerX = controlPanel.centerX;
+    timeControl.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
     timeControl.bottom = resetAllButton.top - SCREEN_VIEW_MARGIN;
-    const slowMotionControl = new SlowMotionControl(model.timer);
-    slowMotionControl.centerX = timeControl.centerX;
-    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
-    this.addChild(slowMotionControl);
 
     // ── Accessibility: reading and tab order ──────────────────────────────────
     this.addChild(
@@ -167,7 +152,6 @@ export class ReflectionScreenView extends ScreenView {
           controlPanel.launchButton,
           controlPanel.farEndRadioButtons,
           controlPanel.compareCheckbox,
-          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

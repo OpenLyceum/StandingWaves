@@ -20,16 +20,13 @@ import { BooleanProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
-import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { EndCondition } from "../../common/model/PipeTermination.js";
-import {
-  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RESET_ALL_BUTTON_OPTIONS,
-} from "../../common/StandingWavesButtonOptions.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
+import { createTimeControl } from "../../common/view/createTimeControl.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
-import { SlowMotionControl } from "../../common/view/SlowMotionControl.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -196,17 +193,9 @@ export class PhaseScreenView extends ScreenView {
     equations.top = controlPanel.bottom + STRIP_SPACING;
     this.addChild(equations);
 
-    const timeControl = new TimeControlNode(model.timer.isPlayingProperty, {
-      playPauseStepButtonOptions: {
-        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-        stepForwardButtonOptions: {
-          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
-          listener: () => {
-            model.stepForward();
-            this.updateWave();
-          },
-        },
-      },
+    const timeControl = createTimeControl(model.timer, () => {
+      model.stepForward();
+      this.updateWave();
     });
     this.addChild(timeControl);
 
@@ -221,12 +210,8 @@ export class PhaseScreenView extends ScreenView {
     });
     this.addChild(resetAllButton);
 
-    timeControl.centerX = controlPanel.centerX;
+    timeControl.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
     timeControl.bottom = resetAllButton.top - SCREEN_VIEW_MARGIN;
-    const slowMotionControl = new SlowMotionControl(model.timer);
-    slowMotionControl.centerX = timeControl.centerX;
-    slowMotionControl.bottom = timeControl.top - STRIP_SPACING;
-    this.addChild(slowMotionControl);
 
     this.addChild(
       new Node({
@@ -235,7 +220,6 @@ export class PhaseScreenView extends ScreenView {
           controlPanel.wavelengthControl,
           controlPanel.equationsCheckbox,
           this.marker,
-          slowMotionControl,
           timeControl,
           resetAllButton,
         ],

@@ -32,6 +32,7 @@ current and specific; neither is a stub.
 | Terminations, mode ladder | `src/common/model/PipeTermination.ts` |
 | φₕ(x), ψₕ(x), node positions | `src/common/model/modeShapes.ts` |
 | Driven modal bank | `src/common/model/PipeModalModel.ts` |
+| When nodes exist to mark (`standingModeProperty`) | `src/common/model/PipeModalModel.ts`, `src/standing-waves/view/NodeMarkersNode.ts` |
 | Velocity-Verlet lattice | `src/reflection/model/SpringChainModel.ts` |
 | Closed-form travelling wave | `src/phase-relationships/model/PhaseModel.ts` |
 | Chart chrome (ported from WaveComposer) | `src/common/view/ChartFrame.ts` |
@@ -42,6 +43,7 @@ current and specific; neither is a stub.
 | Pipe, walls and end treatments | `src/common/view/PipeNode.ts` |
 | Themed slider | `src/common/view/StandingWavesNumberControl.ts` |
 | Drive-frequency slider (per-pipe range, mode ticks) | `src/standing-waves/view/DriveFrequencyControl.ts` |
+| Automatic frequency sweep (model: `isSweepingProperty`, `getSweepRate`) | `src/common/model/PipeModalModel.ts`, `src/standing-waves/view/SweepButton.ts` |
 | Constants (SI + layout px) | `src/StandingWavesConstants.ts` |
 | Colors | `src/StandingWavesColors.ts` |
 
@@ -74,7 +76,7 @@ full a11y wiring all pass Baton's compliance check as-is.
 
 ## Testing
 
-162 vitest specs; `happy-dom`, template `tests/setup.ts`.
+174 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -82,9 +84,9 @@ full a11y wiring all pass Baton's compliance check as-is.
 | `tests/PipeTermination.test.ts` | c/2L, c/4L, the exact 2:1 octave, the odd series |
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
-| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range |
+| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range, the automatic sweep, when the pipe holds a standing mode |
 | `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
-| `tests/DriveFrequencyControl.test.ts` | each mode tick sits under the thumb for every pipe; odd-only ticks on a stopped pipe |
+| `tests/DriveFrequencyControl.test.ts` | each mode tick sits under the thumb for every pipe; odd-only ticks on a stopped pipe; manual tuning locked while sweeping |
 | `tests/PhaseModel.test.ts` | δρ/ρ = −∂ξ/∂x, peak kA, the pair's kΔx lag and finite-difference squeeze |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |
 

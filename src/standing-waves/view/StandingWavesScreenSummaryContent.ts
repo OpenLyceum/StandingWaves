@@ -9,6 +9,9 @@
  * the whole feedback loop of the frequency slider, and a description that only ever
  * named the frequency would hide it.
  *
+ * During an automatic sweep a sentence in front says so, since the frequency in
+ * the rest of the paragraph is then changing on its own.
+ *
  * With density shading on, a second sentence says where the density swings: at the
  * displacement nodes, not the antinodes — the place a learner least expects it.
  */
@@ -32,10 +35,12 @@ export class StandingWavesScreenSummaryContent extends ScreenSummaryContent {
         pipe.isDrivingProperty,
         pipe.nearestHarmonicProperty,
         pipe.driveFrequencyProperty,
+        pipe.isSweepingProperty,
         model.showDensityProperty,
         details.atResonanceStringProperty,
         details.offResonanceStringProperty,
         details.silentStringProperty,
+        details.sweepingStringProperty,
         details.densityStringProperty,
       ],
       (
@@ -43,10 +48,12 @@ export class StandingWavesScreenSummaryContent extends ScreenSummaryContent {
         isDriving: boolean,
         harmonic: number,
         frequency: number,
+        isSweeping: boolean,
         showDensity: boolean,
         atPattern: string,
         offPattern: string,
         silent: string,
+        sweeping: string,
         density: string,
       ) => {
         const hertz = StringUtils.toFixedLTR(frequency, 0);
@@ -55,7 +62,8 @@ export class StandingWavesScreenSummaryContent extends ScreenSummaryContent {
           : atResonance
             ? atPattern.replace("{{harmonic}}", `${harmonic}`).replace("{{frequency}}", hertz)
             : offPattern.replace("{{frequency}}", hertz);
-        return showDensity ? `${state} ${density}` : state;
+        const sweepState = isSweeping ? `${sweeping} ${state}` : state;
+        return showDensity ? `${sweepState} ${density}` : sweepState;
       },
     );
 

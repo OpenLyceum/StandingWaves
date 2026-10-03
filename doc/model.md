@@ -198,6 +198,35 @@ arrow buttons stay under the ~14 Hz width of a resonance. Crossing to a
 different harmonic starts its modal build-up from rest so the old mode does not obscure the new
 pattern on the higher harmonic's smaller display scale.
 
+**Automatic sweep.** A toggle beside the slider (after the Resonance sim's) sweeps the drive from
+0.5 f₁ to 8.5 f₁ linearly, advanced in `PipeModalModel.step` so it runs on model time and pauses and
+slows with the clock. Its pace is stated against the pipe's own response: one resonance width f₁/Q₁
+per 0.3 τ (`SWEEP_CROSSING_TIME_CONSTANTS`), i.e. a rate πf₁²/(0.3·Q₁²) Hz per model second. Every
+mode then rises to the same ~0.6 of its steady-state amplitude as the drive passes — a clear peak,
+not a settled one; sitting on a resonance is still the slider's and the ladder's job. The default
+open pipe sweeps in about 128 s of wall clock at Normal (320 s on Slow); a stopped pipe of the same
+length, with half the f₁, takes twice that. While sweeping, crossing to another harmonic does **not**
+clear the modal state, so the mode just passed visibly rings down. The sweep ends at the top, when
+the driver is switched off, or when the drive is retuned from the ladder.
+
+**When there are nodes to mark.** Nodes belong to one mode's established pattern, not to the drive
+frequency, so the node markers follow `standingModeProperty`, read off the modal state every step.
+Mode h is the standing mode when (1) its envelope has reached `STANDING_MODE_MIN_FRACTION` = 0.25 of
+its resonant amplitude, and (2) at each of h's displacement nodes the other modes together could move
+ξ by at most `STANDING_MODE_MAX_IMPURITY` = 0.25 of h's antinode, and likewise p at each pressure
+node (worst case, every envelope in phase). Once shown, both thresholds relax by
+`STANDING_MODE_HYSTERESIS` = 0.6 before the mode is dropped. Consequences: from rest the markers
+appear after τ·ln(4/3) ≈ 0.29 τ, not when the drive lands on the rung; they stay through a ring-down
+until the envelope falls to 0.15, i.e. τ·ln(1/0.15) ≈ 1.9 τ after the driver stops; a drive between
+two rungs, or a faint off-resonance response, has none; and a sweep lights each mode once, in order.
+
+A driven mode's envelope is not √(aₕ² + (ȧₕ/ωₕ)²): it moves at the drive's ω in steady state and at its
+own ωₕ in transient, and dividing by the wrong one inflates a low mode under a high drive by ω/ωₕ.
+`modeEnvelope` splits off the closed-form steady part A·cos(Θ − δ) and treats the remainder as a free
+oscillation at ωₕ, then sums the two phasors. Comparing envelopes over the whole pipe rather than at
+the nodes was also wrong: at h = 4 on a sweep, the lower modes' combined displacement is 27 % of
+mode 4's, yet almost none of it falls at mode 4's nodes.
+
 The driver sits at the left end and is whatever kind of source that end admits: a pressure source (a
 reed) against a closed end, a volume-velocity source (a jet) at an open one. Each couples to the
 quantity its end has an antinode in, so both couple equally to every mode — which is *why* a reed at

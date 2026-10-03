@@ -150,6 +150,7 @@ describe("View nodes release the model Properties they linked", () => {
       pipe.nearestHarmonicProperty,
       pipe.isAtResonanceProperty,
       pipe.isDrivingProperty,
+      pipe.standingModeProperty,
     ];
     const before = watched.map(listenerCount);
 
@@ -185,7 +186,7 @@ describe("View nodes release the model Properties they linked", () => {
           new StringProperty("Drive frequency"),
           new StringProperty("Drive frequency"),
           new StringProperty("{{value}} Hz"),
-          { trackWidth: 180 },
+          { trackWidth: 180, sweepAccessibleName: new StringProperty("Sweep") },
         ),
     );
     pipe.dispose();

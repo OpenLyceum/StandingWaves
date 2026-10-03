@@ -19,7 +19,11 @@ import { BULK_MODULUS } from "../src/common/model/acoustics.js";
 import { displacementShape } from "../src/common/model/modeShapes.js";
 import { PipeModalModel } from "../src/common/model/PipeModalModel.js";
 import { PipeTermination } from "../src/common/model/PipeTermination.js";
-import { FUNDAMENTAL_QUALITY_FACTOR } from "../src/StandingWavesConstants.js";
+import {
+  FUNDAMENTAL_QUALITY_FACTOR,
+  STANDING_MODE_HYSTERESIS,
+  STANDING_MODE_MIN_FRACTION,
+} from "../src/StandingWavesConstants.js";
 
 /** Runs the model for `duration` model seconds in fixed steps. */
 function run(model: PipeModalModel, duration: number, stepCount = 2000): void {
@@ -480,5 +484,210 @@ describe("reset", () => {
     expect(model.modalAmplitude(1)).toBe(0);
     expect(model.displacementAt(0.25)).toBe(0);
     model.dispose();
+  });
+});
+
+describe("automatic frequency sweep", () => {
+  /** One 60 Hz frame of model time on the Standing Waves screen at Normal speed. */
+  const FRAME_DT = 1 / 60 / 200;
+
+  /** Runs a sweep to completion; returns each mode's peak |aₕ| over its resonant amplitude. */
+  function sweepPeaks(model: PipeModalModel): number[] {
+    model.isSweepingProperty.value = true;
+    const peaks = new Array<number>(9).fill(0);
+    let previous = model.driveFrequencyProperty.value;
+    for (let frame = 0; model.isSweepingProperty.value; frame++) {
+      expect(frame).toBeLessThan(1e5);
+      model.step(FRAME_DT);
+      const frequency = model.driveFrequencyProperty.value;
+      expect(frequency).toBeGreaterThanOrEqual(previous);
+      previous = frequency;
+      for (let h = 1; h <= 8; h++) {
+        const ratio = Math.abs(model.modalAmplitude(h)) / model.resonantAmplitude(h);
+        peaks[h] = Math.max(peaks[h] ?? 0, ratio);
+      }
+    }
+    return peaks;
+  }
+
+  it("starts at the bottom of the range with the driver on, and stops at the top", () => {
+    const model = new PipeModalModel();
+    model.isDrivingProperty.value = false;
+    model.tuneToHarmonic(4);
+    const range = model.driveFrequencyRangeProperty.value;
+    model.isSweepingProperty.value = true;
+    expect(model.isDrivingProperty.value).toBe(true);
+    expect(model.driveFrequencyProperty.value).toBe(range.min);
+    sweepPeaks(model);
+    expect(model.isSweepingProperty.value).toBe(false);
+    expect(model.driveFrequencyProperty.value).toBe(range.max);
+    model.dispose();
+  });
+
+  it("raises every mode to the same clear peak, since its pace is set in units of τ", () => {
+    for (const termination of [PipeTermination.OPEN_OPEN, PipeTermination.CLOSED_OPEN]) {
+      const model = new PipeModalModel({ termination });
+      const peaks = sweepPeaks(model);
+      const allowed = model.getAllowedHarmonics().filter((h) => h <= 8);
+      const fundamentalPeak = peaks[1] ?? 0;
+      // A chirped oscillator crossing its width in 0.3 τ reaches roughly 0.6 of
+      // its steady state (√(π·0.3) ≈ 0.97 is the fast-sweep upper estimate).
+      expect(fundamentalPeak).toBeGreaterThan(0.3);
+      expect(fundamentalPeak).toBeLessThan(0.8);
+      for (const h of allowed) {
+        expect(peaks[h]).toBeCloseTo(fundamentalPeak, 1);
+      }
+      for (let h = 1; h <= 8; h++) {
+        if (!allowed.includes(h)) {
+          expect(peaks[h]).toBe(0);
+        }
+      }
+      model.dispose();
+    }
+  });
+
+  it("sweeps at a rate proportional to f₁², so a half-length pipe sweeps 4× faster", () => {
+    const model = new PipeModalModel();
+    const longRate = model.getSweepRate();
+    model.pipeLengthProperty.value /= 2;
+    expect(model.getSweepRate()).toBeCloseTo(4 * longRate, 6);
+    model.dispose();
+  });
+
+  it("advances only in model time", () => {
+    const model = new PipeModalModel();
+    model.isSweepingProperty.value = true;
+    const start = model.driveFrequencyProperty.value;
+    model.step(0);
+    expect(model.driveFrequencyProperty.value).toBe(start);
+    model.step(FRAME_DT);
+    expect(model.driveFrequencyProperty.value).toBeCloseTo(start + model.getSweepRate() * FRAME_DT, 9);
+    model.dispose();
+  });
+
+  it("keeps the passed mode ringing across the midpoint between harmonics", () => {
+    const model = new PipeModalModel();
+    model.isSweepingProperty.value = true;
+    while (model.nearestHarmonicProperty.value < 2) {
+      model.step(FRAME_DT);
+    }
+    // Outside a sweep, crossing into harmonic 2 would zero mode 1 here.
+    expect(model.modalAmplitude(1)).not.toBe(0);
+    model.dispose();
+  });
+
+  it("ends when the driver is switched off, the drive is retuned, or on reset", () => {
+    const model = new PipeModalModel();
+    model.isSweepingProperty.value = true;
+    model.isDrivingProperty.value = false;
+    expect(model.isSweepingProperty.value).toBe(false);
+
+    model.isSweepingProperty.value = true;
+    model.jumpToHarmonic(3);
+    expect(model.isSweepingProperty.value).toBe(false);
+    expect(model.nearestHarmonicProperty.value).toBe(3);
+
+    model.isSweepingProperty.value = true;
+    model.reset();
+    expect(model.isSweepingProperty.value).toBe(false);
+    model.dispose();
+  });
+});
+
+describe("standing mode — when there are nodes to mark", () => {
+  /** One 60 Hz frame of model time on the Standing Waves screen at Normal speed. */
+  const FRAME_DT = 1 / 60 / 200;
+
+  /** Steps until `done` or `limit` model seconds; returns the model time taken. */
+  function runUntil(model: PipeModalModel, done: () => boolean, limit: number): number {
+    let t = 0;
+    while (!done() && t < limit) {
+      model.step(FRAME_DT);
+      t += FRAME_DT;
+    }
+    return t;
+  }
+
+  it("holds every allowed rung through whole cycles once settled", () => {
+    for (const termination of [PipeTermination.OPEN_OPEN, PipeTermination.CLOSED_OPEN]) {
+      const model = new PipeModalModel({ termination });
+      for (const h of model.getAllowedHarmonics().filter((n) => n <= 8)) {
+        model.jumpToHarmonic(h);
+        expect(model.standingModeProperty.value).toBe(h);
+        // Several of the fundamental's periods, so every phase of every mode is seen.
+        const periods = 3 / model.fundamentalFrequencyProperty.value;
+        for (let t = 0; t < periods; t += FRAME_DT) {
+          model.step(FRAME_DT);
+          expect(model.standingModeProperty.value).toBe(h);
+        }
+      }
+      model.dispose();
+    }
+  });
+
+  it("marks nothing at rest, or when driven midway between two rungs", () => {
+    for (const termination of [PipeTermination.OPEN_OPEN, PipeTermination.CLOSED_OPEN]) {
+      const model = new PipeModalModel({ termination });
+      expect(model.standingModeProperty.value).toBe(0);
+      const f1 = model.fundamentalFrequencyProperty.value;
+      const allowed = model.getAllowedHarmonics().filter((h) => h <= 8);
+      for (let i = 0; i + 1 < allowed.length; i++) {
+        model.driveFrequencyProperty.value = (((allowed[i] ?? 0) + (allowed[i + 1] ?? 0)) / 2) * f1;
+        model.settleToSteadyState();
+        run(model, 2 / f1, 200);
+        expect(model.standingModeProperty.value).toBe(0);
+      }
+      model.dispose();
+    }
+  });
+
+  it("appears once a resonance has built to the threshold, not when the drive arrives", () => {
+    const model = new PipeModalModel();
+    const tau = model.buildUpTimeConstant(1);
+    // From rest the envelope grows as 1 − e^(−t/τ).
+    const expected = -tau * Math.log(1 - STANDING_MODE_MIN_FRACTION);
+    model.step(FRAME_DT);
+    expect(model.standingModeProperty.value).toBe(0);
+    const t = runUntil(model, () => model.standingModeProperty.value === 1, 5 * tau);
+    expect(t).toBeGreaterThan(0.8 * expected);
+    expect(t).toBeLessThan(1.3 * expected);
+    model.dispose();
+  });
+
+  it("stays through the ring-down after the driver stops, until it has died away", () => {
+    const model = new PipeModalModel();
+    model.jumpToHarmonic(1);
+    const tau = model.buildUpTimeConstant(1);
+    model.isDrivingProperty.value = false;
+    // A free mode decays as e^(−t/τ) from full resonant amplitude to the exit threshold.
+    const expected = -tau * Math.log(STANDING_MODE_HYSTERESIS * STANDING_MODE_MIN_FRACTION);
+    const t = runUntil(model, () => model.standingModeProperty.value !== 1, 10 * tau);
+    expect(model.standingModeProperty.value).toBe(0);
+    expect(t).toBeGreaterThan(0.95 * expected);
+    expect(t).toBeLessThan(1.05 * expected);
+    model.dispose();
+  });
+
+  it("lights each mode once, in ladder order, as a sweep passes it", () => {
+    for (const termination of [PipeTermination.OPEN_OPEN, PipeTermination.CLOSED_OPEN]) {
+      const model = new PipeModalModel({ termination });
+      model.isSweepingProperty.value = true;
+      const seen: number[] = [];
+      let previous = 0;
+      runUntil(
+        model,
+        () => {
+          const mode = model.standingModeProperty.value;
+          if (mode !== previous && mode !== 0) {
+            seen.push(mode);
+          }
+          previous = mode;
+          return !model.isSweepingProperty.value;
+        },
+        1e3,
+      );
+      expect(seen).toEqual(model.getAllowedHarmonics().filter((h) => h <= 8));
+      model.dispose();
+    }
   });
 });

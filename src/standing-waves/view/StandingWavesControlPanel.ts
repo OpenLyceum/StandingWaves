@@ -13,6 +13,10 @@
  * so they can also just *be* at one. Neither alone teaches the whole idea: the
  * sweep shows that the pipe is selective, the ladder shows what it selects.
  *
+ * The sweep button beside the slider's title runs the hunt automatically, from
+ * the bottom of the range to the top, so every resonance swells and fades in turn
+ * and the pipe's selectivity shows without any dragging.
+ *
  * The badge reports which of the two states the pipe is currently in, and it is
  * derived from the same model Property the physics uses, so it cannot disagree with
  * what the pipe is doing.
@@ -101,7 +105,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       standingWaves.driveFrequencyStringProperty,
       a11y.controls.driveFrequencyStringProperty,
       units.hertzStringProperty,
-      { trackWidth: PANEL_WIDTH - 20 },
+      { trackWidth: PANEL_WIDTH - 20, sweepAccessibleName: a11y.controls.sweepStringProperty },
     );
 
     const lengthControl = new StandingWavesNumberControl(

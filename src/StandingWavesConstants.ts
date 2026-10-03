@@ -184,6 +184,45 @@ export const DRIVE_FREQUENCY_RANGE_HARMONICS = new Range(0.5, 8.5);
  */
 export const RESONANCE_BANDWIDTH_FRACTION = 0.5;
 
+/**
+ * Pace of the automatic frequency sweep, as the model time it spends crossing one
+ * resonance width f₁/Q₁, in units of the build-up time τ = Q₁/(πf₁).
+ *
+ * Stated against τ rather than in Hz/s so that every pipe sweeps the same way
+ * relative to its own response: a mode crossed in a fraction of τ still rises to
+ * a clear peak (a chirped oscillator reaches about √(π·t/τ) of its steady state),
+ * but does not fully settle, so the sweep shows *where* the resonances are while
+ * the slider and the ladder remain the way to *sit on* one. At this pace the
+ * default pipe's full 0.5 f₁ – 8.5 f₁ sweep takes about two minutes of wall clock
+ * at Normal speed.
+ */
+export const SWEEP_CROSSING_TIME_CONSTANTS = 0.3;
+
+/**
+ * When the pipe is said to *have* nodes and antinodes. A node is a property of one
+ * mode's shape, so a mode h is the standing mode only when
+ *
+ *   - its envelope has reached at least this fraction of its resonant amplitude,
+ *     so a faint off-resonance sliver or the first moments of a build-up do not
+ *     count, and
+ */
+export const STANDING_MODE_MIN_FRACTION = 0.25;
+
+/**
+ *   - every other mode together is at most this fraction of it in displacement, so
+ *     the zeros of the sum really sit still at that mode's nodes rather than
+ *     swimming between two patterns (a drive between two rungs, or the mode just
+ *     passed still ringing down during a sweep).
+ */
+export const STANDING_MODE_MAX_IMPURITY = 0.25;
+
+/**
+ * Once a mode is the standing mode, both thresholds above are relaxed by this
+ * factor before it is dropped, so a pattern hovering at a threshold does not make
+ * the markers flicker.
+ */
+export const STANDING_MODE_HYSTERESIS = 0.6;
+
 // ── Phase screen: the travelling wave ─────────────────────────────────────────
 
 /**
@@ -248,6 +287,10 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   FUNDAMENTAL_QUALITY_FACTOR,
   DRIVE_FREQUENCY_RANGE_HARMONICS,
   RESONANCE_BANDWIDTH_FRACTION,
+  SWEEP_CROSSING_TIME_CONSTANTS,
+  STANDING_MODE_MIN_FRACTION,
+  STANDING_MODE_MAX_IMPURITY,
+  STANDING_MODE_HYSTERESIS,
   PARTICLE_COUNT,
   PARTICLE_AMPLITUDE_SPACINGS,
   PHASE_WAVELENGTH_RANGE_FRACTION,

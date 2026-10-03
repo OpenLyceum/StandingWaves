@@ -78,9 +78,13 @@ import {
   PIPE_LENGTH_DEFAULT_M,
   PIPE_LENGTH_RANGE_M,
   RESONANCE_BANDWIDTH_FRACTION,
+  STANDING_MODE_HYSTERESIS,
+  STANDING_MODE_MAX_IMPURITY,
+  STANDING_MODE_MIN_FRACTION,
+  SWEEP_CROSSING_TIME_CONSTANTS,
 } from "../../StandingWavesConstants.js";
 import { BULK_MODULUS } from "./acoustics.js";
-import { displacementShape, pressureShape } from "./modeShapes.js";
+import { displacementNodePositions, displacementShape, pressureNodePositions, pressureShape } from "./modeShapes.js";
 import {
   allowedHarmonics,
   createPipeTerminationProperty,
@@ -134,6 +138,15 @@ export class PipeModalModel {
   public readonly isDrivingProperty: BooleanProperty;
 
   /**
+   * Whether the drive frequency is sweeping upward on its own, advanced by
+   * {@link step} in *model* time so that pausing or slowing the clock pauses or
+   * slows the sweep with it. Set it true to start a sweep from the bottom of the
+   * range; it falls back to false at the top, when the driver is switched off, or
+   * when the drive is retuned by hand ({@link tuneToHarmonic}).
+   */
+  public readonly isSweepingProperty: BooleanProperty;
+
+  /**
    * Accumulated drive phase Θ = ∫ω dt (radians). Integrated rather than computed
    * as ωt so that dragging the frequency slider does not make the drive jump
    * discontinuously — the same trick as Resonance's `drivingPhaseProperty`.
@@ -158,6 +171,16 @@ export class PipeModalModel {
 
   /** Whether the drive sits inside the nearest mode's resonance band. */
   public readonly isAtResonanceProperty: TReadOnlyProperty<boolean>;
+
+  /**
+   * Harmonic whose standing pattern the pipe actually holds, or 0 when it holds
+   * none — the only time nodes and antinodes exist to be marked. Read off the
+   * modal state, not the drive: it is 0 while a resonance is still building, off
+   * resonance, between two rungs, and once a ring-down has died away, and it stays
+   * on a mode that rings on after the driver stops. See {@link STANDING_MODE_MIN_FRACTION}.
+   */
+  public readonly standingModeProperty: TReadOnlyProperty<number>;
+  private readonly standingModeNumberProperty: NumberProperty;
 
   /** Quality factor Q₁ of the fundamental; harmonic h has h·Q₁. */
   public readonly qualityFactor: number;
@@ -193,8 +216,11 @@ export class PipeModalModel {
       units: "Hz",
     });
     this.isDrivingProperty = new BooleanProperty(true);
+    this.isSweepingProperty = new BooleanProperty(false);
     this.drivePhaseProperty = new NumberProperty(0);
     this.stateChangeCountProperty = new NumberProperty(0);
+    this.standingModeNumberProperty = new NumberProperty(0);
+    this.standingModeProperty = this.standingModeNumberProperty;
 
     this.amplitudes = new Float64Array(MODE_COUNT);
     this.rates = new Float64Array(MODE_COUNT);
@@ -243,15 +269,50 @@ export class PipeModalModel {
     // A broad frequency sweep changes which mode the learner is inspecting.
     // Start that mode's build-up from rest; otherwise a low mode keeps ringing
     // against the much smaller scale of a high mode for many seconds.
+    //
+    // Not during an automatic sweep: there the ring-down of the mode just passed
+    // is part of what the learner is watching, and clearing it at each midpoint
+    // would snap the pipe still twice per harmonic.
     let selectedHarmonic = this.nearestHarmonicProperty.value;
     this.nearestHarmonicProperty.link((harmonic: number) => {
       if (harmonic !== selectedHarmonic) {
         selectedHarmonic = harmonic;
+        if (this.isSweepingProperty.value) {
+          return;
+        }
         this.amplitudes.fill(0);
         this.rates.fill(0);
+        this.updateStandingMode();
         this.stateChangeCountProperty.value++;
       }
     });
+
+    // A sweep always covers the whole range, so it starts from the bottom, and it
+    // turns the driver on, since sweeping a silent driver would show nothing.
+    this.isSweepingProperty.lazyLink((isSweeping: boolean) => {
+      if (isSweeping) {
+        this.isDrivingProperty.value = true;
+        this.driveFrequencyProperty.value = this.driveFrequencyRangeProperty.value.min;
+      }
+    });
+    this.isDrivingProperty.lazyLink((isDriving: boolean) => {
+      if (!isDriving) {
+        this.isSweepingProperty.value = false;
+      }
+    });
+  }
+
+  /**
+   * Rate of the automatic sweep for the current pipe (Hz per model second): one
+   * resonance width f₁/Q₁ every {@link SWEEP_CROSSING_TIME_CONSTANTS} build-up
+   * times τ = Q₁/(πf₁). It scales as f₁², so a short pipe sweeps its ladder in
+   * the same number of its own τ as a long one.
+   */
+  public getSweepRate(): number {
+    const fundamental = this.fundamentalFrequencyProperty.value;
+    const bandwidth = fundamental / this.qualityFactor;
+    const timeConstant = this.qualityFactor / (Math.PI * fundamental);
+    return bandwidth / (SWEEP_CROSSING_TIME_CONSTANTS * timeConstant);
   }
 
   /** Harmonic numbers the current pipe supports, ascending. */
@@ -391,9 +452,10 @@ export class PipeModalModel {
     return total;
   }
 
-  /** Sets the drive exactly onto harmonic h, if the pipe has one there. */
+  /** Sets the drive exactly onto harmonic h, if the pipe has one there. Ends any sweep. */
   public tuneToHarmonic(harmonicNumber: number): void {
     if (isModeAllowed(harmonicNumber, this.terminationProperty.value)) {
+      this.isSweepingProperty.value = false;
       this.driveFrequencyProperty.value = this.getModeFrequency(harmonicNumber);
     }
   }
@@ -459,6 +521,7 @@ export class PipeModalModel {
       }
     }
     this.drivePhaseProperty.value = 0;
+    this.updateStandingMode();
     this.stateChangeCountProperty.value++;
   }
 
@@ -469,6 +532,10 @@ export class PipeModalModel {
    * MAX_PHASE_STEP radians of its own phase: the top of the ladder can be two
    * orders of magnitude faster than the fundamental, and a step sized for the
    * fundamental would integrate it into nonsense.
+   *
+   * A running sweep advances the drive frequency once per call, after the
+   * integration. Within one frame it moves by a small fraction of a resonance
+   * width, and the drive phase is integrated, so the drive stays continuous.
    *
    * @param dt - model seconds
    */
@@ -515,10 +582,22 @@ export class PipeModalModel {
 
     // Keep the accumulated phase bounded; cos is 2π-periodic so this is exact.
     this.drivePhaseProperty.value = phase % (2 * Math.PI);
+
+    if (this.isSweepingProperty.value) {
+      const top = this.driveFrequencyRangeProperty.value.max;
+      const next = driveFrequency + this.getSweepRate() * dt;
+      this.driveFrequencyProperty.value = Math.min(next, top);
+      if (next >= top) {
+        this.isSweepingProperty.value = false;
+      }
+    }
+
+    this.updateStandingMode();
     this.stateChangeCountProperty.value++;
   }
 
   public reset(): void {
+    this.isSweepingProperty.reset();
     this.pipeLengthProperty.reset();
     this.terminationProperty.reset();
     this.isDrivingProperty.reset();
@@ -529,16 +608,19 @@ export class PipeModalModel {
     );
     this.amplitudes.fill(0);
     this.rates.fill(0);
+    this.standingModeNumberProperty.reset();
     this.stateChangeCountProperty.reset();
   }
 
   public dispose(): void {
+    this.standingModeNumberProperty.dispose();
     this.isAtResonanceProperty.dispose();
     this.nearestHarmonicProperty.dispose();
     this.driveFrequencyRangeProperty.dispose();
     this.fundamentalFrequencyProperty.dispose();
     this.stateChangeCountProperty.dispose();
     this.drivePhaseProperty.dispose();
+    this.isSweepingProperty.dispose();
     this.isDrivingProperty.dispose();
     this.driveFrequencyProperty.dispose();
     this.terminationProperty.dispose();
@@ -554,6 +636,104 @@ export class PipeModalModel {
         this.rates[h - 1] = 0;
       }
     }
+    this.updateStandingMode();
+  }
+
+  /**
+   * Envelope of harmonic h's oscillation (m): its amplitude independent of where
+   * in the cycle it is.
+   *
+   * A driven mode moves at two frequencies at once — its steady-state response at
+   * the drive's ω, and whatever transient is left over at its own ωₕ — so no single
+   * ω turns (aₕ, ȧₕ) into an amplitude. Split it instead: the steady part
+   * s = A·cos(Θ − δ) is known in closed form, the remainder aₕ − s rings freely at
+   * ωₕ, and the envelope is the length of the sum of their two phasors. That is
+   * exact at every instant, including the slow beat between the two parts while a
+   * resonance builds. With the driver off the steady part is zero.
+   */
+  private modeEnvelope(harmonicNumber: number): number {
+    const amplitude = this.amplitudes[harmonicNumber - 1] ?? 0;
+    const rate = this.rates[harmonicNumber - 1] ?? 0;
+    if (amplitude === 0 && rate === 0) {
+      return 0;
+    }
+    const omegaMode = 2 * Math.PI * this.getModeFrequency(harmonicNumber);
+    let steadyRate = 0;
+    let steadyQuadrature = 0;
+    if (this.isDrivingProperty.value) {
+      const driveFrequency = this.driveFrequencyProperty.value;
+      const omegaDrive = 2 * Math.PI * driveFrequency;
+      const steadyAmplitude = this.steadyStateAmplitude(harmonicNumber, driveFrequency);
+      const phase = this.drivePhaseProperty.value - this.steadyStatePhaseLag(harmonicNumber, driveFrequency);
+      // s = A·cos(φ), ṡ = −A·ω·sin(φ); its phasor's quadrature part is ṡ/ω.
+      steadyRate = -steadyAmplitude * omegaDrive * Math.sin(phase);
+      steadyQuadrature = steadyRate / omegaDrive;
+    }
+    // In-phase parts sum to aₕ itself; quadrature parts are ṡ/ω and (ȧₕ − ṡ)/ωₕ.
+    return Math.hypot(amplitude, steadyQuadrature + (rate - steadyRate) / omegaMode);
+  }
+
+  /**
+   * How far harmonic h's nodes are from being nodes: the most the other modes
+   * could move the field at any of h's displacement nodes, or the pressure at any
+   * of its pressure nodes, as a fraction of h's own antinode there. A worst case —
+   * every other mode's envelope taken in phase — so a value below the threshold
+   * guarantees the node holds through the whole cycle.
+   */
+  private nodeImpurity(harmonicNumber: number, envelopes: number[]): number {
+    const termination = this.terminationProperty.value;
+    const length = this.pipeLengthProperty.value;
+    const own = envelopes[harmonicNumber - 1] ?? 0;
+    const ownPressure = own * modeWavenumber(harmonicNumber, termination, length);
+    let worst = 0;
+    for (const x of displacementNodePositions(harmonicNumber, termination, length)) {
+      let residual = 0;
+      for (let j = 1; j <= MODE_COUNT; j++) {
+        if (j !== harmonicNumber) {
+          residual += (envelopes[j - 1] ?? 0) * Math.abs(displacementShape(j, termination, length, x));
+        }
+      }
+      worst = Math.max(worst, residual / own);
+    }
+    for (const x of pressureNodePositions(harmonicNumber, termination, length)) {
+      let residual = 0;
+      for (let j = 1; j <= MODE_COUNT; j++) {
+        if (j !== harmonicNumber) {
+          const k = modeWavenumber(j, termination, length);
+          residual += k * (envelopes[j - 1] ?? 0) * Math.abs(pressureShape(j, termination, length, x));
+        }
+      }
+      worst = Math.max(worst, residual / ownPressure);
+    }
+    return worst;
+  }
+
+  /** Recomputes {@link standingModeProperty} from the current modal state. */
+  private updateStandingMode(): void {
+    const envelopes: number[] = [];
+    let dominant = 0;
+    let dominantFraction = 0;
+    for (let h = 1; h <= MODE_COUNT; h++) {
+      const envelope = this.modeEnvelope(h);
+      envelopes.push(envelope);
+      const fraction = envelope > 0 ? envelope / this.resonantAmplitude(h) : 0;
+      if (fraction > dominantFraction) {
+        dominantFraction = fraction;
+        dominant = h;
+      }
+    }
+
+    let standingMode = 0;
+    if (dominant > 0) {
+      const relax = dominant === this.standingModeNumberProperty.value ? STANDING_MODE_HYSTERESIS : 1;
+      if (
+        dominantFraction >= relax * STANDING_MODE_MIN_FRACTION &&
+        this.nodeImpurity(dominant, envelopes) <= STANDING_MODE_MAX_IMPURITY / relax
+      ) {
+        standingMode = dominant;
+      }
+    }
+    this.standingModeNumberProperty.value = standingMode;
   }
 
   /** Harmonic whose frequency is closest to `driveFrequency`, or 0 if none. */

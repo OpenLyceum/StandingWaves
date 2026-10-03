@@ -152,14 +152,15 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tuyau dont chacune des deux extrémités peut être fermée ou ouverte, excité à une extrémité. À l'intérieur, une onde stationnaire en déplacement et en pression, avec des repères sur les nœuds et les ventres. À côté, l'échelle des harmoniques que ce tuyau peut produire.",
-        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, un curseur de fréquence d'excitation avec des boutons fléchés de réglage fin et grossier, une échelle d'harmoniques, une commande de longueur du tuyau, des cases à cocher pour les repères de nœuds et la densité de l'air, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, un curseur de fréquence d'excitation avec des boutons fléchés de réglage fin et grossier et un bouton qui la balaie automatiquement, une échelle d'harmoniques, une commande de longueur du tuyau, des cases à cocher pour les repères de nœuds et la densité de l'air, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Choisissez une terminaison, puis balayez la fréquence pour trouver une résonance — ou alignez-vous directement sur une harmonique."
       },
       "currentDetails": {
         "atResonance": "Le tuyau est en résonance sur l'harmonique {{harmonic}}, à {{frequency}} hertz. Une onde stationnaire remplit le tuyau.",
         "offResonance": "Le tuyau est hors résonance à {{frequency}} hertz, entre deux harmoniques. Très peu d'onde stationnaire s'établit.",
         "density": "L’ombrage bleu montre la densité de l’air. Elle varie le plus aux nœuds de déplacement, où l’air voisin arrive des deux côtés puis s’en éloigne, et reste presque normale aux ventres de déplacement, où les voisins bougent ensemble.",
-        "silent": "L'excitation est coupée et le tuyau s'amortit."
+        "silent": "L'excitation est coupée et le tuyau s'amortit.",
+        "sweeping": "La fréquence d'excitation balaie vers le haut les harmoniques du tuyau ; chacune s'amplifie brièvement au passage."
       },
       "controls": {
         "termination": "Terminaison du tuyau",
@@ -168,7 +169,8 @@
         "pipeLength": "Longueur du tuyau",
         "driverOn": "Excitation active",
         "showNodes": "Marquer nœuds et ventres",
-        "showDensity": "Afficher la densité de l’air"
+        "showDensity": "Afficher la densité de l’air",
+        "sweep": "Balayer la fréquence d'excitation"
       }
     },
     "instruments": {

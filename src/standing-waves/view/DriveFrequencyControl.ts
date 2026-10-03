@@ -4,7 +4,7 @@
  * The drive-frequency slider of the Standing Waves screen, with a tick at every
  * mode the current pipe has.
  *
- *     Drive frequency
+ *     Drive frequency                     [∿∿]
  *      1    2    3    4    5    6    7    8
  *     ━┿━━━━┿━━━━┿━━━━●━━━━┿━━━━┿━━━━┿━━━━┿━
  *       «  ‹  [ 686 Hz ]  ›  »
@@ -24,6 +24,13 @@
  *
  * The look matches StandingWavesNumberControl's coarse/fine layout, and the
  * readout supplies the slider's aria-valuetext exactly as NumberControl does.
+ *
+ * ── The sweep button ────────────────────────────────────────────────────────
+ *
+ * Beside the title, a toggle starts the model's automatic sweep from the bottom
+ * of the range to the top, as the Resonance sim's sweep does. While it runs, the
+ * slider and arrows are disabled, again as in Resonance: the thumb is moving on
+ * its own and a drag would fight it. Press the button again to stop.
  */
 
 import { DerivedProperty, Multilink, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
@@ -37,6 +44,7 @@ import { FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../../common/StandingWavesButto
 import { THUMB_SIZE, TITLE_FONT, TRACK_SIZE, VALUE_FONT } from "../../common/view/StandingWavesNumberControl.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import { DRIVE_FREQUENCY_RANGE_HARMONICS } from "../../StandingWavesConstants.js";
+import { SweepButton } from "./SweepButton.js";
 
 /** Snap while dragging, and the fine arrows' step (Hz). */
 const FINE_STEP_HZ = 1;
@@ -62,6 +70,8 @@ const TICK_LABEL_FONT = new PhetFont(10);
 export type DriveFrequencyControlOptions = {
   /** Width of the slider track, view pixels. */
   readonly trackWidth: number;
+  /** Accessible name of the sweep toggle. */
+  readonly sweepAccessibleName: TReadOnlyProperty<string>;
 };
 
 /** One tick: the harmonic it marks, its line, and its number. */
@@ -74,6 +84,9 @@ export type DriveFrequencyTick = {
 export class DriveFrequencyControl extends VBox {
   /** The slider; tick x positions are in its local frame. */
   public readonly slider: Slider;
+
+  /** Toggle for the automatic frequency sweep. */
+  public readonly sweepButton: SweepButton;
 
   /** One tick per harmonic within reach, in ascending order. */
   public readonly ticks: readonly DriveFrequencyTick[];
@@ -106,8 +119,14 @@ export class DriveFrequencyControl extends VBox {
     // model's Property after this control is gone.
     const sliderRangeProperty = new DerivedProperty([rangeProperty], (range: Range) => range);
 
+    const manualTuningEnabledProperty = new DerivedProperty(
+      [pipe.isSweepingProperty],
+      (isSweeping: boolean) => !isSweeping,
+    );
+
     const slider = new Slider(frequencyProperty, sliderRangeProperty, {
       enabledRangeProperty: sliderRangeProperty,
+      enabledProperty: manualTuningEnabledProperty,
       trackSize: new Dimension2(options.trackWidth, TRACK_SIZE.height),
       trackLineWidth: TRACK_LINE_WIDTH,
       thumbSize: THUMB_SIZE,
@@ -191,10 +210,10 @@ export class DriveFrequencyControl extends VBox {
     }
 
     const arrowEnabledMultilink: UnknownMultilink = Multilink.multilink(
-      [frequencyProperty, rangeProperty],
-      (frequency: number, range: Range) => {
-        coarseDecrement.enabled = fineDecrement.enabled = frequency > range.min;
-        coarseIncrement.enabled = fineIncrement.enabled = frequency < range.max;
+      [frequencyProperty, rangeProperty, manualTuningEnabledProperty],
+      (frequency: number, range: Range, manualTuningEnabled: boolean) => {
+        coarseDecrement.enabled = fineDecrement.enabled = manualTuningEnabled && frequency > range.min;
+        coarseIncrement.enabled = fineIncrement.enabled = manualTuningEnabled && frequency < range.max;
       },
     );
 
@@ -204,11 +223,18 @@ export class DriveFrequencyControl extends VBox {
       maxWidth: 130,
     });
 
+    // Title hard left, sweep button hard right over the end of the track. Placed
+    // by hand: the enclosing VBox would override an HBox's preferred width.
+    const sweepButton = new SweepButton(pipe.isSweepingProperty, options.sweepAccessibleName);
+    sweepButton.right = options.trackWidth;
+    titleText.centerY = sweepButton.centerY;
+    const titleRow = new Node({ children: [titleText, sweepButton] });
+
     super({
       align: "left",
       spacing: 4,
       children: [
-        titleText,
+        titleRow,
         sliderWithTicks,
         new HBox({
           spacing: 6,
@@ -219,6 +245,7 @@ export class DriveFrequencyControl extends VBox {
     });
 
     this.slider = slider;
+    this.sweepButton = sweepButton;
     this.ticks = ticks;
 
     this.disposeDriveFrequencyControl = () => {
@@ -231,7 +258,9 @@ export class DriveFrequencyControl extends VBox {
       for (const tick of ticks) {
         tick.label.dispose();
       }
+      sweepButton.dispose();
       slider.dispose();
+      manualTuningEnabledProperty.dispose();
       sliderRangeProperty.dispose();
       numberDisplay.dispose();
       titleText.dispose();

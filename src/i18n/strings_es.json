@@ -152,14 +152,15 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tubo cuyos dos extremos pueden estar cerrados o abiertos, excitado en un extremo. En su interior, una onda estacionaria en desplazamiento y en presión, con marcas en los nodos y antinodos. Al lado, la escalera de armónicos que este tubo puede sonar.",
-        "controlArea": "El área de control tiene un control de terminación de los extremos, un deslizador de frecuencia de excitación con botones de flecha finos y gruesos, una escalera de armónicos, un control de longitud del tubo, casillas para las marcas de nodos y la densidad del aire, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un control de terminación de los extremos, un deslizador de frecuencia de excitación con botones de flecha finos y gruesos y un botón que la barre automáticamente, una escalera de armónicos, un control de longitud del tubo, casillas para las marcas de nodos y la densidad del aire, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
         "interactionHint": "Elija una terminación y luego barra la frecuencia para encontrar una resonancia — o ajústese directamente a un armónico."
       },
       "currentDetails": {
         "atResonance": "El tubo está en resonancia en el armónico {{harmonic}}, a {{frequency}} hercios. Una onda estacionaria llena el tubo.",
         "offResonance": "El tubo está fuera de resonancia a {{frequency}} hercios, entre armónicos. Se forma muy poca onda estacionaria.",
         "density": "El sombreado azul muestra la densidad del aire. Varía más en los nodos de desplazamiento, donde el aire vecino llega desde ambos lados y luego se aleja, y se mantiene casi normal en los antinodos de desplazamiento, donde los vecinos se mueven juntos.",
-        "silent": "La excitación está apagada y el tubo se está amortiguando."
+        "silent": "La excitación está apagada y el tubo se está amortiguando.",
+        "sweeping": "La frecuencia de excitación barre hacia arriba los armónicos del tubo; cada uno crece brevemente al pasar."
       },
       "controls": {
         "termination": "Terminación del tubo",
@@ -168,7 +169,8 @@
         "pipeLength": "Longitud del tubo",
         "driverOn": "Excitación activa",
         "showNodes": "Marcar nodos y antinodos",
-        "showDensity": "Mostrar densidad del aire"
+        "showDensity": "Mostrar densidad del aire",
+        "sweep": "Barrer la frecuencia de excitación"
       }
     },
     "instruments": {

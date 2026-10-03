@@ -2,7 +2,13 @@
  * NodeMarkersNode.ts
  *
  * Markers along the pipe at the displacement nodes and the pressure nodes of the
- * mode currently resonating.
+ * mode the pipe actually holds.
+ *
+ * They follow `standingModeProperty`, not the drive frequency: nodes are a feature
+ * of one mode's established pattern, so the markers appear only once that pattern
+ * has built up and dominates, and vanish off resonance, between rungs, while a
+ * resonance is still filling, and when a ring-down has died away. Marking nodes the
+ * pipe does not have would teach that they are a property of the frequency dial.
  *
  * ── The one thing this node exists to say ─────────────────────────────────────
  *
@@ -64,7 +70,7 @@ export class NodeMarkersNode extends Node {
     const rebuild = (): void => {
       markerLayer.removeAllChildren();
 
-      const harmonic = pipe.nearestHarmonicProperty.value;
+      const harmonic = pipe.standingModeProperty.value;
       if (harmonic < 1) {
         return;
       }
@@ -88,14 +94,15 @@ export class NodeMarkersNode extends Node {
       );
     };
 
-    // The marker set is a function of the mode and the geometry, and of nothing that
-    // changes per frame, so it is rebuilt on those changes only — not in step().
-    pipe.nearestHarmonicProperty.link(rebuild);
+    // The marker set is a function of the standing mode and the geometry. The mode is
+    // re-evaluated every step but notifies only when it changes, so this still
+    // rebuilds on those changes only — not every frame.
+    pipe.standingModeProperty.link(rebuild);
     pipe.terminationProperty.link(rebuild);
     pipe.pipeLengthProperty.link(rebuild);
 
     this.disposeNodeMarkersNode = () => {
-      pipe.nearestHarmonicProperty.unlink(rebuild);
+      pipe.standingModeProperty.unlink(rebuild);
       pipe.terminationProperty.unlink(rebuild);
       pipe.pipeLengthProperty.unlink(rebuild);
       markerLayer.removeAllChildren();

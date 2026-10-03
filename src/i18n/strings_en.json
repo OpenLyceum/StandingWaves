@@ -152,14 +152,15 @@
     "standingWaves": {
       "screenSummary": {
         "playArea": "A pipe whose two ends can each be closed or open, driven at one end. Inside, a standing wave in displacement and pressure, with markers on the nodes and antinodes. Beside it, a ladder of the harmonics this pipe can sound.",
-        "controlArea": "The control area has a termination control for the pipe ends, a drive frequency slider with fine and coarse arrow buttons, a ladder of harmonics to snap to, a pipe length control, checkboxes for the node markers and the air density, playback controls with Normal and Slow speeds, and a Reset All button.",
+        "controlArea": "The control area has a termination control for the pipe ends, a drive frequency slider with fine and coarse arrow buttons and a button that sweeps it automatically, a ladder of harmonics to snap to, a pipe length control, checkboxes for the node markers and the air density, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Choose a termination, then sweep the frequency to find a resonance — or snap straight to a harmonic."
       },
       "currentDetails": {
         "atResonance": "The pipe is at resonance on harmonic {{harmonic}}, at {{frequency}} hertz. A standing wave fills the pipe.",
         "offResonance": "The pipe is off resonance at {{frequency}} hertz, between harmonics. Very little standing wave forms.",
         "density": "The blue shading shows air density. It swings most at the displacement nodes, where neighbouring air moves in from both sides and then away again, and stays near normal at the displacement antinodes, where neighbours move together.",
-        "silent": "The driver is off and the pipe is ringing down."
+        "silent": "The driver is off and the pipe is ringing down.",
+        "sweeping": "The drive frequency is sweeping upward through the pipe's harmonics; each one swells briefly as the drive passes it."
       },
       "controls": {
         "termination": "Pipe termination",
@@ -168,7 +169,8 @@
         "pipeLength": "Pipe length",
         "driverOn": "Driver on",
         "showNodes": "Mark nodes and antinodes",
-        "showDensity": "Show air density"
+        "showDensity": "Show air density",
+        "sweep": "Sweep the drive frequency"
       }
     },
     "instruments": {

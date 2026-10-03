@@ -82,6 +82,7 @@ src/common/view/
   StandingWavesNumberControl.ts  themed slider; accessible name required, keyboard steps explicit
 src/standing-waves/view/
   DriveFrequencyControl.ts    per-pipe frequency slider with a tick at each mode
+  SweepButton.ts              chirp / stop toggle for the automatic frequency sweep
 ```
 
 ### Everything is laid out at a common **origin**, never by bounds
@@ -122,6 +123,11 @@ pipe. Because that span scales with f₁, harmonic h sits at a fixed fraction of
 tick marks are placed once and only toggled visible (even ones hidden on a stopped pipe); Slider's
 own ticks are pinned to values and can be neither moved nor removed. Single arrows step 1 Hz,
 double arrows 10 Hz — under the ~14 Hz width of a resonance, so neither steps over a peak.
+
+The sweep toggle (`SweepButton`, a `BooleanRectangularToggleButton` on
+`PipeModalModel.isSweepingProperty`) sits on the control's title row. As in Resonance, the slider
+and arrows are disabled while it runs. The sweep itself lives in the model, not in a twixt
+`Animation` as in Resonance, so pause, step and the Slow speed apply to it with no extra wiring.
 
 Two Slider quirks the control works around, both caught by the listener-count leak test: given a
 range Property and no `enabledRangeProperty`, Slider adopts the range as its enabled range and
@@ -166,9 +172,13 @@ The node markers carry **both** names of each point — `ξ = 0, p max` — for 
 a node with one of its two names is what produces the misconception that a node is a place where
 nothing is happening.
 
+The markers appear only while the pipe actually holds a mode (`PipeModalModel.standingModeProperty`,
+criterion in `doc/model.md`). They are absent while a resonance is still building, off resonance,
+between rungs and after a ring-down. They rebuild only when that Property changes, not per frame.
+
 ## Testing
 
-162 vitest specs; `happy-dom`, template `tests/setup.ts`.
+174 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -176,7 +186,7 @@ nothing is happening.
 | `tests/PipeTermination.test.ts` | c/2L, c/4L, the 2:1 octave, the odd series |
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
-| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range |
+| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range, the automatic sweep, when the pipe holds a standing mode |
 | `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |
 

@@ -20,7 +20,7 @@ function createControl(pipe: PipeModalModel): DriveFrequencyControl {
     new StringProperty("Drive frequency"),
     new StringProperty("Drive frequency"),
     new StringProperty("{{value}} Hz"),
-    { trackWidth: 180 },
+    { trackWidth: 180, sweepAccessibleName: new StringProperty("Sweep") },
   );
 }
 
@@ -56,6 +56,20 @@ describe("DriveFrequencyControl ticks", () => {
 
     pipe.terminationProperty.value = PipeTermination.CLOSED_OPEN;
     expect(control.ticks.filter((tick) => tick.line.visible).map((tick) => tick.harmonic)).toEqual([1, 3, 5, 7]);
+    control.dispose();
+    pipe.dispose();
+  });
+});
+
+describe("DriveFrequencyControl sweep", () => {
+  it("disables manual tuning while a sweep runs, and restores it when the sweep ends", () => {
+    const pipe = new PipeModalModel();
+    const control = createControl(pipe);
+    expect(control.slider.enabled).toBe(true);
+    pipe.isSweepingProperty.value = true;
+    expect(control.slider.enabled).toBe(false);
+    pipe.isSweepingProperty.value = false;
+    expect(control.slider.enabled).toBe(true);
     control.dispose();
     pipe.dispose();
   });

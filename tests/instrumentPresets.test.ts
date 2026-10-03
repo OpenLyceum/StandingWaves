@@ -140,7 +140,7 @@ describe("the screen model", () => {
   });
 
   it("restores the preset's geometry on reset, not the pipe's own defaults", () => {
-    // `pipe.reset()` returns the pipe to open–open at 0.5 m, which is no instrument.
+    // `pipe.reset()` returns the pipe to open–open at 1 m, which is no instrument.
     const model = new InstrumentsModel();
     model.presetProperty.value = InstrumentPreset.CLARINET;
     model.reset();

@@ -67,7 +67,8 @@ describe("construction and defaults", () => {
     const model = new PipeModalModel();
     expect(model.terminationProperty.value).toBe(PipeTermination.OPEN_OPEN);
     expect(model.driveFrequencyProperty.value).toBeCloseTo(model.fundamentalFrequencyProperty.value, 9);
-    expect(model.fundamentalFrequencyProperty.value).toBeCloseTo(343, 6);
+    // The 1 m default: f₁ = c/2L = 343/2.
+    expect(model.fundamentalFrequencyProperty.value).toBeCloseTo(171.5, 6);
     model.dispose();
   });
 
@@ -371,8 +372,8 @@ describe("reset", () => {
     model.reset();
 
     expect(model.terminationProperty.value).toBe(PipeTermination.OPEN_OPEN);
-    expect(model.pipeLengthProperty.value).toBeCloseTo(0.5, 9);
-    expect(model.driveFrequencyProperty.value).toBeCloseTo(343, 6);
+    expect(model.pipeLengthProperty.value).toBeCloseTo(1, 9);
+    expect(model.driveFrequencyProperty.value).toBeCloseTo(171.5, 6);
     expect(model.modalAmplitude(1)).toBe(0);
     expect(model.displacementAt(0.25)).toBe(0);
     model.dispose();

@@ -39,7 +39,7 @@ const TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 const LADDER_RUNGS = 8;
 
 /** Width of a rung's content, in view pixels. */
-const RUNG_CONTENT_WIDTH = 128;
+const RUNG_CONTENT_WIDTH = 108;
 
 export class OvertoneLadderNode extends Node {
   private readonly disposeOvertoneLadderNode: () => void;

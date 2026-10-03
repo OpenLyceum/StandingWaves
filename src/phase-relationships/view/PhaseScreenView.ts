@@ -18,8 +18,9 @@
 
 import { BooleanProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
+import { Shape } from "scenerystack/kite";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Text } from "scenerystack/scenery";
+import { Node, Path, Text } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { EndCondition } from "../../common/model/PipeTermination.js";
@@ -36,14 +37,19 @@ import {
   PIPE_BORE_HEIGHT,
   SCREEN_VIEW_MARGIN,
   STRIP_SPACING,
-  TRACE_STRIP_SIZE,
 } from "../../StandingWavesConstants.js";
 import type { PhaseModel } from "../model/PhaseModel.js";
 import { EquationReadoutNode, PhaseControlPanel } from "./PhaseControlPanel.js";
 import { PhaseScreenSummaryContent } from "./PhaseScreenSummaryContent.js";
 import { ReferenceMarkerNode } from "./ReferenceMarkerNode.js";
 
-const PIPE_VIEW_LENGTH = TRACE_STRIP_SIZE.width;
+const PIPE_VIEW_LENGTH = 700;
+
+/** Plot height of each of the three trace strips. */
+const STRIP_HEIGHT = 128;
+
+/** Plot origin of the pipe stack: room on the left for the open end's flare. */
+const STACK_ORIGIN_X = 34;
 const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 
 /** Rows of particle markers stacked across the bore. */
@@ -101,8 +107,10 @@ export class PhaseScreenView extends ScreenView {
       positionRange: new Range(0, model.pipeLength),
       positionProperty: model.referencePositionProperty,
       maxArrowLength: PIPE_VIEW_LENGTH / 14,
+      particleAmplitude: particleAmplitudePx,
       accessibleName: a11y.controls.referencePointStringProperty,
       caption: phase.referencePointStringProperty,
+      visibleProperty: model.showReferencePointProperty,
     });
     pipe.addChild(this.marker);
 
@@ -114,7 +122,7 @@ export class PhaseScreenView extends ScreenView {
     const makeStrip = (traces: TraceSpec[], isBottom: boolean): TraceStripNode =>
       new TraceStripNode(traces, {
         viewWidth: PIPE_VIEW_LENGTH,
-        viewHeight: TRACE_STRIP_SIZE.height,
+        viewHeight: STRIP_HEIGHT,
         xRange,
         xSpacing: tickSpacing,
         showXTickLabels: isBottom,
@@ -168,8 +176,28 @@ export class PhaseScreenView extends ScreenView {
       strip.x = 0;
       strip.y = y;
       stack.addChild(strip);
-      y += TRACE_STRIP_SIZE.height + STRIP_SPACING;
+      y += STRIP_HEIGHT + STRIP_SPACING;
     }
+
+    // The reference point's guide line, continued down through all three plots so
+    // ξ, u and p can be read off at the same x. It stays at the point's equilibrium
+    // position — that is the x the traces are plotted against — while the dot in
+    // the bore rides with the particle.
+    const stripsTop = displacementStrip.y;
+    const stripsBottom = y - STRIP_SPACING;
+    const referenceLine = new Path(Shape.lineSegment(0, stripsTop, 0, stripsBottom), {
+      stroke: StandingWavesColors.nodeMarkerColorProperty,
+      lineWidth: 1.5,
+      lineDash: [4, 3],
+      pickable: false,
+      visibleProperty: model.showReferencePointProperty,
+    });
+    stack.addChild(referenceLine);
+    const onReferencePosition = (position: number): void => {
+      referenceLine.x = (position / model.pipeLength) * PIPE_VIEW_LENGTH;
+    };
+    model.referencePositionProperty.link(onReferencePosition);
+
     const axisLabel = new Text(strings.getAxes().positionAlongPipeStringProperty, {
       font: AXIS_TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
@@ -179,7 +207,7 @@ export class PhaseScreenView extends ScreenView {
     axisLabel.top = y + STRIP_SPACING;
     stack.addChild(axisLabel);
 
-    stack.left = SCREEN_VIEW_MARGIN;
+    stack.x = this.layoutBounds.minX + STACK_ORIGIN_X;
     stack.centerY = this.layoutBounds.centerY;
     this.addChild(stack);
 
@@ -219,6 +247,7 @@ export class PhaseScreenView extends ScreenView {
           controlPanel.directionRadioButtons,
           controlPanel.wavelengthControl,
           controlPanel.equationsCheckbox,
+          controlPanel.referencePointCheckbox,
           this.marker,
           timeControl,
           resetAllButton,
@@ -227,6 +256,7 @@ export class PhaseScreenView extends ScreenView {
     );
 
     this.disposePhaseScreenView = () => {
+      model.referencePositionProperty.unlink(onReferencePosition);
       alwaysVisible.dispose();
       summaryContent.dispose();
     };

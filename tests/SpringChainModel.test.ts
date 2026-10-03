@@ -131,7 +131,8 @@ describe("a launched pulse", () => {
     const chain = makeChain(EndCondition.OPEN);
     chain.launchPulse();
     const start = pulsePosition(chain);
-    run(chain, 3e-4);
+    // Long enough to carry the pulse two pulse-widths clear of where it started.
+    run(chain, (0.2 * L) / SOUND_SPEED_MPS);
     const later = pulsePosition(chain);
     expect(later).toBeGreaterThan(start);
     // A pulse that had split in two would have left half its amplitude behind,

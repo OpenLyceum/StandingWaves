@@ -40,7 +40,6 @@ import {
   PIPE_BORE_HEIGHT,
   SCREEN_VIEW_MARGIN,
   STRIP_SPACING,
-  TRACE_STRIP_SIZE,
 } from "../../StandingWavesConstants.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
 import { NodeMarkersNode } from "./NodeMarkersNode.js";
@@ -48,7 +47,13 @@ import { OvertoneLadderNode } from "./OvertoneLadderNode.js";
 import { StandingWavesControlPanel } from "./StandingWavesControlPanel.js";
 import { StandingWavesScreenSummaryContent } from "./StandingWavesScreenSummaryContent.js";
 
-const PIPE_VIEW_LENGTH = 470;
+const PIPE_VIEW_LENGTH = 600;
+
+/** Plot height of the displacement and pressure strips. */
+const STRIP_HEIGHT = 160;
+
+/** Plot origin of the pipe stack: room on the left for a closed end's cap. */
+const STACK_ORIGIN_X = 30;
 const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 const PARTICLE_ROW_COUNT = 3;
 
@@ -158,7 +163,7 @@ export class StandingWavesScreenView extends ScreenView {
     const makeStrip = (traces: TraceSpec[], isBottom: boolean): TraceStripNode =>
       new TraceStripNode(traces, {
         viewWidth: PIPE_VIEW_LENGTH,
-        viewHeight: TRACE_STRIP_SIZE.height,
+        viewHeight: STRIP_HEIGHT,
         xRange: new Range(0, 1),
         xSpacing: 0.25,
         showXTickLabels: isBottom,
@@ -188,7 +193,7 @@ export class StandingWavesScreenView extends ScreenView {
       strip.x = 0;
       strip.y = y;
       stack.addChild(strip);
-      y += TRACE_STRIP_SIZE.height + STRIP_SPACING;
+      y += STRIP_HEIGHT + STRIP_SPACING;
     }
     const axisLabel = new Text(strings.getAxes().positionAlongPipeStringProperty, {
       font: AXIS_TITLE_FONT,
@@ -199,19 +204,21 @@ export class StandingWavesScreenView extends ScreenView {
     axisLabel.top = y + STRIP_SPACING;
     stack.addChild(axisLabel);
 
-    stack.left = SCREEN_VIEW_MARGIN;
+    stack.x = this.layoutBounds.minX + STACK_ORIGIN_X;
     stack.centerY = this.layoutBounds.centerY;
     this.addChild(stack);
-
-    const ladder = new OvertoneLadderNode(model);
-    ladder.left = stack.right + SCREEN_VIEW_MARGIN;
-    ladder.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
-    this.addChild(ladder);
 
     const controlPanel = new StandingWavesControlPanel(model);
     controlPanel.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
     controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
     this.addChild(controlPanel);
+
+    // The ladder sits in the gutter between the traces and the controls, closer to
+    // the controls it works alongside (it retunes the drive frequency).
+    const ladder = new OvertoneLadderNode(model);
+    ladder.right = controlPanel.left - SCREEN_VIEW_MARGIN;
+    ladder.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
+    this.addChild(ladder);
 
     const timeControl = createTimeControl(model.timer, () => {
       model.stepForward();
@@ -230,8 +237,9 @@ export class StandingWavesScreenView extends ScreenView {
     });
     this.addChild(resetAllButton);
 
-    timeControl.left = stack.left;
-    timeControl.bottom = this.layoutBounds.maxY - SCREEN_VIEW_MARGIN;
+    // Beside Reset All rather than under the traces, so the traces get the full height.
+    timeControl.right = resetAllButton.left - SCREEN_VIEW_MARGIN * 2;
+    timeControl.centerY = resetAllButton.centerY;
 
     // ── Termination → which pipe drawing shows ────────────────────────────────
     const onTermination = (termination: string): void => {

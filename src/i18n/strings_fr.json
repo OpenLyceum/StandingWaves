@@ -48,6 +48,7 @@
     "inPhase": "Vitesse et pression EN phase",
     "outOfPhase": "Vitesse et pression EN OPPOSITION de phase (180°)",
     "showEquations": "Afficher les équations",
+    "showReferencePoint": "Afficher le point de référence",
     "equationPressureForward": "p(x,t) = A cos(ωt − kx)",
     "equationPressureBackward": "p(x,t) = A cos(ωt + kx)",
     "equationVelocityForward": "u(x,t) = + p / ρc",
@@ -127,6 +128,7 @@
         "direction": "Sens de propagation",
         "wavelength": "Longueur d'onde",
         "showEquations": "Afficher les équations",
+        "showReferencePoint": "Afficher le point de référence",
         "referencePoint": "Point de référence le long du tuyau"
       }
     },

@@ -64,6 +64,9 @@ export class PhaseModel implements TModel {
   /** Whether the equation readout is showing. */
   public readonly showEquationsProperty: BooleanProperty;
 
+  /** Whether the reference marker (and its guide line through the traces) is showing. */
+  public readonly showReferencePointProperty: BooleanProperty;
+
   /** Position of the draggable reference marker along the pipe (m). */
   public readonly referencePositionProperty: NumberProperty;
 
@@ -88,6 +91,7 @@ export class PhaseModel implements TModel {
       units: "m",
     });
     this.showEquationsProperty = new BooleanProperty(true);
+    this.showReferencePointProperty = new BooleanProperty(false);
     this.referencePositionProperty = new NumberProperty(0.35 * this.pipeLength, {
       range: new Range(0, this.pipeLength),
       units: "m",
@@ -160,6 +164,7 @@ export class PhaseModel implements TModel {
     this.directionProperty.reset();
     this.wavelengthProperty.reset();
     this.showEquationsProperty.reset();
+    this.showReferencePointProperty.reset();
     this.referencePositionProperty.reset();
     this.phaseProperty.reset();
   }
@@ -168,6 +173,7 @@ export class PhaseModel implements TModel {
     this.frequencyProperty.dispose();
     this.phaseProperty.dispose();
     this.referencePositionProperty.dispose();
+    this.showReferencePointProperty.dispose();
     this.showEquationsProperty.dispose();
     this.wavelengthProperty.dispose();
     this.directionProperty.dispose();

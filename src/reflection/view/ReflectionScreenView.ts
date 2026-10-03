@@ -6,14 +6,17 @@
  *
  * ── Layout ───────────────────────────────────────────────────────────────────
  *
- * Single view: one pipe assembly, centred. Comparison view: the closed-ended and
- * open-ended assemblies stacked, each captioned with what its end does. Both
- * assemblies exist for the whole life of the screen and only their visibility
- * changes — building one on demand would drop the pulse mid-flight, and the
- * comparison would lose the shared clock that makes it a comparison.
+ * Single view: one pipe assembly with tall traces, filling the area left of the
+ * controls. Comparison view: the closed-ended and open-ended assemblies stacked,
+ * each captioned with what its end does, with shorter traces so both fit.
+ *
+ * All four assemblies (two chains × two sizes) exist for the whole life of the
+ * screen and only their visibility changes — building one on demand would drop
+ * the pulse mid-flight, and the comparison would lose the shared clock that makes
+ * it a comparison. Only visible assemblies are repainted.
  */
 
-import { DerivedProperty } from "scenerystack/axon";
+import { Multilink } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
@@ -24,22 +27,32 @@ import { createTimeControl } from "../../common/view/createTimeControl.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { StandingWavesPreferencesModel } from "../../preferences/StandingWavesPreferencesModel.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
-import { SCREEN_VIEW_MARGIN, STRIP_SPACING, TRACE_STRIP_SIZE } from "../../StandingWavesConstants.js";
+import { PIPE_BORE_HEIGHT, SCREEN_VIEW_MARGIN, STRIP_SPACING } from "../../StandingWavesConstants.js";
 import type { ReflectionModel } from "../model/ReflectionModel.js";
+import type { SpringChainModel } from "../model/SpringChainModel.js";
 import { ChainPipeNode } from "./ChainPipeNode.js";
 import { ReflectionControlPanel } from "./ReflectionControlPanel.js";
 import { ReflectionScreenSummaryContent } from "./ReflectionScreenSummaryContent.js";
 
 /** Drawn length of a pipe bore, in view pixels. */
-const PIPE_VIEW_LENGTH = TRACE_STRIP_SIZE.width;
+const PIPE_VIEW_LENGTH = 720;
+
+/** Plot origin of the pipe stack: room on the left for the closed end's cap. */
+const STACK_ORIGIN_X = 30;
+
+/** Trace-strip height when one assembly is showing. */
+const SINGLE_STRIP_HEIGHT = 150;
+
+/** Bore and strip heights when two assemblies share the screen. */
+const COMPARE_BORE_HEIGHT = 44;
+const COMPARE_STRIP_HEIGHT = 72;
 
 const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 
 export type ReflectionScreenViewOptions = ScreenViewOptions;
 
 export class ReflectionScreenView extends ScreenView {
-  private readonly closedPipe: ChainPipeNode;
-  private readonly openPipe: ChainPipeNode;
+  private readonly assemblies: ChainPipeNode[];
   private readonly disposeReflectionScreenView: () => void;
 
   public constructor(
@@ -56,30 +69,34 @@ export class ReflectionScreenView extends ScreenView {
 
     const showVelocityProperty = preferences.showVelocityTraceProperty;
 
-    this.closedPipe = new ChainPipeNode(model.closedChain, {
-      viewLength: PIPE_VIEW_LENGTH,
-      showHeading: true,
-      showVelocityProperty,
-    });
-    this.openPipe = new ChainPipeNode(model.openChain, {
-      viewLength: PIPE_VIEW_LENGTH,
-      showHeading: true,
-      showVelocityProperty,
-    });
+    const makeAssembly = (chain: SpringChainModel, isCompact: boolean): ChainPipeNode =>
+      new ChainPipeNode(chain, {
+        viewLength: PIPE_VIEW_LENGTH,
+        boreHeight: isCompact ? COMPARE_BORE_HEIGHT : PIPE_BORE_HEIGHT,
+        stripHeight: isCompact ? COMPARE_STRIP_HEIGHT : SINGLE_STRIP_HEIGHT,
+        showHeading: true,
+        showVelocityProperty,
+      });
+
+    const singleClosed = makeAssembly(model.closedChain, false);
+    const singleOpen = makeAssembly(model.openChain, false);
+    const compareClosed = makeAssembly(model.closedChain, true);
+    const compareOpen = makeAssembly(model.openChain, true);
+    this.assemblies = [singleClosed, singleOpen, compareClosed, compareOpen];
 
     // Laid out by hand at a common origin rather than in a VBox, for the same
-    // reason ChainPipeNode does: the two assemblies must agree on where model
-    // x = 0 sits, so that a feature in the closed pipe lines up with the same
-    // feature in the open one directly below it.
-    // Without this the hidden assembly still counts toward the layer's bounds, and
-    // the single-pipe view would be centred as though two pipes were showing.
+    // reason ChainPipeNode does: every assembly must agree on where model x = 0
+    // sits, so that a feature in the closed pipe lines up with the same feature in
+    // the open one directly below it.
+    // Without excludeInvisibleChildrenFromBounds the hidden assemblies would still
+    // count toward the layer's bounds, and the stack would be centred wrongly.
     const pipeLayer = new Node({ excludeInvisibleChildrenFromBounds: true });
-    this.closedPipe.x = 0;
-    this.closedPipe.y = 0;
-    this.openPipe.x = 0;
-    this.openPipe.y = this.closedPipe.height + STRIP_SPACING * 4;
-    pipeLayer.addChild(this.closedPipe);
-    pipeLayer.addChild(this.openPipe);
+    for (const assembly of this.assemblies) {
+      assembly.x = 0;
+      assembly.y = 0;
+      pipeLayer.addChild(assembly);
+    }
+    compareOpen.y = compareClosed.height + STRIP_SPACING * 3;
     this.addChild(pipeLayer);
 
     // One position-axis title for the whole stack, under whichever assembly is
@@ -112,33 +129,25 @@ export class ReflectionScreenView extends ScreenView {
     this.addChild(resetAllButton);
 
     // ── Visibility: which assemblies are on screen ─────────────────────────────
-    const showClosedProperty = new DerivedProperty(
-      [model.isComparingProperty, model.farEndProperty],
-      (isComparing: boolean, farEnd: EndCondition) => isComparing || farEnd === EndCondition.CLOSED,
-    );
-    const showOpenProperty = new DerivedProperty(
-      [model.isComparingProperty, model.farEndProperty],
-      (isComparing: boolean, farEnd: EndCondition) => isComparing || farEnd === EndCondition.OPEN,
-    );
-    showClosedProperty.link((visible) => {
-      this.closedPipe.visible = visible;
-    });
-    showOpenProperty.link((visible) => {
-      this.openPipe.visible = visible;
-    });
+    const onVisibility = (isComparing: boolean, farEnd: EndCondition): void => {
+      singleClosed.visible = !isComparing && farEnd === EndCondition.CLOSED;
+      singleOpen.visible = !isComparing && farEnd === EndCondition.OPEN;
+      compareClosed.visible = isComparing;
+      compareOpen.visible = isComparing;
 
-    // The axis title follows the lowest *visible* assembly, and the whole stack is
-    // centred on what is showing — one pipe or two.
-    const relayout = (): void => {
-      const bottomPipe = this.openPipe.visible ? this.openPipe : this.closedPipe;
+      // The axis title follows the lowest visible assembly, and the whole stack is
+      // centred vertically on what is showing — one pipe or two.
+      const bottomAssembly = isComparing ? compareOpen : farEnd === EndCondition.CLOSED ? singleClosed : singleOpen;
       axisLabel.centerX = PIPE_VIEW_LENGTH / 2;
-      axisLabel.top = bottomPipe.y + bottomPipe.height + STRIP_SPACING;
+      axisLabel.top = bottomAssembly.y + bottomAssembly.height + STRIP_SPACING / 2;
 
-      pipeLayer.left = SCREEN_VIEW_MARGIN;
+      pipeLayer.x = this.layoutBounds.minX + STACK_ORIGIN_X;
       pipeLayer.centerY = this.layoutBounds.centerY;
+
+      // A newly shown assembly has not been painted since it was last hidden.
+      this.updatePipes();
     };
-    model.isComparingProperty.link(relayout);
-    model.farEndProperty.link(relayout);
+    const visibilityMultilink = Multilink.multilink([model.isComparingProperty, model.farEndProperty], onVisibility);
 
     controlPanel.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
     controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
@@ -159,9 +168,10 @@ export class ReflectionScreenView extends ScreenView {
     );
 
     this.disposeReflectionScreenView = () => {
-      showClosedProperty.dispose();
-      showOpenProperty.dispose();
-      model.isComparingProperty.unlink(relayout);
+      visibilityMultilink.dispose();
+      for (const assembly of this.assemblies) {
+        assembly.dispose();
+      }
       summaryContent.dispose();
     };
 
@@ -178,11 +188,10 @@ export class ReflectionScreenView extends ScreenView {
   }
 
   private updatePipes(): void {
-    if (this.closedPipe.visible) {
-      this.closedPipe.update();
-    }
-    if (this.openPipe.visible) {
-      this.openPipe.update();
+    for (const assembly of this.assemblies) {
+      if (assembly.visible) {
+        assembly.update();
+      }
     }
   }
 

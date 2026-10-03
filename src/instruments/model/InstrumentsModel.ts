@@ -13,7 +13,7 @@ import { Property } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
 import { PipeModalModel } from "../../common/model/PipeModalModel.js";
 import { TimeModel } from "../../common/TimeModel.js";
-import { HARMONIC_TIME_SCALE, MAX_FRAME_DT_S } from "../../StandingWavesConstants.js";
+import { INSTRUMENTS_TIME_SCALE, MAX_FRAME_DT_S } from "../../StandingWavesConstants.js";
 import { InstrumentPreset, InstrumentPresetValues, specFor } from "./instrumentPresets.js";
 
 export class InstrumentsModel implements TModel {
@@ -41,7 +41,7 @@ export class InstrumentsModel implements TModel {
     this.pipe.terminationProperty.value = spec.termination;
     this.pipe.tuneToHarmonic(1);
     // Skip the build-up: this screen is about the steady tone of an instrument, and
-    // watching each preset fill for three seconds would get in the way of flipping
+    // watching each preset fill for several seconds would get in the way of flipping
     // between them to compare.
     this.pipe.settleToSteadyState();
   }
@@ -82,6 +82,6 @@ export class InstrumentsModel implements TModel {
   }
 
   private toModelTime(dt: number): number {
-    return Math.min(dt, MAX_FRAME_DT_S) * HARMONIC_TIME_SCALE * this.timer.speedMultiplier;
+    return Math.min(dt, MAX_FRAME_DT_S) * INSTRUMENTS_TIME_SCALE * this.timer.speedMultiplier;
   }
 }

@@ -48,12 +48,20 @@ export type ReferenceMarkerNodeOptions = {
   positionRange: Range;
   /** Marker position along the pipe (m). */
   positionProperty: NumberProperty;
-  /** Peak arrow length for each quantity, in view pixels. */
+  /** Peak velocity-arrow length, in view pixels. */
   maxArrowLength: number;
+  /**
+   * Peak drawn displacement of the particles in the bore, in view pixels. The dot
+   * and the displacement arrow use this, so they move exactly as far as the
+   * particles around them.
+   */
+  particleAmplitude: number;
   /** Accessible name for the draggable marker. */
   accessibleName: TReadOnlyProperty<string>;
   /** Caption drawn above the marker. */
   caption: TReadOnlyProperty<string>;
+  /** Whether the marker is shown; hidden, it also drops out of the focus order. */
+  visibleProperty: TReadOnlyProperty<boolean>;
 };
 
 export class ReferenceMarkerNode extends Node {
@@ -61,6 +69,7 @@ export class ReferenceMarkerNode extends Node {
   private readonly velocityArrow: ArrowNode;
   private readonly dot: Circle;
   private readonly maxArrowLength: number;
+  private readonly particleAmplitude: number;
   private readonly disposeReferenceMarkerNode: () => void;
 
   public constructor(options: ReferenceMarkerNodeOptions) {
@@ -70,9 +79,11 @@ export class ReferenceMarkerNode extends Node {
       tagName: "div",
       focusable: true,
       accessibleName: options.accessibleName,
+      visibleProperty: options.visibleProperty,
     });
 
     this.maxArrowLength = options.maxArrowLength;
+    this.particleAmplitude = options.particleAmplitude;
 
     // A full-height guide line, so the marker's position can be read against the
     // traces stacked below the pipe.
@@ -165,11 +176,13 @@ export class ReferenceMarkerNode extends Node {
    * @param velocityFraction - u as a fraction of the wave's peak, −1 … 1
    */
   public update(displacementFraction: number, velocityFraction: number): void {
-    setArrow(this.displacementArrow, displacementFraction * this.maxArrowLength, DISPLACEMENT_ARROW_Y);
+    // The displacement arrow is drawn on the particles' scale, so its tip sits level
+    // with the dot: it shows how far the followed particle actually is from rest.
+    setArrow(this.displacementArrow, displacementFraction * this.particleAmplitude, DISPLACEMENT_ARROW_Y);
     setArrow(this.velocityArrow, velocityFraction * this.maxArrowLength, VELOCITY_ARROW_Y);
-    // The dot rides with the particle it is following, so the marker's own dot and
-    // the surrounding particles move together.
-    this.dot.centerX = displacementFraction * this.maxArrowLength;
+    // The dot rides with the particle it is following, on the particles' own scale,
+    // so the marker's dot and the surrounding particles move together.
+    this.dot.centerX = displacementFraction * this.particleAmplitude;
   }
 
   public override dispose(): void {

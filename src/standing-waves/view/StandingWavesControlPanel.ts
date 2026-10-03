@@ -27,7 +27,7 @@ import { StandingWavesPanel } from "../../common/StandingWavesPanel.js";
 import { StandingWavesNumberControl } from "../../common/view/StandingWavesNumberControl.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
-import { DRIVE_FREQUENCY_RANGE_HARMONICS } from "../../StandingWavesConstants.js";
+import { DRIVE_FREQUENCY_RANGE_HARMONICS, PIPE_LENGTH_RANGE_M } from "../../StandingWavesConstants.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
 
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
@@ -99,8 +99,8 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
     // so it keeps covering the same set of modes when the length or termination
     // changes rather than sliding off the ladder.
     const frequencyRange = new Range(
-      DRIVE_FREQUENCY_RANGE_HARMONICS.min * fundamentalFrequency(PipeTermination.CLOSED_OPEN, 1.0),
-      DRIVE_FREQUENCY_RANGE_HARMONICS.max * fundamentalFrequency(PipeTermination.OPEN_OPEN, 0.2),
+      DRIVE_FREQUENCY_RANGE_HARMONICS.min * fundamentalFrequency(PipeTermination.CLOSED_OPEN, PIPE_LENGTH_RANGE_M.max),
+      DRIVE_FREQUENCY_RANGE_HARMONICS.max * fundamentalFrequency(PipeTermination.OPEN_OPEN, PIPE_LENGTH_RANGE_M.min),
     );
 
     const frequencyControl = new StandingWavesNumberControl(
@@ -112,7 +112,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
         valuePattern: units.hertzStringProperty,
         decimals: 0,
         delta: 1,
-        // A resonance is fₕ/Q wide — about 17 Hz at the default fundamental — so an
+        // A resonance is fₕ/Q wide — about 14 Hz at the default fundamental — so an
         // arrow key has to move less than that or it would step straight over every
         // peak on the ladder.
         keyboardStep: 10,

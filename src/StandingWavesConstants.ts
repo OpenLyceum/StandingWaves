@@ -29,18 +29,8 @@ export const PANEL_CORNER_RADIUS = 6;
 /** Vertical gap between stacked trace strips and the pipe above them. */
 export const STRIP_SPACING = 8;
 
-/**
- * Plot size of a single displacement/pressure/velocity trace strip (px).
- *
- * The height is set by the tightest case: the Reflection screen's comparison view
- * stacks two whole pipe assemblies — heading, pipe, and two strips each — inside
- * one screen. Sized so that fits without the lower assembly running off the
- * bottom.
- */
-export const TRACE_STRIP_SIZE = { width: 600, height: 72 };
-
 /** Drawn height of a pipe's bore, i.e. the inside gap between its walls (px). */
-export const PIPE_BORE_HEIGHT = 48;
+export const PIPE_BORE_HEIGHT = 60;
 
 /** Thickness of a pipe wall, and of the cap that closes an end (px). */
 export const PIPE_WALL_THICKNESS = 5;
@@ -64,19 +54,25 @@ export const AIR_DENSITY_KGPM3 = 1.204;
 // ── Pipe geometry (SI units) ──────────────────────────────────────────────────
 
 /**
- * Default pipe length (m). At 0.5 m an open–open pipe has f₁ = c/2L = 343 Hz,
- * near concert F₄, and the stopped pipe of the same length lands an octave below
- * it — both comfortably inside the range below.
+ * Default pipe length (m). At 1 m an open–open pipe has f₁ = c/2L = 171.5 Hz,
+ * near F₃, and the stopped pipe of the same length lands an octave below it.
+ *
+ * Deliberately a long pipe. The pipe is drawn at a fixed pixel length whatever
+ * its metres, so a longer pipe means a lower fundamental and a slower-looking
+ * wave at the same clock rate — without slowing the speed of sound.
  */
-export const PIPE_LENGTH_DEFAULT_M = 0.5;
+export const PIPE_LENGTH_DEFAULT_M = 1.0;
 
-/** Selectable pipe-length range (m). */
-export const PIPE_LENGTH_RANGE_M = new Range(0.2, 1.0);
+/**
+ * Selectable pipe-length range (m): a 2 ft to a 6.5 ft organ pipe. The short end
+ * bounds how fast the top of the overtone ladder can look on screen.
+ */
+export const PIPE_LENGTH_RANGE_M = new Range(0.5, 2.0);
 
 // ── Slow motion (dimensionless) ───────────────────────────────────────────────
 //
-// Audible sound is far too fast to animate: the 343 Hz fundamental of the
-// default pipe has a 2.9 ms period, and its pulse crosses the pipe in 1.5 ms.
+// Audible sound is far too fast to animate: the 171.5 Hz fundamental of the
+// default pipe has a 5.8 ms period, and its pulse crosses the pipe in 2.9 ms.
 // Both would alias into meaningless flicker at any display refresh rate.
 //
 // So the *clock* is slowed and the physics is left alone — every frequency,
@@ -87,25 +83,33 @@ export const PIPE_LENGTH_RANGE_M = new Range(0.2, 1.0);
 
 /**
  * Normal-speed model seconds per wall-clock second on Reflection. A pulse crosses
- * the default 0.5 m pipe in L/c = 1.46 ms, so this stretches one crossing to
- * about 2.9 s, or about 7.3 s with Slow motion selected.
+ * the default 1 m pipe in L/c = 2.9 ms, so this stretches one crossing to about
+ * 4.4 s, or about 11 s with Slow motion selected.
  */
-export const REFLECTION_TIME_SCALE = 1 / 2000;
+export const REFLECTION_TIME_SCALE = 1 / 1500;
 
 /**
- * Normal-speed model seconds per wall-clock second on Standing Waves and
- * Instruments. The 343 Hz fundamental then oscillates at an apparent 1.7 Hz,
- * or 0.69 Hz with Slow selected by default.
+ * Normal-speed model seconds per wall-clock second on Standing Waves. The
+ * 171.5 Hz fundamental of the default pipe then oscillates at an apparent
+ * 0.86 Hz, or 0.34 Hz (a 2.9 s period) with Slow selected by default.
  */
 export const HARMONIC_TIME_SCALE = 1 / 200;
 
 /**
  * Normal-speed model seconds per wall-clock second on Phase. The default wave
- * is one wavelength long, so f = c/L = 686 Hz — twice the 343 Hz fundamental
- * of the other screens. Half of {@link HARMONIC_TIME_SCALE} puts that wave at
- * the same apparent 1.7 Hz, or 0.69 Hz with Slow selected.
+ * is one wavelength long, so f = c/L = 343 Hz — twice the 171.5 Hz fundamental
+ * of the Standing Waves screen. Half of {@link HARMONIC_TIME_SCALE} puts that
+ * wave at the same apparent 0.86 Hz, or 0.34 Hz with Slow selected.
  */
 export const PHASE_TIME_SCALE = 1 / 400;
+
+/**
+ * Normal-speed model seconds per wall-clock second on Instruments. Its pipes
+ * are real instruments and keep their real lengths, so the clock is slowed
+ * instead: the default flute's 286 Hz fundamental appears at 0.95 Hz, or
+ * 0.38 Hz with Slow selected — close to the Standing Waves screen's rate.
+ */
+export const INSTRUMENTS_TIME_SCALE = 1 / 300;
 
 /** Default Slow motion rate relative to each screen's normal clock rate. */
 export const SLOW_MOTION_MULTIPLIER = 0.4;
@@ -156,10 +160,10 @@ export const MODE_COUNT = 12;
  * Quality factor of each pipe mode. A real organ pipe sits somewhere around
  * 30–50; this is deliberately lower so that the resonance is broad enough to
  * find by dragging the frequency slider, and so the build-up time constant
- * τ = Q/(πfₙ) stays near 3 s of wall clock at the default length rather than
- * tens of seconds.
+ * τ = Q/(πfₙ) — about 3.8 periods — stays near 4.5 s of wall clock at the
+ * default length (11 s in Slow) rather than tens of seconds.
  */
-export const MODE_QUALITY_FACTOR = 20;
+export const MODE_QUALITY_FACTOR = 12;
 
 /** Selectable driving-frequency range (Hz), as a multiple of the open-pipe f₁. */
 export const DRIVE_FREQUENCY_RANGE_HARMONICS = new Range(0.5, 6.5);
@@ -219,7 +223,6 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   SCREEN_VIEW_MARGIN,
   PANEL_CORNER_RADIUS,
   STRIP_SPACING,
-  TRACE_STRIP_SIZE,
   PIPE_BORE_HEIGHT,
   PIPE_WALL_THICKNESS,
   SOUND_SPEED_MPS,
@@ -229,6 +232,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   REFLECTION_TIME_SCALE,
   HARMONIC_TIME_SCALE,
   PHASE_TIME_SCALE,
+  INSTRUMENTS_TIME_SCALE,
   SLOW_MOTION_MULTIPLIER,
   CHAIN_MASS_COUNT,
   PULSE_WIDTH_FRACTION,

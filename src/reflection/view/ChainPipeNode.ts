@@ -22,12 +22,7 @@ import { PipeNode } from "../../common/view/PipeNode.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
-import {
-  PARTICLE_AMPLITUDE_SPACINGS,
-  PIPE_BORE_HEIGHT,
-  STRIP_SPACING,
-  TRACE_STRIP_SIZE,
-} from "../../StandingWavesConstants.js";
+import { PARTICLE_AMPLITUDE_SPACINGS, STRIP_SPACING } from "../../StandingWavesConstants.js";
 import type { SpringChainModel } from "../model/SpringChainModel.js";
 
 const HEADING_FONT = new PhetFont({ size: 14, weight: "bold" });
@@ -59,6 +54,10 @@ const TRACE_HEADROOM = 2.4;
 export type ChainPipeNodeOptions = {
   /** Drawn length of the bore, in view pixels. */
   viewLength: number;
+  /** Drawn height of the bore, in view pixels. */
+  boreHeight: number;
+  /** Plot height of each trace strip, in view pixels. */
+  stripHeight: number;
   /** Whether to show the heading naming this pipe's far end. */
   showHeading: boolean;
   /** Whether to draw the velocity trace as well. */
@@ -81,6 +80,7 @@ export class ChainPipeNode extends Node {
 
     const pipe = new PipeNode({
       viewLength: options.viewLength,
+      boreHeight: options.boreHeight,
       leftEnd: EndCondition.CLOSED,
       rightEnd: chain.farEnd,
     });
@@ -95,7 +95,7 @@ export class ChainPipeNode extends Node {
 
     this.particles = new ParticleRowNode({
       viewLength: options.viewLength,
-      bandHeight: PIPE_BORE_HEIGHT,
+      bandHeight: options.boreHeight,
       rowCount: PARTICLE_ROW_COUNT,
       columnCount: PARTICLE_COLUMN_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
@@ -133,7 +133,7 @@ export class ChainPipeNode extends Node {
     const tickSpacing = chain.pipeLength / 4;
     this.displacementStrip = new TraceStripNode([displacementTrace, velocityTrace], {
       viewWidth: options.viewLength,
-      viewHeight: TRACE_STRIP_SIZE.height,
+      viewHeight: options.stripHeight,
       xRange,
       xSpacing: tickSpacing,
       // The strip below carries the numbers for the axis both share.
@@ -144,7 +144,7 @@ export class ChainPipeNode extends Node {
     // title under whichever assembly is lowest — see ReflectionScreenView.
     this.pressureStrip = new TraceStripNode([pressureTrace], {
       viewWidth: options.viewLength,
-      viewHeight: TRACE_STRIP_SIZE.height,
+      viewHeight: options.stripHeight,
       xRange,
       xSpacing: tickSpacing,
     });
@@ -184,15 +184,15 @@ export class ChainPipeNode extends Node {
 
     // The pipe's origin is on its bore centreline, so it needs half a bore of room.
     pipe.x = 0;
-    pipe.y = y + PIPE_BORE_HEIGHT / 2;
+    pipe.y = y + options.boreHeight / 2;
     this.addChild(pipe);
-    y = pipe.y + PIPE_BORE_HEIGHT / 2 + STRIP_SPACING * 2;
+    y = pipe.y + options.boreHeight / 2 + STRIP_SPACING * 2;
 
     for (const strip of [this.displacementStrip, this.pressureStrip]) {
       strip.x = 0;
       strip.y = y;
       this.addChild(strip);
-      y += TRACE_STRIP_SIZE.height + STRIP_SPACING;
+      y += options.stripHeight + STRIP_SPACING;
     }
   }
 

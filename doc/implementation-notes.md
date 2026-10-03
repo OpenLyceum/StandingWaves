@@ -62,7 +62,7 @@ discontinuously relocating the wave. Same trick as `Resonance`'s `drivingPhasePr
 ## Slow motion lives in the screen models
 
 Each screen model converts a frame's wall-clock `dt` into model seconds
-(`REFLECTION_TIME_SCALE`, `HARMONIC_TIME_SCALE`) and clamps it with `MAX_FRAME_DT_S` so a
+(`REFLECTION_TIME_SCALE`, `PHASE_TIME_SCALE`, `HARMONIC_TIME_SCALE`, `INSTRUMENTS_TIME_SCALE`) and clamps it with `MAX_FRAME_DT_S` so a
 backgrounded tab cannot hand over one enormous `dt`. **Do not** "fix" the animation speed by scaling
 `c` or `fₕ` instead: every readout in the sim would start lying.
 

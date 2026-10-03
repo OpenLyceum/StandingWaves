@@ -48,6 +48,7 @@
     "inPhase": "Velocity and pressure are IN phase",
     "outOfPhase": "Velocity and pressure are 180° OUT of phase",
     "showEquations": "Show equations",
+    "showReferencePoint": "Show reference point",
     "equationPressureForward": "p(x,t) = A cos(ωt − kx)",
     "equationPressureBackward": "p(x,t) = A cos(ωt + kx)",
     "equationVelocityForward": "u(x,t) = + p / ρc",
@@ -127,6 +128,7 @@
         "direction": "Direction of travel",
         "wavelength": "Wavelength",
         "showEquations": "Show equations",
+        "showReferencePoint": "Show reference point",
         "referencePoint": "Reference point along the pipe"
       }
     },

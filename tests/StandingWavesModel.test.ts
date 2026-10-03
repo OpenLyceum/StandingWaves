@@ -19,7 +19,7 @@ describe("Standing Waves frequency controls", () => {
 
     model.reset();
     expect(model.fineTuneOffsetProperty.value).toBe(0);
-    expect(model.pipe.driveFrequencyProperty.value).toBeCloseTo(343);
+    expect(model.pipe.driveFrequencyProperty.value).toBeCloseTo(171.5);
     model.dispose();
   });
 });

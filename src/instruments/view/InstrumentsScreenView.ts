@@ -37,15 +37,15 @@ import {
   PIPE_BORE_HEIGHT,
   SCREEN_VIEW_MARGIN,
   STRIP_SPACING,
-  TRACE_STRIP_SIZE,
 } from "../../StandingWavesConstants.js";
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { createHarmonicSeriesLabelProperty, HarmonicSpectrumNode } from "./HarmonicSpectrumNode.js";
 import { InstrumentsScreenSummaryContent } from "./InstrumentsScreenSummaryContent.js";
 import { PresetPanel } from "./PresetPanel.js";
 
-const PIPE_VIEW_LENGTH = 380;
-const SPECTRUM_SIZE = { width: 255, height: 150 };
+const PIPE_VIEW_LENGTH = 770;
+const STRIP_HEIGHT = 110;
+const SPECTRUM_SIZE = { width: 420, height: 150 };
 
 // Everything on this screen is positioned by its **plot origin** (`.x`/`.y`) rather
 // than by its bounds (`.left`/`.top`). Both the pipe stack and the spectrum have
@@ -53,8 +53,13 @@ const SPECTRUM_SIZE = { width: 255, height: 150 };
 // x, a rotated y-axis title sits to the left of its chart — so laying them out by
 // bounds would space them by however much chrome each happened to have, and the gaps
 // would change when the learner switched instrument.
-const PIPE_ORIGIN_X = 34;
-const SPECTRUM_ORIGIN_X = 505;
+//
+// The pipe and its traces run across the top, left of the preset list; the
+// spectrum and the readout that summarises it share the row beneath.
+const PIPE_ORIGIN = { x: 30, y: 34 };
+const SPECTRUM_ORIGIN = { x: 80, y: 400 };
+const READOUT_GAP = 50;
+const READOUT_MAX_WIDTH = 300;
 const READOUT_FONT = new PhetFont(13);
 const SERIES_FONT = new PhetFont({ size: 14, weight: "bold" });
 const PARTICLE_ROW_COUNT = 3;
@@ -136,7 +141,7 @@ export class InstrumentsScreenView extends ScreenView {
     const makeStrip = (traces: TraceSpec[], isBottom: boolean): TraceStripNode =>
       new TraceStripNode(traces, {
         viewWidth: PIPE_VIEW_LENGTH,
-        viewHeight: TRACE_STRIP_SIZE.height,
+        viewHeight: STRIP_HEIGHT,
         xRange: new Range(0, 1),
         xSpacing: 0.25,
         showXTickLabels: isBottom,
@@ -159,10 +164,10 @@ export class InstrumentsScreenView extends ScreenView {
       strip.x = 0;
       strip.y = y;
       stack.addChild(strip);
-      y += TRACE_STRIP_SIZE.height + STRIP_SPACING;
+      y += STRIP_HEIGHT + STRIP_SPACING;
     }
-    stack.x = PIPE_ORIGIN_X;
-    stack.y = this.layoutBounds.minY + 70;
+    stack.x = this.layoutBounds.minX + PIPE_ORIGIN.x;
+    stack.y = this.layoutBounds.minY + PIPE_ORIGIN.y;
     this.addChild(stack);
 
     const presetPanel = new PresetPanel(model);
@@ -170,15 +175,15 @@ export class InstrumentsScreenView extends ScreenView {
     presetPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
     this.addChild(presetPanel);
 
-    // The spectrum sits below the preset list and right of the pipe. Positioned by
-    // its plot origin (x = 0 is the plot's left edge, not the node's bounds), with
-    // SPECTRUM_GUTTER reserving the room its rotated y-axis title needs.
+    // The spectrum sits below the pipe. Positioned by its plot origin (x = 0 is the
+    // plot's left edge, not the node's bounds), with SPECTRUM_ORIGIN.x reserving the
+    // room its rotated y-axis title needs.
     const spectrum = new HarmonicSpectrumNode(pipe, {
       viewWidth: SPECTRUM_SIZE.width,
       viewHeight: SPECTRUM_SIZE.height,
     });
-    spectrum.x = SPECTRUM_ORIGIN_X;
-    spectrum.y = presetPanel.bottom + SCREEN_VIEW_MARGIN * 2;
+    spectrum.x = this.layoutBounds.minX + SPECTRUM_ORIGIN.x;
+    spectrum.y = this.layoutBounds.minY + SPECTRUM_ORIGIN.y;
     this.addChild(spectrum);
 
     // ── The two facts, in words ───────────────────────────────────────────────
@@ -199,35 +204,33 @@ export class InstrumentsScreenView extends ScreenView {
         new Text(seriesProperty, {
           font: SERIES_FONT,
           fill: StandingWavesColors.pressureColorProperty,
-          maxWidth: SPECTRUM_SIZE.width,
+          maxWidth: READOUT_MAX_WIDTH,
         }),
         new Text(fundamentalProperty, {
           font: READOUT_FONT,
           fill: StandingWavesColors.textColorProperty,
-          maxWidth: SPECTRUM_SIZE.width,
+          maxWidth: READOUT_MAX_WIDTH,
         }),
         new Text(lengthProperty, {
           font: READOUT_FONT,
           fill: StandingWavesColors.textColorProperty,
-          maxWidth: SPECTRUM_SIZE.width,
+          maxWidth: READOUT_MAX_WIDTH,
         }),
         new Text(instruments.sameLengthNoteStringProperty, {
           font: new PhetFont(11),
           fill: StandingWavesColors.axisColorProperty,
-          maxWidth: SPECTRUM_SIZE.width,
+          maxWidth: READOUT_MAX_WIDTH,
         }),
       ],
     });
-    readout.x = spectrum.x;
-    readout.y = spectrum.y + SPECTRUM_SIZE.height + SCREEN_VIEW_MARGIN * 2 + 14;
+    readout.left = spectrum.x + SPECTRUM_SIZE.width + READOUT_GAP;
+    readout.top = spectrum.y;
     this.addChild(readout);
 
     const timeControl = createTimeControl(model.timer, () => {
       model.stepForward();
       this.updatePipe();
     });
-    timeControl.left = SCREEN_VIEW_MARGIN;
-    timeControl.bottom = this.layoutBounds.maxY - SCREEN_VIEW_MARGIN;
     this.addChild(timeControl);
 
     const resetAllButton = new ResetAllButton({
@@ -240,6 +243,9 @@ export class InstrumentsScreenView extends ScreenView {
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
     this.addChild(resetAllButton);
+
+    timeControl.right = resetAllButton.left - SCREEN_VIEW_MARGIN * 2;
+    timeControl.centerY = resetAllButton.centerY;
 
     const onTermination = (termination: PipeTermination): void => {
       for (const [key, node] of this.pipeNodes) {

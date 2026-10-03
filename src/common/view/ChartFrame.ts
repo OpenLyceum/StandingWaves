@@ -93,6 +93,9 @@ export class ChartFrame extends Node {
       }),
     );
 
+    // The x title sits below the tick labels when there are any, not at a fixed
+    // offset that a tall label font would run into.
+    let xTitleTop = options.viewHeight + X_TITLE_GUTTER * 0.5;
     if (options.xSpacing !== undefined) {
       this.addChild(
         new GridLineSet(transform, Orientation.HORIZONTAL, options.xSpacing, {
@@ -136,12 +139,12 @@ export class ChartFrame extends Node {
         }),
       );
       if (options.showXTickLabels !== false) {
-        this.addChild(
-          new TickLabelSet(transform, Orientation.HORIZONTAL, options.xSpacing, {
-            edge: "min",
-            createLabel: options.createXTickLabel ?? defaultTickLabel,
-          }),
-        );
+        const xTickLabels = new TickLabelSet(transform, Orientation.HORIZONTAL, options.xSpacing, {
+          edge: "min",
+          createLabel: options.createXTickLabel ?? defaultTickLabel,
+        });
+        this.addChild(xTickLabels);
+        xTitleTop = Math.max(xTitleTop, xTickLabels.bottom + 2);
       }
     }
     if (options.ySpacing !== undefined) {
@@ -167,7 +170,7 @@ export class ChartFrame extends Node {
           fill: StandingWavesColors.textColorProperty,
           maxWidth: options.viewWidth * 0.8,
           centerX: options.viewWidth / 2,
-          top: options.viewHeight + X_TITLE_GUTTER * 0.5,
+          top: xTitleTop,
         }),
       );
     }

@@ -146,10 +146,10 @@ perfect standing wave at *any* frequency, which is precisely the thing that is n
 pipe. This way two behaviours come out for free rather than being animated by hand:
 
 - the **steady-state response is a Lorentzian**, so resonance is something to hunt for;
-- the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 9 s of wall clock at the
-  default pipe on Slow, or about 4 s at Normal speed.
+- the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 11 s of wall clock at the
+  default pipe on Slow, or about 4.5 s at Normal speed.
 
-Q = 20 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
+Q = 12 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
 dragging a slider and the build-up is watchable rather than tens of seconds long.
 
 The broad frequency slider covers every available pipe length and termination. A second slider
@@ -179,18 +179,26 @@ what the screen is about.
 
 ## Slow motion
 
-Audible sound is far too fast to animate: the default pipe's 343 Hz fundamental has a 2.9 ms period,
-and a pulse crosses the pipe in 1.5 ms. Both would alias into meaningless flicker.
+Audible sound is far too fast to animate: the default 1 m pipe's 171.5 Hz fundamental has a 5.8 ms
+period, and a pulse crosses the pipe in 2.9 ms. Both would alias into meaningless flicker.
 
 So the **clock** is slowed and the physics is left alone. Every frequency, length and speed in the
-model is a true SI value. Normal speed advances model time at 1/2000 of wall time on Reflection
-(a crossing takes ~3 s), 1/400 on Phase, and 1/200 on Standing Waves and Instruments (the 343 Hz
-fundamental appears to oscillate at 1.7 Hz). Phase is slower because its default wave is one
-wavelength long (f = c/L = 686 Hz); the extra factor of two puts that wave at the same apparent
-rate as the fundamental on the other screens. Slow, selected by default on the playback radios,
-multiplies those rates by 0.4: a Reflection crossing takes about 7 s, and the default fundamental
-appears to oscillate at 0.69 Hz. The readouts still report the true frequencies; the default pipe
-says 343 Hz in either speed mode.
+model is a true SI value. Two things set how fast the screen looks:
+
+- **A long pipe.** The pipe is drawn at a fixed pixel length whatever its metres, so a longer pipe
+  means sound takes longer to cross the same pixels. The default is 1 m (range 0.5–2 m), which puts
+  the fundamental at 171.5 Hz rather than the 343 Hz of a 0.5 m pipe, and caps how fast the top of
+  the overtone ladder can look.
+- **A per-screen clock rate.** Normal speed advances model time at 1/1500 of wall time on
+  Reflection (a crossing takes ~4.4 s), 1/400 on Phase, 1/200 on Standing Waves (the fundamental
+  appears to oscillate at 0.86 Hz) and 1/300 on Instruments. Phase is slower because its default
+  wave is one wavelength long (f = c/L = 343 Hz); the extra factor of two puts that wave at the same
+  apparent rate as the Standing Waves fundamental. Instruments keeps its real instrument lengths, so
+  its clock is slowed instead; the default flute appears at 0.95 Hz.
+
+Slow, selected by default on the playback radios, multiplies those rates by 0.4: a Reflection
+crossing takes about 11 s, and the default fundamental appears to oscillate at 0.34 Hz. The readouts
+still report the true frequencies; the default pipe says 171.5 Hz in either speed mode.
 
 ## Where the numbers come from
 

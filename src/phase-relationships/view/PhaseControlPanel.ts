@@ -32,6 +32,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
   public readonly directionRadioButtons: Node;
   public readonly wavelengthControl: Node;
   public readonly equationsCheckbox: Node;
+  public readonly referencePointCheckbox: Node;
 
   private readonly disposePhaseControlPanel: () => void;
 
@@ -104,6 +105,20 @@ export class PhaseControlPanel extends StandingWavesPanel {
       },
     );
 
+    const referencePointCheckbox = new Checkbox(
+      model.showReferencePointProperty,
+      new Text(phase.showReferencePointStringProperty, {
+        font: LABEL_FONT,
+        fill: StandingWavesColors.textColorProperty,
+        maxWidth: PANEL_WIDTH - 30,
+      }),
+      {
+        checkboxColor: StandingWavesColors.textColorProperty,
+        checkboxColorBackground: StandingWavesColors.panelBackgroundColorProperty,
+        accessibleName: a11y.controls.showReferencePointStringProperty,
+      },
+    );
+
     // The impedance, spelled out. ρc is the constant of proportionality in the
     // relation the whole screen is about, so it should be a number on screen and
     // not only a symbol in an equation.
@@ -131,13 +146,22 @@ export class PhaseControlPanel extends StandingWavesPanel {
       new VBox({
         align: "left",
         spacing: 12,
-        children: [directionLabel, directionRadioButtons, verdict, wavelengthControl, equationsCheckbox, impedanceNote],
+        children: [
+          directionLabel,
+          directionRadioButtons,
+          verdict,
+          wavelengthControl,
+          equationsCheckbox,
+          referencePointCheckbox,
+          impedanceNote,
+        ],
       }),
     );
 
     this.directionRadioButtons = directionRadioButtons;
     this.wavelengthControl = wavelengthControl;
     this.equationsCheckbox = equationsCheckbox;
+    this.referencePointCheckbox = referencePointCheckbox;
 
     this.disposePhaseControlPanel = () => {
       impedanceValueProperty.dispose();

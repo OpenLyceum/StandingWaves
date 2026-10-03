@@ -2,12 +2,14 @@
  * StandingWavesControlPanel.ts
  *
  * Controls for the Standing Waves screen: the termination pair, the drive
- * frequency, the pipe length, and the node markers — plus the resonance badge.
+ * frequency, the pipe length, the node markers and the density shading — plus the
+ * resonance badge.
  *
  * ── The frequency slider and the ladder are two ways to do one thing ──────────
  *
- * The slider sweeps continuously, so a learner can *hunt* for a resonance and see
- * that almost nowhere works. The ladder (a separate node) snaps to an exact mode,
+ * The slider sweeps continuously over this pipe's own ladder (with fine and
+ * coarse arrow buttons for the last few hertz, and a tick at every mode), so a
+ * learner can *hunt* for a resonance and see that almost nowhere works. The ladder (a separate node) snaps to an exact mode,
  * so they can also just *be* at one. Neither alone teaches the whole idea: the
  * sweep shows that the pipe is selective, the ladder shows what it selects.
  *
@@ -18,17 +20,16 @@
 
 import type { Property } from "scenerystack/axon";
 import { DerivedProperty } from "scenerystack/axon";
-import { Range } from "scenerystack/dot";
 import { type Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
-import { fundamentalFrequency, PipeTermination } from "../../common/model/PipeTermination.js";
+import { PipeTermination } from "../../common/model/PipeTermination.js";
 import { StandingWavesPanel } from "../../common/StandingWavesPanel.js";
 import { StandingWavesNumberControl } from "../../common/view/StandingWavesNumberControl.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
-import { DRIVE_FREQUENCY_RANGE_HARMONICS, PIPE_LENGTH_RANGE_M } from "../../StandingWavesConstants.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
+import { DriveFrequencyControl } from "./DriveFrequencyControl.js";
 
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
 const LABEL_FONT = new PhetFont(14);
@@ -39,10 +40,10 @@ const PANEL_WIDTH = 200;
 export class StandingWavesControlPanel extends StandingWavesPanel {
   public readonly terminationRadioButtons: Node;
   public readonly frequencyControl: Node;
-  public readonly fineTuneControl: Node;
   public readonly lengthControl: Node;
   public readonly driverCheckbox: Node;
   public readonly nodesCheckbox: Node;
+  public readonly densityCheckbox: Node;
 
   private readonly disposeStandingWavesControlPanel: () => void;
 
@@ -95,49 +96,12 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       { spacing: 6, accessibleName: a11y.controls.terminationStringProperty },
     );
 
-    // The reachable frequency span is expressed in *harmonics of the current pipe*,
-    // so it keeps covering the same set of modes when the length or termination
-    // changes rather than sliding off the ladder.
-    const frequencyRange = new Range(
-      DRIVE_FREQUENCY_RANGE_HARMONICS.min * fundamentalFrequency(PipeTermination.CLOSED_OPEN, PIPE_LENGTH_RANGE_M.max),
-      DRIVE_FREQUENCY_RANGE_HARMONICS.max * fundamentalFrequency(PipeTermination.OPEN_OPEN, PIPE_LENGTH_RANGE_M.min),
-    );
-
-    const frequencyControl = new StandingWavesNumberControl(
+    const frequencyControl = new DriveFrequencyControl(
+      pipe,
       standingWaves.driveFrequencyStringProperty,
-      pipe.driveFrequencyProperty,
-      frequencyRange,
-      {
-        accessibleName: a11y.controls.driveFrequencyStringProperty,
-        valuePattern: units.hertzStringProperty,
-        decimals: 0,
-        delta: 1,
-        // A resonance is fₕ/Q wide — about 14 Hz at the default fundamental — so an
-        // arrow key has to move less than that or it would step straight over every
-        // peak on the ladder.
-        keyboardStep: 10,
-        shiftKeyboardStep: 1,
-        pageKeyboardStep: 50,
-        trackWidth: PANEL_WIDTH - 70,
-      },
-    );
-
-    // The broad track spans every pipe setup. Its subpixel resonance bands are
-    // explored with this local ±50 Hz track after choosing a nearby frequency.
-    const fineTuneControl = new StandingWavesNumberControl(
-      standingWaves.fineTuneStringProperty,
-      model.fineTuneOffsetProperty,
-      model.fineTuneOffsetProperty.range,
-      {
-        accessibleName: a11y.controls.fineTuneStringProperty,
-        valuePattern: units.hertzStringProperty,
-        decimals: 1,
-        delta: 0.1,
-        keyboardStep: 1,
-        shiftKeyboardStep: 0.1,
-        pageKeyboardStep: 10,
-        trackWidth: PANEL_WIDTH - 70,
-      },
+      a11y.controls.driveFrequencyStringProperty,
+      units.hertzStringProperty,
+      { trackWidth: PANEL_WIDTH - 20 },
     );
 
     const lengthControl = new StandingWavesNumberControl(
@@ -181,6 +145,20 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       },
     );
 
+    const densityCheckbox = new Checkbox(
+      model.showDensityProperty,
+      new Text(strings.getDensityStrings().showDensityStringProperty, {
+        font: LABEL_FONT,
+        fill: StandingWavesColors.textColorProperty,
+        maxWidth: PANEL_WIDTH - 30,
+      }),
+      {
+        checkboxColor: StandingWavesColors.textColorProperty,
+        checkboxColorBackground: StandingWavesColors.panelBackgroundColorProperty,
+        accessibleName: a11y.controls.showDensityStringProperty,
+      },
+    );
+
     // ── The resonance badge ───────────────────────────────────────────────────
     const badgeTextProperty = new DerivedProperty(
       [
@@ -218,21 +196,21 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
           terminationLabel,
           terminationRadioButtons,
           frequencyControl,
-          fineTuneControl,
           badge,
           lengthControl,
           driverCheckbox,
           nodesCheckbox,
+          densityCheckbox,
         ],
       }),
     );
 
     this.terminationRadioButtons = terminationRadioButtons;
     this.frequencyControl = frequencyControl;
-    this.fineTuneControl = fineTuneControl;
     this.lengthControl = lengthControl;
     this.driverCheckbox = driverCheckbox;
     this.nodesCheckbox = nodesCheckbox;
+    this.densityCheckbox = densityCheckbox;
 
     this.disposeStandingWavesControlPanel = () => {
       badgeColorProperty.dispose();

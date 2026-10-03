@@ -9,6 +9,10 @@
  * then, once the reflection has happened, states **the result**: which of the two
  * quantities flipped and which did not.
  *
+ * With density shading on, the reflection itself also gets a sentence: what the
+ * far end does to the *spacing* of the air, which is the reason the pressure
+ * doubles at one end and vanishes at the other.
+ *
  * That last sentence is the point. A sighted learner reads the inversion off the
  * two traces in an instant; without it stated in words, a screen-reader user gets
  * a description of two graphs and none of the physics they are for.
@@ -31,6 +35,7 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         model.pulseStageProperty,
         model.farEndProperty,
         model.isComparingProperty,
+        model.showDensityProperty,
         details.atRestStringProperty,
         details.travellingTowardStringProperty,
         details.reflectingStringProperty,
@@ -38,11 +43,14 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         details.travellingBackStringProperty,
         details.closedResultStringProperty,
         details.openResultStringProperty,
+        details.densityClosedStringProperty,
+        details.densityOpenStringProperty,
       ],
       (
         stage: PulseStage,
         farEnd: EndCondition,
         isComparing: boolean,
+        showDensity: boolean,
         atRest: string,
         travellingToward: string,
         reflecting: string,
@@ -50,6 +58,8 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
         travellingBack: string,
         closedResult: string,
         openResult: string,
+        densityClosed: string,
+        densityOpen: string,
       ) => {
         if (stage === PulseStage.AT_REST) {
           return atRest;
@@ -58,7 +68,13 @@ export class ReflectionScreenSummaryContent extends ScreenSummaryContent {
           return travellingToward;
         }
         if (stage === PulseStage.REFLECTING) {
-          return reflecting;
+          if (!showDensity) {
+            return reflecting;
+          }
+          if (isComparing) {
+            return `${reflecting} ${densityClosed} ${densityOpen}`;
+          }
+          return `${reflecting} ${farEnd === EndCondition.CLOSED ? densityClosed : densityOpen}`;
         }
         if (stage === PulseStage.NEAR_REFLECTING) {
           return nearReflecting;

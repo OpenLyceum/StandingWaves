@@ -26,6 +26,7 @@ import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { EndCondition } from "../../common/model/PipeTermination.js";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
 import { createTimeControl } from "../../common/view/createTimeControl.js";
+import { DensitySlabsNode } from "../../common/view/DensitySlabsNode.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
@@ -39,6 +40,7 @@ import {
   STRIP_SPACING,
 } from "../../StandingWavesConstants.js";
 import type { PhaseModel } from "../model/PhaseModel.js";
+import { NeighbourPairNode } from "./NeighbourPairNode.js";
 import { EquationReadoutNode, PhaseControlPanel } from "./PhaseControlPanel.js";
 import { PhaseScreenSummaryContent } from "./PhaseScreenSummaryContent.js";
 import { ReferenceMarkerNode } from "./ReferenceMarkerNode.js";
@@ -58,7 +60,9 @@ const PARTICLE_ROW_COUNT = 3;
 export type PhaseScreenViewOptions = ScreenViewOptions;
 
 export class PhaseScreenView extends ScreenView {
+  private readonly densitySlabs: DensitySlabsNode;
   private readonly particles: ParticleRowNode;
+  private readonly neighbourPair: NeighbourPairNode;
   private readonly strips: TraceStripNode[];
   private readonly marker: ReferenceMarkerNode;
   private readonly model: PhaseModel;
@@ -90,14 +94,28 @@ export class PhaseScreenView extends ScreenView {
     const columnSpacingPx = PIPE_VIEW_LENGTH / PARTICLE_COUNT;
     const particleAmplitudePx = PARTICLE_AMPLITUDE_SPACINGS * columnSpacingPx;
 
+    const drawnDisplacementAt = (fraction: number): number =>
+      (model.displacementAt(fraction * model.pipeLength) / model.displacementAmplitude) * particleAmplitudePx;
+
+    this.densitySlabs = new DensitySlabsNode({
+      viewLength: PIPE_VIEW_LENGTH,
+      bandHeight: PIPE_BORE_HEIGHT,
+      slabCount: PARTICLE_COUNT,
+      displacementAt: drawnDisplacementAt,
+      densityAt: (fraction) => model.densityChangeAt(fraction * model.pipeLength) / model.densityChangeAmplitude,
+      fillColorProperty: StandingWavesColors.pressureColorProperty,
+      wallColorProperty: StandingWavesColors.particleColorProperty,
+      visibleProperty: model.showDensityProperty,
+    });
+    pipe.boreLayer.addChild(this.densitySlabs);
+
     this.particles = new ParticleRowNode({
       viewLength: PIPE_VIEW_LENGTH,
       bandHeight: PIPE_BORE_HEIGHT,
       rowCount: PARTICLE_ROW_COUNT,
       columnCount: PARTICLE_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
-      displacementAt: (fraction) =>
-        (model.displacementAt(fraction * model.pipeLength) / model.displacementAmplitude) * particleAmplitudePx,
+      displacementAt: drawnDisplacementAt,
       radius: Math.min(2.2, columnSpacingPx * 0.18),
     });
     pipe.boreLayer.addChild(this.particles);
@@ -114,18 +132,31 @@ export class PhaseScreenView extends ScreenView {
     });
     pipe.addChild(this.marker);
 
+    this.neighbourPair = new NeighbourPairNode(model, {
+      viewLength: PIPE_VIEW_LENGTH,
+      particleAmplitude: particleAmplitudePx,
+    });
+    pipe.addChild(this.neighbourPair);
+
     // ── Traces ────────────────────────────────────────────────────────────────
     const xRange = new Range(0, model.pipeLength);
     const tickSpacing = model.pipeLength / 4;
     const alwaysVisible = new BooleanProperty(true);
 
-    const makeStrip = (traces: TraceSpec[], isBottom: boolean): TraceStripNode =>
+    // The pressure strip is also the density strip, and says so when density is shown.
+    const makeStrip = (
+      traces: TraceSpec[],
+      isBottom: boolean,
+      densityNoteVisibleProperty?: BooleanProperty,
+    ): TraceStripNode =>
       new TraceStripNode(traces, {
         viewWidth: PIPE_VIEW_LENGTH,
         viewHeight: STRIP_HEIGHT,
         xRange,
         xSpacing: tickSpacing,
         showXTickLabels: isBottom,
+        note: densityNoteVisibleProperty ? strings.getDensityStrings().densityFollowsPressureStringProperty : undefined,
+        noteVisibleProperty: densityNoteVisibleProperty,
       });
 
     // Order matters: velocity sits directly above pressure so the two can be
@@ -163,6 +194,7 @@ export class PhaseScreenView extends ScreenView {
         },
       ],
       true,
+      model.showDensityProperty,
     );
     this.strips = [displacementStrip, velocityStrip, pressureStrip];
 
@@ -249,6 +281,9 @@ export class PhaseScreenView extends ScreenView {
           controlPanel.equationsCheckbox,
           controlPanel.referencePointCheckbox,
           this.marker,
+          controlPanel.densityCheckbox,
+          controlPanel.neighbourPairCheckbox,
+          this.neighbourPair,
           timeControl,
           resetAllButton,
         ],
@@ -258,6 +293,7 @@ export class PhaseScreenView extends ScreenView {
     this.disposePhaseScreenView = () => {
       model.referencePositionProperty.unlink(onReferencePosition);
       alwaysVisible.dispose();
+      this.neighbourPair.dispose();
       summaryContent.dispose();
     };
 
@@ -269,7 +305,9 @@ export class PhaseScreenView extends ScreenView {
   }
 
   private updateWave(): void {
+    this.densitySlabs.update();
     this.particles.update();
+    this.neighbourPair.update();
     for (const strip of this.strips) {
       strip.update();
     }

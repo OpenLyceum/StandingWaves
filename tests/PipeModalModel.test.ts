@@ -19,7 +19,7 @@ import { BULK_MODULUS } from "../src/common/model/acoustics.js";
 import { displacementShape } from "../src/common/model/modeShapes.js";
 import { PipeModalModel } from "../src/common/model/PipeModalModel.js";
 import { PipeTermination } from "../src/common/model/PipeTermination.js";
-import { MODE_QUALITY_FACTOR } from "../src/StandingWavesConstants.js";
+import { FUNDAMENTAL_QUALITY_FACTOR } from "../src/StandingWavesConstants.js";
 
 /** Runs the model for `duration` model seconds in fixed steps. */
 function run(model: PipeModalModel, duration: number, stepCount = 2000): void {
@@ -101,7 +101,7 @@ describe("steady-state response is a Lorentzian", () => {
     model.dispose();
   });
 
-  it("reaches F·Q/ω² at resonance", () => {
+  it("reaches F·Qₕ/ωₕ² at resonance", () => {
     const model = new PipeModalModel();
     for (const h of [1, 2, 3, 5]) {
       const resonant = model.getModeFrequency(h);
@@ -110,24 +110,34 @@ describe("steady-state response is a Lorentzian", () => {
     model.dispose();
   });
 
-  it("falls to 1/√2 of the peak at the half-power points fₕ(1 ± 1/2Q)", () => {
+  it("falls to 1/√2 of the peak at the half-power points fₕ ± f₁/2Q₁ — one width in Hz for every mode", () => {
     const model = new PipeModalModel();
-    const resonant = model.getModeFrequency(1);
-    const peak = model.steadyStateAmplitude(1, resonant);
-    for (const sign of [-1, 1]) {
-      const edge = resonant * (1 + (sign * 1) / (2 * MODE_QUALITY_FACTOR));
-      // One decimal place: fₕ(1 ± 1/2Q) is itself the high-Q approximation to the
-      // half-power point, good to O(1/Q) — 5% at Q = 20.
-      expect(model.steadyStateAmplitude(1, edge) / peak).toBeCloseTo(Math.SQRT1_2, 1);
+    const halfWidth = model.getModeFrequency(1) / (2 * FUNDAMENTAL_QUALITY_FACTOR);
+    for (const h of [1, 3, 6]) {
+      const resonant = model.getModeFrequency(h);
+      const peak = model.steadyStateAmplitude(h, resonant);
+      for (const sign of [-1, 1]) {
+        // One decimal place: fₕ(1 ± 1/2Qₕ) is itself the high-Q approximation to the
+        // half-power point, good to O(1/Qₕ) — 8% at Q = 12.
+        expect(model.steadyStateAmplitude(h, resonant + sign * halfWidth) / peak).toBeCloseTo(Math.SQRT1_2, 1);
+      }
     }
     model.dispose();
   });
 
-  it("rolls the resonant amplitude off as 1/h² — the spectrum the pipe itself imposes", () => {
+  it("gives harmonic h a quality factor of h·Q₁", () => {
+    const model = new PipeModalModel();
+    for (const h of [1, 2, 3, 7]) {
+      expect(model.modeQualityFactor(h)).toBe(h * FUNDAMENTAL_QUALITY_FACTOR);
+    }
+    model.dispose();
+  });
+
+  it("rolls the resonant amplitude off as 1/h — the spectrum the pipe itself imposes", () => {
     const model = new PipeModalModel();
     const first = model.resonantAmplitude(1);
     for (const h of [2, 3, 4, 6]) {
-      expect(model.resonantAmplitude(h)).toBeCloseTo(first / (h * h), 12);
+      expect(model.resonantAmplitude(h)).toBeCloseTo(first / h, 12);
     }
     model.dispose();
   });
@@ -185,10 +195,11 @@ describe("the integrator agrees with the closed form", () => {
 });
 
 describe("build-up and ring-down timing", () => {
-  it("computes τ = Q/(πfₕ)", () => {
+  it("computes τ = Qₕ/(πfₕ) = Q₁/(πf₁) for every harmonic", () => {
     const model = new PipeModalModel();
+    // Default pipe: f₁ = 171.5 Hz, so τ = 12/(π·171.5) ≈ 22.3 ms of model time.
     for (const h of [1, 2, 4]) {
-      expect(model.buildUpTimeConstant(h)).toBeCloseTo(MODE_QUALITY_FACTOR / (Math.PI * model.getModeFrequency(h)), 12);
+      expect(model.buildUpTimeConstant(h)).toBeCloseTo(FUNDAMENTAL_QUALITY_FACTOR / (Math.PI * 171.5), 12);
     }
     model.dispose();
   });
@@ -218,9 +229,13 @@ describe("build-up and ring-down timing", () => {
     model.dispose();
   });
 
-  it("makes higher harmonics build faster, since τ ∝ 1/fₕ", () => {
+  it("builds a high harmonic up as fast as the fundamental, from one shared damping rate", () => {
     const model = new PipeModalModel();
-    expect(model.buildUpTimeConstant(4)).toBeLessThan(model.buildUpTimeConstant(1));
+    model.tuneToHarmonic(4);
+    run(model, model.buildUpTimeConstant(1), 20000);
+    const fraction = peakAmplitude(model, 4) / model.resonantAmplitude(4);
+    expect(fraction).toBeGreaterThan(0.55);
+    expect(fraction).toBeLessThan(0.72);
     model.dispose();
   });
 });
@@ -332,6 +347,40 @@ describe("the pipe's shape", () => {
   });
 });
 
+describe("the nodes stay put through the cycle", () => {
+  // The drawn field is every mode summed. The resonant mode lags the drive by π/2
+  // while the off-resonant ones move with it, so their share makes the nodes swim
+  // back and forth each cycle. With one Q for every mode, that share reached half
+  // the resonant amplitude at h = 3 and the middle node of an open pipe wandered
+  // over 0.475 L – 0.525 L even while the mode was at 70% of its peak. Qₕ = h·Q₁
+  // keeps it within ±0.015 L of the textbook positions.
+  it("holds the third harmonic's displacement nodes at L/6, L/2 and 5L/6", () => {
+    const model = new PipeModalModel();
+    model.tuneToHarmonic(3);
+    model.settleToSteadyState();
+    const length = model.pipeLengthProperty.value;
+    const peak = model.resonantAmplitude(3);
+    const period = 1 / model.driveFrequencyProperty.value;
+    let checked = 0;
+    for (let i = 0; i < 64; i++) {
+      model.step(period / 64);
+      // Only while the mode is well away from its own zero crossing, where the
+      // off-resonant remainder is all there is to draw.
+      if (Math.abs(model.modalAmplitude(3)) >= 0.7 * peak) {
+        for (const node of [1 / 6, 1 / 2, 5 / 6]) {
+          const tolerance = 0.015;
+          const left = model.displacementAt((node - tolerance) * length);
+          const right = model.displacementAt((node + tolerance) * length);
+          expect(left * right).toBeLessThan(0);
+        }
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(20);
+    model.dispose();
+  });
+});
+
 describe("resonance reporting", () => {
   it("flags resonance when tuned to a harmonic and not when detuned", () => {
     const model = new PipeModalModel();
@@ -357,6 +406,60 @@ describe("resonance reporting", () => {
     const before = model.driveFrequencyProperty.value;
     model.tuneToHarmonic(2);
     expect(model.driveFrequencyProperty.value).toBe(before);
+    model.dispose();
+  });
+});
+
+describe("the drive's range follows the pipe", () => {
+  it("spans 0.5 f₁ to 8.5 f₁ of the current pipe", () => {
+    const model = new PipeModalModel();
+    // Open–open, 1 m: f₁ = c/2L = 171.5 Hz.
+    expect(model.driveFrequencyRangeProperty.value.min).toBeCloseTo(85.75, 6);
+    expect(model.driveFrequencyRangeProperty.value.max).toBeCloseTo(1457.75, 6);
+
+    // Closed–open, 1 m: f₁ = c/4L = 85.75 Hz, an octave lower, and so is the range.
+    model.terminationProperty.value = PipeTermination.CLOSED_OPEN;
+    expect(model.driveFrequencyRangeProperty.value.min).toBeCloseTo(42.875, 6);
+    expect(model.driveFrequencyRangeProperty.value.max).toBeCloseTo(728.875, 6);
+    model.dispose();
+  });
+
+  it("puts harmonic h at the same fraction of the range for every pipe", () => {
+    const model = new PipeModalModel();
+    for (const termination of [PipeTermination.OPEN_OPEN, PipeTermination.CLOSED_OPEN]) {
+      for (const length of [0.5, 1, 2]) {
+        model.terminationProperty.value = termination;
+        model.pipeLengthProperty.value = length;
+        const range = model.driveFrequencyRangeProperty.value;
+        expect((model.getModeFrequency(1) - range.min) / range.getLength()).toBeCloseTo(0.5 / 8, 9);
+        expect((model.getModeFrequency(5) - range.min) / range.getLength()).toBeCloseTo(4.5 / 8, 9);
+      }
+    }
+    model.dispose();
+  });
+
+  it("leaves the drive alone when the ladder moves past it", () => {
+    const model = new PipeModalModel();
+    model.pipeLengthProperty.value = 1.2;
+    expect(model.driveFrequencyProperty.value).toBeCloseTo(171.5, 9);
+    model.dispose();
+  });
+
+  it("clamps the drive when the range moves off it", () => {
+    const model = new PipeModalModel();
+    model.tuneToHarmonic(8); // 1372 Hz
+    // Open–open, 2 m: f₁ = 85.75 Hz, so the top of the range falls to 728.875 Hz.
+    model.pipeLengthProperty.value = 2;
+    expect(model.driveFrequencyProperty.value).toBeCloseTo(728.875, 6);
+    model.dispose();
+  });
+
+  it("reaches every rung of the ladder", () => {
+    const model = new PipeModalModel();
+    for (let harmonic = 1; harmonic <= 8; harmonic++) {
+      model.tuneToHarmonic(harmonic);
+      expect(model.driveFrequencyProperty.value).toBeCloseTo(harmonic * 171.5, 6);
+    }
     model.dispose();
   });
 });

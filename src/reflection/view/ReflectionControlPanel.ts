@@ -26,6 +26,9 @@ export class ReflectionControlPanel extends StandingWavesPanel {
   /** The compare checkbox, for the screen's pdomOrder. */
   public readonly compareCheckbox: Node;
 
+  /** The density checkbox, for the screen's pdomOrder. */
+  public readonly densityCheckbox: Node;
+
   /** The launch button, for the screen's pdomOrder. */
   public readonly launchButton: Node;
 
@@ -77,6 +80,20 @@ export class ReflectionControlPanel extends StandingWavesPanel {
       },
     );
 
+    const densityCheckbox = new Checkbox(
+      model.showDensityProperty,
+      new Text(strings.getDensityStrings().showDensityStringProperty, {
+        font: LABEL_FONT,
+        fill: StandingWavesColors.textColorProperty,
+        maxWidth: 180,
+      }),
+      {
+        checkboxColor: StandingWavesColors.textColorProperty,
+        checkboxColorBackground: StandingWavesColors.panelBackgroundColorProperty,
+        accessibleName: a11y.controls.showDensityStringProperty,
+      },
+    );
+
     const launchButton = new RectangularPushButton({
       ...FLAT_RECTANGULAR_BUTTON_OPTIONS,
       content: new Text(reflection.launchPulseStringProperty, {
@@ -105,12 +122,13 @@ export class ReflectionControlPanel extends StandingWavesPanel {
       new VBox({
         align: "left",
         spacing: 10,
-        children: [launchButton, farEndLabel, farEndRadioButtons, compareCheckbox, hint],
+        children: [launchButton, farEndLabel, farEndRadioButtons, compareCheckbox, densityCheckbox, hint],
       }),
     );
 
     this.farEndRadioButtons = farEndRadioButtons;
     this.compareCheckbox = compareCheckbox;
+    this.densityCheckbox = densityCheckbox;
     this.launchButton = launchButton;
   }
 }

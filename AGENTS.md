@@ -37,8 +37,11 @@ current and specific; neither is a stub.
 | Chart chrome (ported from WaveComposer) | `src/common/view/ChartFrame.ts` |
 | Multi-trace strip | `src/common/view/TraceStripNode.ts` |
 | Oscillating particle row | `src/common/view/ParticleRowNode.ts` |
+| Density slabs (Reflection, Phase, Standing Waves) | `src/common/view/DensitySlabsNode.ts` |
+| Neighbour pair probe (Phase) | `src/phase-relationships/view/NeighbourPairNode.ts` |
 | Pipe, walls and end treatments | `src/common/view/PipeNode.ts` |
 | Themed slider | `src/common/view/StandingWavesNumberControl.ts` |
+| Drive-frequency slider (per-pipe range, mode ticks) | `src/standing-waves/view/DriveFrequencyControl.ts` |
 | Constants (SI + layout px) | `src/StandingWavesConstants.ts` |
 | Colors | `src/StandingWavesColors.ts` |
 
@@ -71,7 +74,7 @@ full a11y wiring all pass Baton's compliance check as-is.
 
 ## Testing
 
-145 vitest specs; `happy-dom`, template `tests/setup.ts`.
+162 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -79,8 +82,10 @@ full a11y wiring all pass Baton's compliance check as-is.
 | `tests/PipeTermination.test.ts` | c/2L, c/4L, the exact 2:1 octave, the odd series |
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
-| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, τ = Q/(πfₕ), ring-down, odd-only enforcement |
+| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range |
 | `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
+| `tests/DriveFrequencyControl.test.ts` | each mode tick sits under the thumb for every pipe; odd-only ticks on a stopped pipe |
+| `tests/PhaseModel.test.ts` | δρ/ρ = −∂ξ/∂x, peak kA, the pair's kΔx lag and finite-difference squeeze |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |
 
 Two habits to keep:
@@ -114,6 +119,10 @@ home screen. `?showVelocityTrace=true` adds the velocity curve where it is optio
   plus a long default pipe (1 m) so the fundamental is low to begin with. TimeControlNode's
   Slow speed, selected by default, multiplies those rates by 0.4. Every frequency in the model is a
   true SI value and the readouts say so.
+- **Qₕ = h·Q₁, not one Q for every mode.** Every mode shares the fundamental's damping rate. A single
+  Q let the off-resonant modes, which move with the drive rather than a quarter cycle behind it, reach
+  half the resonant amplitude at h = 3, and the nodes swam through each cycle. Don't flatten it back;
+  `tests/PipeModalModel.test.ts` pins the third harmonic's nodes. See `doc/model.md`.
 - **The two integrators are different on purpose.** The lattice is conservative and needs a symplectic
   method (velocity Verlet); the modal bank is damped and driven and needs accuracy over thousands of
   cycles (RK4). Don't unify them.
@@ -122,11 +131,15 @@ home screen. `?showVelocityTrace=true` adds the velocity curve where it is optio
   off-resonant modes. Any shape assertion must first advance to the mode's extremum — see
   `settleAtPeak()` in `tests/PipeModalModel.test.ts`. Two tests failed this way before that helper.
 - **Pressure needs its own trace scale**, not a multiple of the displacement scale: p carries a factor
-  of kₕ, so resonant pressure falls as 1/h while resonant displacement falls as 1/h². Hence
+  of kₕ, so resonant displacement falls as 1/h while resonant pressure is flat in h. Hence
   `resonantPressureAmplitude`.
 - **Trace scales are the *resonant* amplitude, not the current peak.** Normalising to the instantaneous
   peak would make off-resonance, building-up and at-resonance all look identical and destroy the point
   of the frequency slider.
+- **Density is shaded from the model's pressure, not from the drawn gaps.** δρ/ρ = p/(ρc²), so the
+  slab tint and the pressure trace are one quantity by construction; the drawn gaps are exaggerated
+  and would not be. "Show air density" (Reflection, Phase, Standing Waves) and "Show neighbour pair" (Phase) are off by
+  default, so the screens look as before until a teacher turns them on.
 - **Drawn particle amplitudes are exaggerated** (`PARTICLE_AMPLITUDE_SPACINGS > 1`) because the eye
   reads the *gradient*, not the displacement. The system is linear; this touches no physics.
 

@@ -2,7 +2,9 @@
  * StandingWavesScreenView.ts
  *
  * The pipe with its standing wave, the displacement and pressure traces beneath it,
- * the node markers across all three, and the overtone ladder beside them.
+ * the node markers across all three, and the overtone ladder beside them. Optionally
+ * the air in the bore is cut into slabs tinted by density, as on the Reflection and
+ * Phase screens.
  *
  * ── The one scale decision that matters ───────────────────────────────────────
  *
@@ -21,6 +23,7 @@
  */
 
 import { Range } from "scenerystack/dot";
+import { Shape } from "scenerystack/kite";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
@@ -28,6 +31,7 @@ import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { leftEnd, rightEnd } from "../../common/model/PipeTermination.js";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/StandingWavesButtonOptions.js";
 import { createTimeControl } from "../../common/view/createTimeControl.js";
+import { DensitySlabsNode } from "../../common/view/DensitySlabsNode.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
@@ -68,6 +72,7 @@ export type StandingWavesScreenViewOptions = ScreenViewOptions;
 
 export class StandingWavesScreenView extends ScreenView {
   private readonly model: StandingWavesModel;
+  private readonly densitySlabs: DensitySlabsNode;
   private readonly particles: ParticleRowNode;
   private readonly strips: TraceStripNode[];
   private readonly pipeNodes: Map<string, PipeNode>;
@@ -111,19 +116,46 @@ export class StandingWavesScreenView extends ScreenView {
     const columnSpacingPx = PIPE_VIEW_LENGTH / PARTICLE_COUNT;
     const particleAmplitudePx = PARTICLE_AMPLITUDE_SPACINGS * columnSpacingPx;
 
+    const drawnDisplacementAt = (fraction: number): number => {
+      const scale = this.currentDisplacementScale();
+      if (scale <= 0) {
+        return 0;
+      }
+      return (pipe.displacementAt(fraction * pipe.pipeLengthProperty.value) / scale) * particleAmplitudePx;
+    };
+
+    // Full tint at the resonant pressure amplitude itself (no trace headroom), so a
+    // pipe at resonance swings its pressure antinodes from clear to full blue, and
+    // off resonance the tint barely moves — the same story the traces tell.
+    this.densitySlabs = new DensitySlabsNode({
+      viewLength: PIPE_VIEW_LENGTH,
+      bandHeight: PIPE_BORE_HEIGHT,
+      slabCount: PARTICLE_COUNT,
+      displacementAt: drawnDisplacementAt,
+      densityAt: (fraction) => {
+        const scale = pipe.resonantPressureAmplitude(this.referenceHarmonic());
+        return scale > 0 ? pipe.pressureAt(fraction * pipe.pipeLengthProperty.value) / scale : 0;
+      },
+      fillColorProperty: StandingWavesColors.pressureColorProperty,
+      wallColorProperty: StandingWavesColors.particleColorProperty,
+      visibleProperty: model.showDensityProperty,
+    });
+
+    // The particles on this screen sit above all three PipeNodes rather than in one
+    // bore layer, so the slabs get the bore's clip here: a wall displaced past an
+    // open end must not tint the air outside the pipe.
+    const densityLayer = new Node({
+      children: [this.densitySlabs],
+      clipArea: Shape.rectangle(0, -PIPE_BORE_HEIGHT / 2, PIPE_VIEW_LENGTH, PIPE_BORE_HEIGHT),
+    });
+
     this.particles = new ParticleRowNode({
       viewLength: PIPE_VIEW_LENGTH,
       bandHeight: PIPE_BORE_HEIGHT,
       rowCount: PARTICLE_ROW_COUNT,
       columnCount: PARTICLE_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
-      displacementAt: (fraction) => {
-        const scale = this.currentDisplacementScale();
-        if (scale <= 0) {
-          return 0;
-        }
-        return (pipe.displacementAt(fraction * pipe.pipeLengthProperty.value) / scale) * particleAmplitudePx;
-      },
+      displacementAt: drawnDisplacementAt,
       radius: Math.min(2.2, columnSpacingPx * 0.18),
     });
 
@@ -160,7 +192,8 @@ export class StandingWavesScreenView extends ScreenView {
       caption: quantities.pressureStringProperty,
     };
 
-    const makeStrip = (traces: TraceSpec[], isBottom: boolean): TraceStripNode =>
+    // The pressure strip is also the density strip, and says so when density is shown.
+    const makeStrip = (traces: TraceSpec[], isBottom: boolean, showsDensity = false): TraceStripNode =>
       new TraceStripNode(traces, {
         viewWidth: PIPE_VIEW_LENGTH,
         viewHeight: STRIP_HEIGHT,
@@ -174,16 +207,19 @@ export class StandingWavesScreenView extends ScreenView {
             font: new PhetFont(11),
             fill: StandingWavesColors.axisColorProperty,
           }),
+        note: showsDensity ? strings.getDensityStrings().densityFollowsPressureStringProperty : undefined,
+        noteVisibleProperty: showsDensity ? model.showDensityProperty : undefined,
       });
 
     const displacementStrip = makeStrip([displacementTrace, velocityTrace], false);
-    const pressureStrip = makeStrip([pressureTrace], true);
+    const pressureStrip = makeStrip([pressureTrace], true, true);
     this.strips = [displacementStrip, pressureStrip];
 
     // ── Layout ────────────────────────────────────────────────────────────────
     const stack = new Node();
     pipeLayer.x = 0;
     pipeLayer.y = PIPE_BORE_HEIGHT / 2;
+    pipeLayer.addChild(densityLayer);
     pipeLayer.addChild(this.particles);
     pipeLayer.addChild(markers);
     stack.addChild(pipeLayer);
@@ -254,11 +290,11 @@ export class StandingWavesScreenView extends ScreenView {
         pdomOrder: [
           controlPanel.terminationRadioButtons,
           controlPanel.frequencyControl,
-          controlPanel.fineTuneControl,
           ladder,
           controlPanel.lengthControl,
           controlPanel.driverCheckbox,
           controlPanel.nodesCheckbox,
+          controlPanel.densityCheckbox,
           timeControl,
           resetAllButton,
         ],
@@ -281,6 +317,7 @@ export class StandingWavesScreenView extends ScreenView {
   }
 
   private updatePipe(): void {
+    this.densitySlabs.update();
     this.particles.update();
     for (const strip of this.strips) {
       strip.update();

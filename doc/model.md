@@ -37,7 +37,7 @@ Every quantity in the model is a real SI value. There are no scaled or dimension
 | Characteristic impedance | ρc | Pa·s/m | 413 |
 | Bulk modulus | ρc² | Pa | 1.42 × 10⁵ |
 | Drive frequency | f | Hz | ~85 – 2800 |
-| Mode quality factor | Q | — | 20 (fixed) |
+| Quality factor of the fundamental | Q₁ | — | 12; harmonic h has Qₕ = h·Q₁ |
 
 `c` and `ρ` are held fixed deliberately. Making the sound speed adjustable would let a learner
 change every frequency in the sim without changing anything they can see in the pipe.
@@ -60,6 +60,31 @@ p = ± ρc · u
 
 so velocity and pressure are **in phase** in a forward-going wave and **180° out of phase** in a
 backward-going one. That single sign is the content of the Phase screen.
+
+### Density
+
+Mass conservation for a thin slab of air gives the third name for the same quantity:
+
+```
+δρ/ρ = −∂ξ/∂x = p/(ρc²)
+```
+
+−∂ξ/∂x is how far two neighbouring particles have closed the gap between them, so **air is denser
+only where neighbours move out of step**. Neighbours that move together carry their slab along
+without squeezing it — which is why an open end (∂ξ/∂x = 0) has normal density and no pressure, and
+why a rigid wall, where the neighbour on one side cannot move, has the most.
+
+The Reflection, Phase and Standing Waves screens can draw this ("Show air density"): the bore is cut into slabs
+whose walls ride with the air, each tinted pressure-blue by its density. On the Phase screen a
+"neighbour pair" marks two particles Δx = L/12 apart. In a travelling wave they are out of step by
+kΔx, and the slab between them is squeezed by the finite difference
+−[ξ(x+Δx/2) − ξ(x−Δx/2)]/Δx, which tends to δρ/ρ as Δx → 0.
+
+On the Standing Waves screen the shading makes the counter-intuitive half of a standing wave visible:
+the density swings hardest at the **displacement nodes**, where the air on both sides converges and
+then pulls apart, and barely changes at the displacement antinodes, where neighbours move together.
+The full tint there is the selected harmonic's resonant pressure amplitude, so off resonance the
+shading stays near its resting level, just as the traces stay a sliver.
 
 ## The two boundary conditions
 
@@ -138,7 +163,7 @@ on screen would only muddy it.
 Each mode h carries its own amplitude obeying
 
 ```
-äₕ + (ωₕ/Q)·ȧₕ + ωₕ²·aₕ = F·cos(Θ)
+äₕ + (ωₕ/Qₕ)·ȧₕ + ωₕ²·aₕ = F·cos(Θ),     Qₕ = h·Q₁
 ```
 
 and the pipe is the sum Σ aₕ(t)·φₕ(x). Summing two counter-propagating waves instead would produce a
@@ -146,16 +171,32 @@ perfect standing wave at *any* frequency, which is precisely the thing that is n
 pipe. This way two behaviours come out for free rather than being animated by hand:
 
 - the **steady-state response is a Lorentzian**, so resonance is something to hunt for;
-- the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ) — about 11 s of wall clock at the
-  default pipe on Slow, or about 4.5 s at Normal speed.
+- the **build-up takes the right time**, τ = 2Qₕ/ωₕ = Q₁/(πf₁) — the same for every mode, about
+  11 s of wall clock at the default pipe on Slow, or about 4.5 s at Normal speed.
 
-Q = 12 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
+Q₁ = 12 is lower than a real organ pipe (30–50), chosen so the resonance is broad enough to find by
 dragging a slider and the build-up is watchable rather than tens of seconds long.
 
-The broad frequency slider covers every available pipe length and termination. A second slider
-adjusts the drive by ±50 Hz around the last broad choice, making narrow resonance peaks reachable
-by pointer. Crossing to a different harmonic starts its modal build-up from rest so the old mode
-does not obscure the new pattern on the higher harmonic's smaller display scale.
+**Why Qₕ rises with h.** Every mode is given the same damping *rate* ω₁/Q₁, so Qₕ ∝ fₕ. Real pipes
+go the same way (viscous and thermal wall losses give Q ∝ √f); this is the simplest such law. It
+matters for the *shape*: the drawn field sums every mode, the resonant one lags the drive by π/2
+while the off-resonant ones move with it, and their share relative to the resonant mode scales as
+1/Qₕ. With one Q for all modes that share reached about half the resonant amplitude at h = 3, and
+the nodes visibly swam back and forth through each cycle. With Qₕ = h·Q₁ it is 16 % at h = 3 and
+the nodes hold within about ±0.02 L while the mode is above half its peak. A lossy pipe is never a
+*perfect* standing wave: at the instant the resonant mode passes through zero, only the small
+off-resonant remainder is left, and its zeros are elsewhere. Two further consequences: every
+resonance is the same f₁/Q₁ ≈ 14 Hz wide, and the resonant displacement falls as 1/h.
+
+The frequency slider covers 0.5 f₁ to 8.5 f₁ of the **current** pipe
+(`PipeModalModel.driveFrequencyRangeProperty`), so harmonic h always sits at the same place on the
+track and a tick marks each mode the pipe has: 1–8, or only the odd ones for a stopped pipe. The top
+matches the eight rungs of the overtone ladder. Changing the length or termination leaves the drive
+frequency where it is and moves the ladder past it, which is itself an experiment, unless the drive
+would leave the new range, in which case it is clamped. The slider's fine (1 Hz) and coarse (10 Hz)
+arrow buttons stay under the ~14 Hz width of a resonance. Crossing to a
+different harmonic starts its modal build-up from rest so the old mode does not obscure the new
+pattern on the higher harmonic's smaller display scale.
 
 The driver sits at the left end and is whatever kind of source that end admits: a pressure source (a
 reed) against a closed end, a volume-velocity source (a jet) at an open one. Each couples to the
@@ -169,7 +210,7 @@ deliberately given the **same bore length**, so that the octave and the missing 
 attributable to the termination alone.
 
 Bar heights in the spectrum are the pipe's own resonant response under an equal-per-mode excitation,
-which falls as 1/h². That rolloff is derived, not a timbre curve drawn to look plausible.
+which falls as Qₕ/ωₕ² ∝ 1/h. That rolloff is derived, not a timbre curve drawn to look plausible.
 
 **Known simplifications.** A real clarinet is not a cylinder with a rigid cap, a real flute has an
 embouchure hole rather than a plain open end, and both have end corrections that flatten the ideal
@@ -208,6 +249,6 @@ implementation, so a wrong constant fails instead of being locked in:
 - c/2L and c/4L, and the exact 2:1 octave between them;
 - the odd-harmonic series of a stopped pipe;
 - ρc ≈ 413 rayl and ρc² ≈ 1.42 × 10⁵ Pa for air at 20 °C;
-- the half-power points at fₕ(1 ± 1/2Q) and the build-up constant Q/(πfₕ);
+- the half-power points at fₕ ± f₁/2Q₁ and the build-up constant Q₁/(πf₁), the same for every mode;
 - energy conservation and the measured wave speed on the lattice;
 - and, most importantly, the reflection signs at each kind of end.

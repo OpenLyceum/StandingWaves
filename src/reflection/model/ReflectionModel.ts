@@ -68,6 +68,9 @@ export class ReflectionModel implements TModel {
   /** Whether both far ends are shown at once. */
   public readonly isComparingProperty: BooleanProperty;
 
+  /** Whether the air in the bore is drawn as slabs tinted by their density. */
+  public readonly showDensityProperty: BooleanProperty;
+
   /** Whether a pulse has been launched since the last reset. */
   public readonly hasLaunchedProperty: BooleanProperty;
 
@@ -99,6 +102,7 @@ export class ReflectionModel implements TModel {
       validValues: [EndCondition.CLOSED, EndCondition.OPEN],
     });
     this.isComparingProperty = new BooleanProperty(false);
+    this.showDensityProperty = new BooleanProperty(false);
     this.hasLaunchedProperty = new BooleanProperty(false);
     this.timeSinceLaunchProperty = new NumberProperty(0, { units: "s" });
 
@@ -167,6 +171,7 @@ export class ReflectionModel implements TModel {
     this.openChain.reset();
     this.farEndProperty.reset();
     this.isComparingProperty.reset();
+    this.showDensityProperty.reset();
     this.hasLaunchedProperty.reset();
     this.timeSinceLaunchProperty.reset();
     this.stateChangeCountProperty.reset();
@@ -177,6 +182,7 @@ export class ReflectionModel implements TModel {
     this.stateChangeCountProperty.dispose();
     this.timeSinceLaunchProperty.dispose();
     this.hasLaunchedProperty.dispose();
+    this.showDensityProperty.dispose();
     this.isComparingProperty.dispose();
     this.farEndProperty.dispose();
     this.timer.dispose();

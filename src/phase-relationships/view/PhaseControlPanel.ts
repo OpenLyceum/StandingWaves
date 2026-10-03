@@ -33,6 +33,8 @@ export class PhaseControlPanel extends StandingWavesPanel {
   public readonly wavelengthControl: Node;
   public readonly equationsCheckbox: Node;
   public readonly referencePointCheckbox: Node;
+  public readonly densityCheckbox: Node;
+  public readonly neighbourPairCheckbox: Node;
 
   private readonly disposePhaseControlPanel: () => void;
 
@@ -119,6 +121,34 @@ export class PhaseControlPanel extends StandingWavesPanel {
       },
     );
 
+    const densityCheckbox = new Checkbox(
+      model.showDensityProperty,
+      new Text(strings.getDensityStrings().showDensityStringProperty, {
+        font: LABEL_FONT,
+        fill: StandingWavesColors.textColorProperty,
+        maxWidth: PANEL_WIDTH - 30,
+      }),
+      {
+        checkboxColor: StandingWavesColors.textColorProperty,
+        checkboxColorBackground: StandingWavesColors.panelBackgroundColorProperty,
+        accessibleName: a11y.controls.showDensityStringProperty,
+      },
+    );
+
+    const neighbourPairCheckbox = new Checkbox(
+      model.showNeighbourPairProperty,
+      new Text(phase.showNeighbourPairStringProperty, {
+        font: LABEL_FONT,
+        fill: StandingWavesColors.textColorProperty,
+        maxWidth: PANEL_WIDTH - 30,
+      }),
+      {
+        checkboxColor: StandingWavesColors.textColorProperty,
+        checkboxColorBackground: StandingWavesColors.panelBackgroundColorProperty,
+        accessibleName: a11y.controls.showNeighbourPairStringProperty,
+      },
+    );
+
     // The impedance, spelled out. ρc is the constant of proportionality in the
     // relation the whole screen is about, so it should be a number on screen and
     // not only a symbol in an equation.
@@ -153,6 +183,8 @@ export class PhaseControlPanel extends StandingWavesPanel {
           wavelengthControl,
           equationsCheckbox,
           referencePointCheckbox,
+          densityCheckbox,
+          neighbourPairCheckbox,
           impedanceNote,
         ],
       }),
@@ -162,6 +194,8 @@ export class PhaseControlPanel extends StandingWavesPanel {
     this.wavelengthControl = wavelengthControl;
     this.equationsCheckbox = equationsCheckbox;
     this.referencePointCheckbox = referencePointCheckbox;
+    this.densityCheckbox = densityCheckbox;
+    this.neighbourPairCheckbox = neighbourPairCheckbox;
 
     this.disposePhaseControlPanel = () => {
       impedanceValueProperty.dispose();

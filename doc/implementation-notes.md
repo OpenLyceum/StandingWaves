@@ -80,6 +80,8 @@ src/common/view/
   ParticleRowNode.ts          CanvasNode row of longitudinally oscillating markers
   PipeNode.ts                 walls, bore, and the two end treatments
   StandingWavesNumberControl.ts  themed slider; accessible name required, keyboard steps explicit
+src/standing-waves/view/
+  DriveFrequencyControl.ts    per-pipe frequency slider with a tick at each mode
 ```
 
 ### Everything is laid out at a common **origin**, never by bounds
@@ -113,14 +115,24 @@ Standing Waves screen earns its frequency slider:
 > strip. Normalising to the instantaneous peak would make all three look identical and destroy the
 > point of having a slider at all.
 
-The broad slider spans all pipe geometries, so its resonances are too narrow for pointer
-adjustment by itself. The ±50 Hz fine-tune slider is centred on the last broad frequency choice.
-When that choice crosses into another harmonic's region, `PipeModalModel` clears the old modal
+The frequency slider is `DriveFrequencyControl`, not a `NumberControl`: NumberControl takes a
+fixed `Range`, and a range covering every pipe (21 Hz – 2.2 kHz) left a resonance about one pixel
+wide. Sun's `Slider` accepts a range *Property*, so the track spans 0.5 f₁ – 8.5 f₁ of the current
+pipe. Because that span scales with f₁, harmonic h sits at a fixed fraction of the track, so the
+tick marks are placed once and only toggled visible (even ones hidden on a stopped pipe); Slider's
+own ticks are pinned to values and can be neither moved nor removed. Single arrows step 1 Hz,
+double arrows 10 Hz — under the ~14 Hz width of a resonance, so neither steps over a peak.
+
+Two Slider quirks the control works around, both caught by the listener-count leak test: given a
+range Property and no `enabledRangeProperty`, Slider adopts the range as its enabled range and
+**disposes it**; and `SliderTrack` never disposes the `DerivedProperty` it hangs on the range. So
+the slider gets a local proxy of the model's range, which the control owns and disposes. When the frequency crosses into another harmonic's region, `PipeModalModel` clears the old modal
 state and lets the new mode build from rest; otherwise a low harmonic can clip a high harmonic's
 trace for several seconds.
 
 Pressure needs its own scale, not a multiple of the displacement one: p carries a factor of kₕ, so
-the resonant pressure falls only as 1/h while the resonant displacement falls as 1/h². Hence
+the resonant displacement falls as 1/h (Qₕ/ωₕ² with Qₕ = h·Q₁) while the resonant pressure is the
+same at every harmonic. Hence
 `PipeModalModel.resonantPressureAmplitude`.
 
 ### Drawn amplitudes are exaggerated, and that is a view decision
@@ -156,7 +168,7 @@ nothing is happening.
 
 ## Testing
 
-145 vitest specs; `happy-dom`, template `tests/setup.ts`.
+162 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -164,7 +176,7 @@ nothing is happening.
 | `tests/PipeTermination.test.ts` | c/2L, c/4L, the 2:1 octave, the odd series |
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
-| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, τ = Q/(πfₕ), ring-down, odd-only enforcement |
+| `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range |
 | `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |
 

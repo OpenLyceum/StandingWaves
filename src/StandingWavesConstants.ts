@@ -157,19 +157,25 @@ export const CHAIN_STABILITY_SAFETY = 0.5;
 export const MODE_COUNT = 12;
 
 /**
- * Quality factor of each pipe mode. A real organ pipe sits somewhere around
- * 30–50; this is deliberately lower so that the resonance is broad enough to
- * find by dragging the frequency slider, and so the build-up time constant
- * τ = Q/(πfₙ) — about 3.8 periods — stays near 4.5 s of wall clock at the
- * default length (11 s in Slow) rather than tens of seconds.
+ * Quality factor Q₁ of a pipe's fundamental; harmonic h has Qₕ = h·Q₁, so every
+ * mode shares one damping rate (see PipeModalModel). A real organ pipe sits
+ * somewhere around 30–50; this is deliberately lower so that the resonance is
+ * broad enough to find by dragging the frequency slider, and so the build-up time
+ * constant τ = Q₁/(πf₁) — about 3.8 periods of the fundamental, and the same for
+ * every mode — stays near 4.5 s of wall clock at the default length (11 s in
+ * Slow) rather than tens of seconds.
  */
-export const MODE_QUALITY_FACTOR = 12;
+export const FUNDAMENTAL_QUALITY_FACTOR = 12;
 
-/** Selectable driving-frequency range (Hz), as a multiple of the open-pipe f₁. */
-export const DRIVE_FREQUENCY_RANGE_HARMONICS = new Range(0.5, 6.5);
-
-/** Fine adjustment around the frequency last selected with the broad control (Hz). */
-export const DRIVE_FINE_TUNE_RANGE_HZ = new Range(-50, 50);
+/**
+ * Driving-frequency range, in multiples of the *current* pipe's own f₁. Because it
+ * scales with the pipe, harmonic h always sits at the same place on the slider
+ * track, and the track spends its pixels on this pipe's ladder alone: at the
+ * default pipe a resonance is about two pixels wide rather than one, and a tick
+ * marks each rung. The top covers the eight rungs of the overtone ladder, so every
+ * rung the ladder offers is one the slider can also reach.
+ */
+export const DRIVE_FREQUENCY_RANGE_HARMONICS = new Range(0.5, 8.5);
 
 /**
  * Fraction of a mode's half-power bandwidth within which the sim reports that
@@ -239,9 +245,8 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   PULSE_AMPLITUDE_CELLS,
   CHAIN_STABILITY_SAFETY,
   MODE_COUNT,
-  MODE_QUALITY_FACTOR,
+  FUNDAMENTAL_QUALITY_FACTOR,
   DRIVE_FREQUENCY_RANGE_HARMONICS,
-  DRIVE_FINE_TUNE_RANGE_HZ,
   RESONANCE_BANDWIDTH_FRACTION,
   PARTICLE_COUNT,
   PARTICLE_AMPLITUDE_SPACINGS,

@@ -17,15 +17,17 @@
  * defect — a model that keeps calling into a discarded node.
  */
 
-import type { TReadOnlyProperty } from "scenerystack/axon";
+import { StringProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { describe, expect, it } from "vitest";
 import { PipeModalModel } from "../src/common/model/PipeModalModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
 import { InstrumentsModel } from "../src/instruments/model/InstrumentsModel.js";
 import { HarmonicSpectrumNode } from "../src/instruments/view/HarmonicSpectrumNode.js";
 import { PhaseModel } from "../src/phase-relationships/model/PhaseModel.js";
+import { NeighbourPairNode } from "../src/phase-relationships/view/NeighbourPairNode.js";
 import { ReflectionModel } from "../src/reflection/model/ReflectionModel.js";
 import { StandingWavesModel } from "../src/standing-waves/model/StandingWavesModel.js";
+import { DriveFrequencyControl } from "../src/standing-waves/view/DriveFrequencyControl.js";
 import { NodeMarkersNode } from "../src/standing-waves/view/NodeMarkersNode.js";
 import { OvertoneLadderNode } from "../src/standing-waves/view/OvertoneLadderNode.js";
 import { describeDisposalLeaks, forceGC } from "./helpers/memoryLeak.js";
@@ -144,6 +146,7 @@ describe("View nodes release the model Properties they linked", () => {
       pipe.pipeLengthProperty,
       pipe.terminationProperty,
       pipe.driveFrequencyProperty,
+      pipe.driveFrequencyRangeProperty,
       pipe.nearestHarmonicProperty,
       pipe.isAtResonanceProperty,
       pipe.isDrivingProperty,
@@ -172,9 +175,42 @@ describe("View nodes release the model Properties they linked", () => {
     pipe.dispose();
   });
 
+  it("DriveFrequencyControl", () => {
+    const pipe = new PipeModalModel();
+    expectNoLeakedListeners(
+      pipe,
+      () =>
+        new DriveFrequencyControl(
+          pipe,
+          new StringProperty("Drive frequency"),
+          new StringProperty("Drive frequency"),
+          new StringProperty("{{value}} Hz"),
+          { trackWidth: 180 },
+        ),
+    );
+    pipe.dispose();
+  });
+
   it("OvertoneLadderNode", () => {
     const model = new StandingWavesModel();
     expectNoLeakedListeners(model.pipe, () => new OvertoneLadderNode(model));
+    model.dispose();
+  });
+});
+
+describe("Phase screen nodes release the model Properties they linked", () => {
+  it("NeighbourPairNode", () => {
+    const model = new PhaseModel();
+    const watched: readonly TReadOnlyProperty<unknown>[] = [
+      model.pairPositionProperty,
+      model.pairPhaseLagProperty,
+      model.showNeighbourPairProperty,
+    ];
+    const before = watched.map(listenerCount);
+    const node = new NeighbourPairNode(model, { viewLength: 700, particleAmplitude: 17 });
+    expect(watched.map(listenerCount).some((count, index) => count > (before[index] ?? 0))).toBe(true);
+    node.dispose();
+    expect(watched.map(listenerCount)).toEqual(before);
     model.dispose();
   });
 });

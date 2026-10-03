@@ -17,6 +17,7 @@ import { Range } from "scenerystack/dot";
 import { Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { EndCondition } from "../../common/model/PipeTermination.js";
+import { DensitySlabsNode } from "../../common/view/DensitySlabsNode.js";
 import { ParticleRowNode } from "../../common/view/ParticleRowNode.js";
 import { PipeNode } from "../../common/view/PipeNode.js";
 import { type TraceSpec, TraceStripNode } from "../../common/view/TraceStripNode.js";
@@ -62,9 +63,12 @@ export type ChainPipeNodeOptions = {
   showHeading: boolean;
   /** Whether to draw the velocity trace as well. */
   showVelocityProperty: TReadOnlyProperty<boolean>;
+  /** Whether to tint the air by its density. */
+  showDensityProperty: TReadOnlyProperty<boolean>;
 };
 
 export class ChainPipeNode extends Node {
+  private readonly densitySlabs: DensitySlabsNode;
   private readonly particles: ParticleRowNode;
   private readonly displacementStrip: TraceStripNode;
   private readonly pressureStrip: TraceStripNode;
@@ -92,6 +96,22 @@ export class ChainPipeNode extends Node {
     const columnSpacingPx = options.viewLength / PARTICLE_COLUMN_COUNT;
     const particleAmplitudePx = PARTICLE_AMPLITUDE_SPACINGS * columnSpacingPx;
     const displacementToPixels = particleAmplitudePx / chain.launchPeakDisplacement;
+
+    // Full tint sits between the incident pulse and its doubling at a rigid wall:
+    // the incident pulse must read clearly on its own, and the pile-up against the
+    // wall must still read darker, even if its very peak saturates.
+    const densityFullScale = 1.5 * chain.launchPeakPressure;
+    this.densitySlabs = new DensitySlabsNode({
+      viewLength: options.viewLength,
+      bandHeight: options.boreHeight,
+      slabCount: PARTICLE_COLUMN_COUNT,
+      displacementAt: (fraction) => this.chainDisplacementAt(chain, fraction) * displacementToPixels,
+      densityAt: (fraction) => this.interpolatedPressure(chain, fraction * chain.pipeLength) / densityFullScale,
+      fillColorProperty: StandingWavesColors.pressureColorProperty,
+      wallColorProperty: StandingWavesColors.particleColorProperty,
+      visibleProperty: options.showDensityProperty,
+    });
+    pipe.boreLayer.addChild(this.densitySlabs);
 
     this.particles = new ParticleRowNode({
       viewLength: options.viewLength,
@@ -147,6 +167,8 @@ export class ChainPipeNode extends Node {
       viewHeight: options.stripHeight,
       xRange,
       xSpacing: tickSpacing,
+      note: strings.getDensityStrings().densityFollowsPressureStringProperty,
+      noteVisibleProperty: options.showDensityProperty,
     });
 
     // ── Layout: one shared position axis ──────────────────────────────────────
@@ -198,6 +220,7 @@ export class ChainPipeNode extends Node {
 
   /** Repaints particles and traces from the chain's current state. */
   public update(): void {
+    this.densitySlabs.update();
     this.particles.update();
     this.displacementStrip.update();
     this.pressureStrip.update();

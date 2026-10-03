@@ -76,6 +76,7 @@ export class ReflectionScreenView extends ScreenView {
         stripHeight: isCompact ? COMPARE_STRIP_HEIGHT : SINGLE_STRIP_HEIGHT,
         showHeading: true,
         showVelocityProperty,
+        showDensityProperty: model.showDensityProperty,
       });
 
     const singleClosed = makeAssembly(model.closedChain, false);
@@ -161,6 +162,7 @@ export class ReflectionScreenView extends ScreenView {
           controlPanel.launchButton,
           controlPanel.farEndRadioButtons,
           controlPanel.compareCheckbox,
+          controlPanel.densityCheckbox,
           timeControl,
           resetAllButton,
         ],

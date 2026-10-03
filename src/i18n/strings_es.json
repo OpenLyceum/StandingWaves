@@ -11,6 +11,10 @@
     "velocity": "Velocidad",
     "pressure": "Presión"
   },
+  "density": {
+    "showDensity": "Mostrar densidad del aire",
+    "densityFollowsPressure": "La densidad sigue a la presión: δρ = p / c²"
+  },
   "axes": {
     "positionAlongPipe": "Posición a lo largo del tubo (m)",
     "harmonicNumber": "Armónico",
@@ -56,13 +60,18 @@
     "impedanceLabel": "impedancia característica ρc",
     "impedanceValue": "{{value}} Pa·s/m",
     "referencePoint": "Punto de referencia",
-    "atReferencePoint": "En el punto de referencia"
+    "atReferencePoint": "En el punto de referencia",
+    "showNeighbourPair": "Mostrar par de vecinas",
+    "neighbourPair": "Par de vecinas",
+    "pairDenser": "comprimido, más denso",
+    "pairRarer": "estirado, menos denso",
+    "pairNormal": "cerca de la separación en reposo",
+    "phaseLag": "Desfase de {{value}}°"
   },
   "standingWaves": {
     "termination": "Terminación",
     "harmonic": "Armónico",
     "driveFrequency": "Frecuencia de excitación",
-    "fineTune": "Ajuste fino (±50 Hz)",
     "driverOn": "Excitación activa",
     "atResonance": "En resonancia",
     "buildingUp": "Estableciéndose…",
@@ -106,12 +115,15 @@
         "nearReflecting": "El pulso se refleja en el extremo cercano rígido.",
         "travellingBack": "El pulso reflejado viaja de vuelta hacia el extremo cercano.",
         "closedResult": "Reflejado en el extremo cerrado, el pulso de desplazamiento se ha invertido mientras que el de presión no.",
-        "openResult": "Reflejado en el extremo abierto, el pulso de desplazamiento sigue en el mismo sentido mientras que el de presión se ha invertido."
+        "openResult": "Reflejado en el extremo abierto, el pulso de desplazamiento sigue en el mismo sentido mientras que el de presión se ha invertido.",
+        "densityClosed": "El sombreado azul muestra la densidad del aire. Contra el extremo cerrado la pared no puede moverse, así que el aire vecino es empujado contra ella: allí está más comprimido y la densidad y la presión son máximas.",
+        "densityOpen": "El sombreado azul muestra la densidad del aire. En el extremo abierto el aire vecino sale junto, así que las separaciones entre partículas apenas cambian: la densidad se mantiene casi normal, igual que la presión."
       },
       "controls": {
         "launchPulse": "Lanzar pulso",
         "farEnd": "Extremo lejano del tubo",
-        "compare": "Comparar ambos extremos lejanos"
+        "compare": "Comparar ambos extremos lejanos",
+        "showDensity": "Mostrar densidad del aire"
       }
     },
     "phaseRelationships": {
@@ -122,35 +134,41 @@
       },
       "currentDetails": {
         "forward": "La onda viaja hacia el extremo lejano. Velocidad y presión están en fase: el aire se mueve más rápido hacia el extremo lejano exactamente donde está más comprimido.",
-        "backward": "La onda viaja hacia el extremo cercano. Velocidad y presión están en oposición de fase: el aire se mueve más rápido hacia el extremo lejano exactamente donde está más dilatado."
+        "backward": "La onda viaja hacia el extremo cercano. Velocidad y presión están en oposición de fase: el aire se mueve más rápido hacia el extremo lejano exactamente donde está más dilatado.",
+        "density": "El sombreado azul muestra la densidad del aire. Es más oscuro donde las partículas vecinas se han acercado, justo donde la presión es mayor.",
+        "neighbourPair": "Se marcan dos partículas vecinas. Se mueven con un desfase de {{value}} grados, así que la separación entre ellas se abre y se cierra continuamente; si se movieran en fase, la separación nunca cambiaría y el aire no se comprimiría."
       },
       "controls": {
         "direction": "Sentido de propagación",
         "wavelength": "Longitud de onda",
         "showEquations": "Mostrar ecuaciones",
         "showReferencePoint": "Mostrar punto de referencia",
-        "referencePoint": "Punto de referencia a lo largo del tubo"
+        "referencePoint": "Punto de referencia a lo largo del tubo",
+        "showDensity": "Mostrar densidad del aire",
+        "showNeighbourPair": "Mostrar par de vecinas",
+        "neighbourPair": "Par de partículas vecinas a lo largo del tubo"
       }
     },
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tubo cuyos dos extremos pueden estar cerrados o abiertos, excitado en un extremo. En su interior, una onda estacionaria en desplazamiento y en presión, con marcas en los nodos y antinodos. Al lado, la escalera de armónicos que este tubo puede sonar.",
-        "controlArea": "El área de control tiene un control de terminación de los extremos, deslizadores de ajuste general y fino de la frecuencia de excitación, una escalera de armónicos, un control de longitud del tubo, una casilla para las marcas de nodos, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
+        "controlArea": "El área de control tiene un control de terminación de los extremos, un deslizador de frecuencia de excitación con botones de flecha finos y gruesos, una escalera de armónicos, un control de longitud del tubo, casillas para las marcas de nodos y la densidad del aire, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
         "interactionHint": "Elija una terminación y luego barra la frecuencia para encontrar una resonancia — o ajústese directamente a un armónico."
       },
       "currentDetails": {
         "atResonance": "El tubo está en resonancia en el armónico {{harmonic}}, a {{frequency}} hercios. Una onda estacionaria llena el tubo.",
         "offResonance": "El tubo está fuera de resonancia a {{frequency}} hercios, entre armónicos. Se forma muy poca onda estacionaria.",
+        "density": "El sombreado azul muestra la densidad del aire. Varía más en los nodos de desplazamiento, donde el aire vecino llega desde ambos lados y luego se aleja, y se mantiene casi normal en los antinodos de desplazamiento, donde los vecinos se mueven juntos.",
         "silent": "La excitación está apagada y el tubo se está amortiguando."
       },
       "controls": {
         "termination": "Terminación del tubo",
         "driveFrequency": "Frecuencia de excitación",
-        "fineTune": "Ajuste fino de la frecuencia de excitación",
         "harmonicLadder": "Armónico objetivo",
         "pipeLength": "Longitud del tubo",
         "driverOn": "Excitación activa",
-        "showNodes": "Marcar nodos y antinodos"
+        "showNodes": "Marcar nodos y antinodos",
+        "showDensity": "Mostrar densidad del aire"
       }
     },
     "instruments": {

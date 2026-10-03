@@ -15,7 +15,7 @@
  *
  * So each mode h carries its own amplitude aₕ(t) obeying
  *
- *   äₕ + (ωₕ/Q)·ȧₕ + ωₕ²·aₕ = F·cos(Θ)
+ *   äₕ + (ωₕ/Qₕ)·ȧₕ + ωₕ²·aₕ = F·cos(Θ)
  *
  * and the state of the pipe is the sum of the mode shapes weighted by those
  * amplitudes:
@@ -26,8 +26,25 @@
  *
  *   - the **steady-state amplitude is a Lorentzian** in the drive frequency, so
  *     resonance is something you can hunt for with the frequency slider;
- *   - the **build-up takes the right time**, τ = 2Q/ωₕ = Q/(πfₕ), so switching to
+ *   - the **build-up takes the right time**, τ = 2Qₕ/ωₕ = Qₕ/(πfₕ), so switching to
  *     an exact harmonic visibly fills the pipe over a few seconds.
+ *
+ * ── Q rises with the harmonic: Qₕ = h·Q₁ ──────────────────────────────────────
+ *
+ * Every mode has the same damping *rate*, ωₕ/Qₕ = ω₁/Q₁, so Qₕ grows in
+ * proportion to frequency. Real pipes go the same way — viscous and thermal wall
+ * losses give Q ∝ √f — and this is the simplest law that does.
+ *
+ * It matters for the *shape* of the pipe, not only its timing. The drawn field is
+ * the sum of every mode. The resonant one lags the drive by π/2, while each
+ * off-resonant mode moves with the drive (or against it), and their sum relative
+ * to the resonant mode scales as 1/Qₕ. With one Q for all modes that share grew
+ * with h — about half the resonant amplitude at the third harmonic at Q = 12 — and
+ * the nodes visibly swam back and forth through each cycle. With Qₕ = h·Q₁ the
+ * share stays near the fundamental's few percent at every harmonic.
+ *
+ * Two consequences fall out: every mode builds up and rings down with the same
+ * τ = Q₁/(πf₁), and every resonance is the same f₁/Q₁ wide in hertz.
  *
  * ── Drive coupling ───────────────────────────────────────────────────────────
  *
@@ -55,8 +72,9 @@ import {
 } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import {
+  DRIVE_FREQUENCY_RANGE_HARMONICS,
+  FUNDAMENTAL_QUALITY_FACTOR,
   MODE_COUNT,
-  MODE_QUALITY_FACTOR,
   PIPE_LENGTH_DEFAULT_M,
   PIPE_LENGTH_RANGE_M,
   RESONANCE_BANDWIDTH_FRACTION,
@@ -77,10 +95,10 @@ import {
  * Amplitude of the driving acceleration (m/s²). Chosen so that the fundamental
  * of the default pipe reaches about a millimetre of particle displacement at
  * resonance — the right order for a sounding organ pipe — via the resonant
- * amplitude F·Q/ωₕ².
+ * amplitude F·Qₕ/ωₕ².
  *
- * It is the *same* for every mode, deliberately. A mode's response therefore
- * falls off as 1/ωₕ² ∝ 1/h², and that 1/h² rolloff is what the Instruments
+ * It is the *same* for every mode, deliberately. A mode's resonant response
+ * therefore falls off as Qₕ/ωₕ² ∝ 1/h, and that rolloff is what the Instruments
  * screen's spectrum shows: the ladder a broadband excitation produces is a
  * property of the pipe, not something painted on.
  */
@@ -126,6 +144,13 @@ export class PipeModalModel {
   public readonly fundamentalFrequencyProperty: TReadOnlyProperty<number>;
 
   /**
+   * Drive frequencies the current pipe can be swept over (Hz): a fixed span of its
+   * own harmonics, {@link DRIVE_FREQUENCY_RANGE_HARMONICS} × f₁. It moves with the
+   * length and termination, and the drive is clamped into it when it does.
+   */
+  public readonly driveFrequencyRangeProperty: TReadOnlyProperty<Range>;
+
+  /**
    * Harmonic number nearest to the current drive frequency, or 0 when the drive
    * is closer to a gap in the ladder than to any mode the pipe supports.
    */
@@ -134,7 +159,7 @@ export class PipeModalModel {
   /** Whether the drive sits inside the nearest mode's resonance band. */
   public readonly isAtResonanceProperty: TReadOnlyProperty<boolean>;
 
-  /** Quality factor shared by every mode. */
+  /** Quality factor Q₁ of the fundamental; harmonic h has h·Q₁. */
   public readonly qualityFactor: number;
 
   /**
@@ -152,7 +177,7 @@ export class PipeModalModel {
 
   public constructor(providedOptions?: PipeModalModelOptions) {
     const termination = providedOptions?.termination;
-    this.qualityFactor = providedOptions?.qualityFactor ?? MODE_QUALITY_FACTOR;
+    this.qualityFactor = providedOptions?.qualityFactor ?? FUNDAMENTAL_QUALITY_FACTOR;
 
     this.pipeLengthProperty = new NumberProperty(providedOptions?.pipeLength ?? PIPE_LENGTH_DEFAULT_M, {
       range: PIPE_LENGTH_RANGE_M,
@@ -162,8 +187,8 @@ export class PipeModalModel {
 
     const initialFundamental = fundamentalFrequency(this.terminationProperty.value, this.pipeLengthProperty.value);
     this.driveFrequencyProperty = new NumberProperty(initialFundamental, {
-      // The reachable span is set by the mode ladder, which moves with L and the
-      // termination, so the range is generous and the control clamps to it.
+      // The reachable span moves with L and the termination, so this range is only
+      // a generous outer bound; driveFrequencyRangeProperty is the live one.
       range: new Range(20, 20000),
       units: "Hz",
     });
@@ -179,6 +204,19 @@ export class PipeModalModel {
       (terminationValue: PipeTermination, length: number) => fundamentalFrequency(terminationValue, length),
     );
 
+    this.driveFrequencyRangeProperty = new DerivedProperty(
+      [this.fundamentalFrequencyProperty],
+      (fundamental: number) =>
+        new Range(DRIVE_FREQUENCY_RANGE_HARMONICS.min * fundamental, DRIVE_FREQUENCY_RANGE_HARMONICS.max * fundamental),
+    );
+
+    // The drive is the experimenter's knob, so a length change leaves it alone and
+    // moves the ladder past it — unless the ladder moves so far that the drive
+    // would fall off the end of the slider.
+    this.driveFrequencyRangeProperty.link((range: Range) => {
+      this.driveFrequencyProperty.value = range.constrainValue(this.driveFrequencyProperty.value);
+    });
+
     this.nearestHarmonicProperty = new DerivedProperty(
       [this.terminationProperty, this.pipeLengthProperty, this.driveFrequencyProperty],
       (terminationValue: PipeTermination, length: number, driveFrequency: number) =>
@@ -192,8 +230,8 @@ export class PipeModalModel {
           return false;
         }
         const resonant = modeFrequency(harmonic, terminationValue, length);
-        // Half-power bandwidth of a lightly damped mode is fₕ/Q.
-        const halfPowerBandwidth = resonant / this.qualityFactor;
+        // Half-power bandwidth of a lightly damped mode is fₕ/Qₕ.
+        const halfPowerBandwidth = resonant / this.modeQualityFactor(harmonic);
         return Math.abs(driveFrequency - resonant) <= RESONANCE_BANDWIDTH_FRACTION * halfPowerBandwidth;
       },
     );
@@ -249,7 +287,15 @@ export class PipeModalModel {
       return 0;
     }
     const omega = 2 * Math.PI * frequency;
-    return (DRIVE_ACCELERATION_MPS2 * this.qualityFactor) / (omega * omega);
+    return (DRIVE_ACCELERATION_MPS2 * this.modeQualityFactor(harmonicNumber)) / (omega * omega);
+  }
+
+  /**
+   * Quality factor of harmonic h: Qₕ = h·Q₁, so that every mode shares the
+   * fundamental's damping rate ω₁/Q₁. See the file header for why.
+   */
+  public modeQualityFactor(harmonicNumber: number): number {
+    return harmonicNumber * this.qualityFactor;
   }
 
   /**
@@ -258,8 +304,9 @@ export class PipeModalModel {
    *
    * Not simply proportional to the displacement amplitude: pressure is a *gradient*
    * of displacement, so it carries a factor of kₕ. Since the resonant displacement
-   * falls as 1/h² and kₕ rises as h, the resonant pressure falls only as 1/h — which
-   * is why a chart scaled for the fundamental's pressure would clip a high harmonic.
+   * falls as 1/h and kₕ rises as h, the resonant pressure is the same at every
+   * harmonic — so a chart scaled to the displacement of one harmonic would clip or
+   * shrink the pressure of another.
    */
   public resonantPressureAmplitude(harmonicNumber: number): number {
     const k = modeWavenumber(harmonicNumber, this.terminationProperty.value, this.pipeLengthProperty.value);
@@ -270,7 +317,7 @@ export class PipeModalModel {
    * Steady-state displacement amplitude of harmonic h at a given drive
    * frequency (m) — the Lorentzian
    *
-   *   aₕ = F / √( (ωₕ² − ω²)² + (ωₕω/Q)² )
+   *   aₕ = F / √( (ωₕ² − ω²)² + (ωₕω/Qₕ)² )
    *
    * Answers for frequencies the pipe is *not* currently driven at, without
    * touching any Property, which is what a response curve samples.
@@ -282,17 +329,17 @@ export class PipeModalModel {
     const omegaMode = 2 * Math.PI * this.getModeFrequency(harmonicNumber);
     const omega = 2 * Math.PI * driveFrequency;
     const detuning = omegaMode * omegaMode - omega * omega;
-    const loss = (omegaMode * omega) / this.qualityFactor;
+    const loss = (omegaMode * omega) / this.modeQualityFactor(harmonicNumber);
     return DRIVE_ACCELERATION_MPS2 / Math.sqrt(detuning * detuning + loss * loss);
   }
 
   /**
    * Time constant of the amplitude build-up or ring-down of harmonic h (s):
-   * τ = 2Q/ωₕ = Q/(πfₕ).
+   * τ = 2Qₕ/ωₕ = Qₕ/(πfₕ) — the same Q₁/(πf₁) for every harmonic.
    */
   public buildUpTimeConstant(harmonicNumber: number): number {
     const frequency = this.getModeFrequency(harmonicNumber);
-    return frequency > 0 ? this.qualityFactor / (Math.PI * frequency) : 0;
+    return frequency > 0 ? this.modeQualityFactor(harmonicNumber) / (Math.PI * frequency) : 0;
   }
 
   /** Particle displacement ξ at position x along the pipe (m). */
@@ -356,7 +403,7 @@ export class PipeModalModel {
    * this mode" affordance behind the overtone ladder.
    *
    * Without the jump, a mode the pipe was previously ringing in keeps sounding while
-   * it decays over its own τ = Q/(πfₕ), which at the fundamental is several seconds.
+   * it decays over τ = Qₕ/(πfₕ), which is several seconds for every mode.
    * Pressing "3" would then show a mixture of modes 1 and 3 for long enough to hide
    * the mode-3 shape the learner just asked for. Jumping is not a cheat: it is the
    * exact steady state this drive produces, computed in closed form.
@@ -374,7 +421,7 @@ export class PipeModalModel {
 
   /**
    * Phase lag δ of harmonic h behind the drive at a given drive frequency
-   * (radians), from tan δ = (ωₕω/Q)/(ωₕ² − ω²). Runs 0 below resonance, π/2 at
+   * (radians), from tan δ = (ωₕω/Qₕ)/(ωₕ² − ω²). Runs 0 below resonance, π/2 at
    * resonance, and π above it — the sign flip that makes a driven system fight
    * its driver past resonance.
    */
@@ -382,7 +429,7 @@ export class PipeModalModel {
     const omegaMode = 2 * Math.PI * this.getModeFrequency(harmonicNumber);
     const omega = 2 * Math.PI * driveFrequency;
     const detuning = omegaMode * omegaMode - omega * omega;
-    const loss = (omegaMode * omega) / this.qualityFactor;
+    const loss = (omegaMode * omega) / this.modeQualityFactor(harmonicNumber);
     return Math.atan2(loss, detuning);
   }
 
@@ -448,7 +495,7 @@ export class PipeModalModel {
           continue;
         }
         const omega = 2 * Math.PI * modeFrequency(h, termination, length);
-        const damping = omega / this.qualityFactor;
+        const damping = omega / this.modeQualityFactor(h);
         const index = h - 1;
         const integrated = integrateOscillator(
           this.amplitudes[index] ?? 0,
@@ -488,6 +535,7 @@ export class PipeModalModel {
   public dispose(): void {
     this.isAtResonanceProperty.dispose();
     this.nearestHarmonicProperty.dispose();
+    this.driveFrequencyRangeProperty.dispose();
     this.fundamentalFrequencyProperty.dispose();
     this.stateChangeCountProperty.dispose();
     this.drivePhaseProperty.dispose();

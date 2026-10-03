@@ -26,17 +26,18 @@ import { isModeAllowed, modeFrequency, type PipeTermination } from "../../common
 import { FLAT_RECTANGULAR_BUTTON_OPTIONS, LIGHT_SURFACE_TEXT_FILL } from "../../common/StandingWavesButtonOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
+import { DRIVE_FREQUENCY_RANGE_HARMONICS } from "../../StandingWavesConstants.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
 
 const RUNG_FONT = new PhetFont(12);
 const TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 
 /**
- * How many harmonics the ladder shows. Fewer than the model carries: the top of the
- * model's ladder lies outside the frequency slider's reach, so listing it would
- * offer rungs that cannot be tuned to.
+ * How many harmonics the ladder shows: exactly those the frequency slider reaches.
+ * Fewer than the model carries, since listing the rest would offer rungs that cannot
+ * be tuned to — the slider's range would clamp them away.
  */
-const LADDER_RUNGS = 8;
+const LADDER_RUNGS = Math.floor(DRIVE_FREQUENCY_RANGE_HARMONICS.max);
 
 /** Width of a rung's content, in view pixels. */
 const RUNG_CONTENT_WIDTH = 108;

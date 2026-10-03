@@ -33,11 +33,13 @@ import { Bounds2, Range } from "scenerystack/dot";
 import type { Color } from "scenerystack/scenery";
 import { CanvasNode, Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
+import StandingWavesColors from "../../StandingWavesColors.js";
 import { TRACE_SAMPLE_COUNT } from "../../StandingWavesConstants.js";
 import { ChartFrame } from "./ChartFrame.js";
 
 const CAPTION_FONT = new PhetFont({ size: 12, weight: "bold" });
 const CAPTION_MARGIN = 6;
+const NOTE_FONT = new PhetFont(11);
 
 export type TraceSpec = {
   /** Colour of the curve and of its caption. */
@@ -87,6 +89,13 @@ export type TraceStripNodeOptions = {
   createXTickLabel?: ((value: number) => Node) | undefined;
   /** False on a strip stacked above one that already labels the shared axis. */
   showXTickLabels?: boolean | undefined;
+  /**
+   * A short remark drawn top-right inside the strip, in the axis colour — e.g. that
+   * the pressure curve is also the density curve. Not a caption: it names no trace.
+   */
+  note?: TReadOnlyProperty<string> | undefined;
+  /** Whether the note is shown. Default: always. */
+  noteVisibleProperty?: TReadOnlyProperty<boolean> | undefined;
 };
 
 export class TraceStripNode extends Node {
@@ -139,6 +148,23 @@ export class TraceStripNode extends Node {
       captions.left = CAPTION_MARGIN;
       captions.top = CAPTION_MARGIN;
       this.frame.addChild(captions);
+    }
+
+    if (options.note) {
+      const note = new Text(options.note, {
+        font: NOTE_FONT,
+        fill: StandingWavesColors.axisColorProperty,
+        maxWidth: options.viewWidth * 0.45,
+      });
+      if (options.noteVisibleProperty) {
+        note.visibleProperty = options.noteVisibleProperty;
+      }
+      // Pinned to the right edge whatever the translated text's width.
+      note.localBoundsProperty.link(() => {
+        note.right = options.viewWidth - CAPTION_MARGIN;
+        note.top = CAPTION_MARGIN;
+      });
+      this.frame.addChild(note);
     }
 
     this.addChild(this.frame);

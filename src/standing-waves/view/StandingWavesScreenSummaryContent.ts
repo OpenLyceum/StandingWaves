@@ -8,6 +8,9 @@
  * forms" — because the visual difference between a full-height wave and a sliver is
  * the whole feedback loop of the frequency slider, and a description that only ever
  * named the frequency would hide it.
+ *
+ * With density shading on, a second sentence says where the density swings: at the
+ * displacement nodes, not the antinodes — the place a learner least expects it.
  */
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
@@ -29,27 +32,30 @@ export class StandingWavesScreenSummaryContent extends ScreenSummaryContent {
         pipe.isDrivingProperty,
         pipe.nearestHarmonicProperty,
         pipe.driveFrequencyProperty,
+        model.showDensityProperty,
         details.atResonanceStringProperty,
         details.offResonanceStringProperty,
         details.silentStringProperty,
+        details.densityStringProperty,
       ],
       (
         atResonance: boolean,
         isDriving: boolean,
         harmonic: number,
         frequency: number,
+        showDensity: boolean,
         atPattern: string,
         offPattern: string,
         silent: string,
+        density: string,
       ) => {
-        if (!isDriving) {
-          return silent;
-        }
         const hertz = StringUtils.toFixedLTR(frequency, 0);
-        if (atResonance) {
-          return atPattern.replace("{{harmonic}}", `${harmonic}`).replace("{{frequency}}", hertz);
-        }
-        return offPattern.replace("{{frequency}}", hertz);
+        const state = !isDriving
+          ? silent
+          : atResonance
+            ? atPattern.replace("{{harmonic}}", `${harmonic}`).replace("{{frequency}}", hertz)
+            : offPattern.replace("{{frequency}}", hertz);
+        return showDensity ? `${state} ${density}` : state;
       },
     );
 

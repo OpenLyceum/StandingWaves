@@ -30,6 +30,7 @@ import { BooleanProperty, DerivedProperty, NumberProperty, Property, type TReadO
 import { Range } from "scenerystack/dot";
 import type { TModel } from "scenerystack/joist";
 import {
+  BULK_MODULUS,
   directionSign,
   frequencyForWavelength,
   pressureFromVelocity,
@@ -52,6 +53,16 @@ import {
  */
 const AMPLITUDE_M = 1e-3;
 
+/**
+ * Equilibrium distance between the two particles of the neighbour pair, as a
+ * fraction of the pipe length.
+ *
+ * Fixed rather than adjustable so that the *wavelength* slider is what changes how
+ * far out of step the pair moves (kΔx): a twelfth of the pipe puts the pair 30°
+ * apart at the default wavelength, and 20°–120° across the slider's range.
+ */
+const PAIR_SEPARATION_FRACTION = 1 / 12;
+
 export class PhaseModel implements TModel {
   public readonly timer = new TimeModel(true);
 
@@ -69,6 +80,21 @@ export class PhaseModel implements TModel {
 
   /** Position of the draggable reference marker along the pipe (m). */
   public readonly referencePositionProperty: NumberProperty;
+
+  /** Whether the air in the bore is drawn as slabs tinted by their density. */
+  public readonly showDensityProperty: BooleanProperty;
+
+  /** Whether the neighbour pair is showing. */
+  public readonly showNeighbourPairProperty: BooleanProperty;
+
+  /** Midpoint of the neighbour pair along the pipe (m). */
+  public readonly pairPositionProperty: NumberProperty;
+
+  /** Equilibrium distance between the two particles of the pair, Δx (m). */
+  public readonly pairSeparation: number;
+
+  /** How far out of step the pair moves, kΔx (degrees). */
+  public readonly pairPhaseLagProperty: TReadOnlyProperty<number>;
 
   /** Accumulated wave phase Θ = ∫ω dt (radians). */
   public readonly phaseProperty: NumberProperty;
@@ -96,10 +122,21 @@ export class PhaseModel implements TModel {
       range: new Range(0, this.pipeLength),
       units: "m",
     });
+    this.showDensityProperty = new BooleanProperty(false);
+    this.showNeighbourPairProperty = new BooleanProperty(false);
+    this.pairSeparation = PAIR_SEPARATION_FRACTION * this.pipeLength;
+    this.pairPositionProperty = new NumberProperty(0.65 * this.pipeLength, {
+      range: new Range(this.pairSeparation / 2, this.pipeLength - this.pairSeparation / 2),
+      units: "m",
+    });
     this.phaseProperty = new NumberProperty(0);
 
     this.frequencyProperty = new DerivedProperty([this.wavelengthProperty], (wavelength: number) =>
       frequencyForWavelength(wavelength),
+    );
+    this.pairPhaseLagProperty = new DerivedProperty(
+      [this.wavelengthProperty],
+      (wavelength: number) => (360 * this.pairSeparation) / wavelength,
     );
   }
 
@@ -123,6 +160,34 @@ export class PhaseModel implements TModel {
    */
   public pressureAt(x: number): number {
     return pressureFromVelocity(this.velocityAt(x), this.directionProperty.value);
+  }
+
+  /**
+   * Fractional density change δρ/ρ = −∂ξ/∂x = p/(ρc²) at position x.
+   *
+   * Taken from the pressure so that the density shading and the pressure trace are
+   * one quantity by construction, not two that happen to agree.
+   */
+  public densityChangeAt(x: number): number {
+    return this.pressureAt(x) / BULK_MODULUS;
+  }
+
+  /** Peak fractional density change of the wave, kA. */
+  public get densityChangeAmplitude(): number {
+    return this.pressureAmplitude / BULK_MODULUS;
+  }
+
+  /**
+   * Fractional density change of the air *between* the two particles of the pair:
+   * how much their gap has closed, as a fraction of its rest length.
+   *
+   * A finite difference, deliberately — this is what the pair shows, and it tends to
+   * {@link densityChangeAt} as Δx → 0. At finite Δx it is smaller by sin(kΔx/2)/(kΔx/2).
+   */
+  public pairDensityChange(): number {
+    const centre = this.pairPositionProperty.value;
+    const half = this.pairSeparation / 2;
+    return -(this.displacementAt(centre + half) - this.displacementAt(centre - half)) / this.pairSeparation;
   }
 
   /** Peak displacement of the wave (m) — the trace scale. */
@@ -166,10 +231,17 @@ export class PhaseModel implements TModel {
     this.showEquationsProperty.reset();
     this.showReferencePointProperty.reset();
     this.referencePositionProperty.reset();
+    this.showDensityProperty.reset();
+    this.showNeighbourPairProperty.reset();
+    this.pairPositionProperty.reset();
     this.phaseProperty.reset();
   }
 
   public dispose(): void {
+    this.pairPhaseLagProperty.dispose();
+    this.pairPositionProperty.dispose();
+    this.showNeighbourPairProperty.dispose();
+    this.showDensityProperty.dispose();
     this.frequencyProperty.dispose();
     this.phaseProperty.dispose();
     this.referencePositionProperty.dispose();

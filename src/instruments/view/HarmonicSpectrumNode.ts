@@ -15,7 +15,7 @@
  * ── What sets a bar's height ──────────────────────────────────────────────────
  *
  * The steady-state amplitude the pipe gives that mode under an equal-per-mode
- * excitation — `PipeModalModel.resonantAmplitude`, which falls as 1/h². That rolloff
+ * excitation — `PipeModalModel.resonantAmplitude`, F·Qₕ/ωₕ², which falls as 1/h. That rolloff
  * is a property of the pipe's own response, derived by the model, not a timbre curve
  * painted on to make the picture look plausible. The bars are the *pipe's*
  * contribution to the sound; the reed or jet supplies its own envelope on top, which

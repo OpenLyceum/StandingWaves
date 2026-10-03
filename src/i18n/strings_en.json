@@ -11,6 +11,10 @@
     "velocity": "Velocity",
     "pressure": "Pressure"
   },
+  "density": {
+    "showDensity": "Show air density",
+    "densityFollowsPressure": "Density follows pressure: δρ = p / c²"
+  },
   "axes": {
     "positionAlongPipe": "Position along pipe (m)",
     "harmonicNumber": "Harmonic",
@@ -56,13 +60,18 @@
     "impedanceLabel": "characteristic impedance ρc",
     "impedanceValue": "{{value}} Pa·s/m",
     "referencePoint": "Reference point",
-    "atReferencePoint": "At the reference point"
+    "atReferencePoint": "At the reference point",
+    "showNeighbourPair": "Show neighbour pair",
+    "neighbourPair": "Neighbour pair",
+    "pairDenser": "squeezed, denser",
+    "pairRarer": "stretched, less dense",
+    "pairNormal": "near its rest spacing",
+    "phaseLag": "Out of step by {{value}}°"
   },
   "standingWaves": {
     "termination": "Termination",
     "harmonic": "Harmonic",
     "driveFrequency": "Drive frequency",
-    "fineTune": "Fine tune (±50 Hz)",
     "driverOn": "Driver on",
     "atResonance": "At resonance",
     "buildingUp": "Building up…",
@@ -106,12 +115,15 @@
         "nearReflecting": "The pulse is reflecting off the rigid near end.",
         "travellingBack": "The reflected pulse is travelling back toward the near end.",
         "closedResult": "Reflected from the closed end, the displacement pulse has flipped upside down while the pressure pulse has not.",
-        "openResult": "Reflected from the open end, the displacement pulse is still upright while the pressure pulse has flipped."
+        "openResult": "Reflected from the open end, the displacement pulse is still upright while the pressure pulse has flipped.",
+        "densityClosed": "The blue shading shows air density. Against the closed end the wall cannot move, so neighbouring air on one side is pushed into it: the air there is squeezed hardest, and the density and pressure are largest.",
+        "densityOpen": "The blue shading shows air density. At the open end, neighbouring air moves out together, so the gaps between particles barely change: the density stays near normal and so does the pressure."
       },
       "controls": {
         "launchPulse": "Launch pulse",
         "farEnd": "Far end of the pipe",
-        "compare": "Compare both far ends"
+        "compare": "Compare both far ends",
+        "showDensity": "Show air density"
       }
     },
     "phaseRelationships": {
@@ -122,35 +134,41 @@
       },
       "currentDetails": {
         "forward": "The wave travels toward the far end. Velocity and pressure are in phase: the air moves fastest toward the far end exactly where it is most compressed.",
-        "backward": "The wave travels toward the near end. Velocity and pressure are 180 degrees out of phase: the air moves fastest toward the far end exactly where it is most rarefied."
+        "backward": "The wave travels toward the near end. Velocity and pressure are 180 degrees out of phase: the air moves fastest toward the far end exactly where it is most rarefied.",
+        "density": "The blue shading shows air density. It is darkest where neighbouring particles have crowded together, which is exactly where the pressure is highest.",
+        "neighbourPair": "Two neighbouring particles are marked. They move {{value}} degrees out of step, so the gap between them keeps opening and closing; if they moved in step the gap would never change and the air would not be compressed."
       },
       "controls": {
         "direction": "Direction of travel",
         "wavelength": "Wavelength",
         "showEquations": "Show equations",
         "showReferencePoint": "Show reference point",
-        "referencePoint": "Reference point along the pipe"
+        "referencePoint": "Reference point along the pipe",
+        "showDensity": "Show air density",
+        "showNeighbourPair": "Show neighbour pair",
+        "neighbourPair": "Neighbour pair along the pipe"
       }
     },
     "standingWaves": {
       "screenSummary": {
         "playArea": "A pipe whose two ends can each be closed or open, driven at one end. Inside, a standing wave in displacement and pressure, with markers on the nodes and antinodes. Beside it, a ladder of the harmonics this pipe can sound.",
-        "controlArea": "The control area has a termination control for the pipe ends, broad and fine drive frequency sliders, a ladder of harmonics to snap to, a pipe length control, a checkbox for the node markers, playback controls with Normal and Slow speeds, and a Reset All button.",
+        "controlArea": "The control area has a termination control for the pipe ends, a drive frequency slider with fine and coarse arrow buttons, a ladder of harmonics to snap to, a pipe length control, checkboxes for the node markers and the air density, playback controls with Normal and Slow speeds, and a Reset All button.",
         "interactionHint": "Choose a termination, then sweep the frequency to find a resonance — or snap straight to a harmonic."
       },
       "currentDetails": {
         "atResonance": "The pipe is at resonance on harmonic {{harmonic}}, at {{frequency}} hertz. A standing wave fills the pipe.",
         "offResonance": "The pipe is off resonance at {{frequency}} hertz, between harmonics. Very little standing wave forms.",
+        "density": "The blue shading shows air density. It swings most at the displacement nodes, where neighbouring air moves in from both sides and then away again, and stays near normal at the displacement antinodes, where neighbours move together.",
         "silent": "The driver is off and the pipe is ringing down."
       },
       "controls": {
         "termination": "Pipe termination",
         "driveFrequency": "Drive frequency",
-        "fineTune": "Fine tune drive frequency",
         "harmonicLadder": "Harmonic to snap to",
         "pipeLength": "Pipe length",
         "driverOn": "Driver on",
-        "showNodes": "Mark nodes and antinodes"
+        "showNodes": "Mark nodes and antinodes",
+        "showDensity": "Show air density"
       }
     },
     "instruments": {

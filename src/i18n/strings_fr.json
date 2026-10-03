@@ -11,6 +11,10 @@
     "velocity": "Vitesse",
     "pressure": "Pression"
   },
+  "density": {
+    "showDensity": "Afficher la densité de l’air",
+    "densityFollowsPressure": "La densité suit la pression : δρ = p / c²"
+  },
   "axes": {
     "positionAlongPipe": "Position le long du tuyau (m)",
     "harmonicNumber": "Harmonique",
@@ -56,13 +60,18 @@
     "impedanceLabel": "impédance caractéristique ρc",
     "impedanceValue": "{{value}} Pa·s/m",
     "referencePoint": "Point de référence",
-    "atReferencePoint": "Au point de référence"
+    "atReferencePoint": "Au point de référence",
+    "showNeighbourPair": "Afficher une paire de voisines",
+    "neighbourPair": "Paire de voisines",
+    "pairDenser": "comprimée, plus dense",
+    "pairRarer": "étirée, moins dense",
+    "pairNormal": "proche de l’écart au repos",
+    "phaseLag": "Décalage de {{value}}°"
   },
   "standingWaves": {
     "termination": "Terminaison",
     "harmonic": "Harmonique",
     "driveFrequency": "Fréquence d'excitation",
-    "fineTune": "Réglage fin (±50 Hz)",
     "driverOn": "Excitation active",
     "atResonance": "À la résonance",
     "buildingUp": "Établissement…",
@@ -106,12 +115,15 @@
         "nearReflecting": "L'impulsion se réfléchit sur l'extrémité proche rigide.",
         "travellingBack": "L'impulsion réfléchie revient vers l'extrémité proche.",
         "closedResult": "Réfléchie sur l'extrémité fermée, l'impulsion de déplacement s'est inversée alors que l'impulsion de pression ne s'est pas inversée.",
-        "openResult": "Réfléchie sur l'extrémité ouverte, l'impulsion de déplacement reste dans le même sens alors que l'impulsion de pression s'est inversée."
+        "openResult": "Réfléchie sur l'extrémité ouverte, l'impulsion de déplacement reste dans le même sens alors que l'impulsion de pression s'est inversée.",
+        "densityClosed": "L’ombrage bleu montre la densité de l’air. Contre l’extrémité fermée, la paroi ne peut pas bouger : l’air voisin est poussé contre elle, il y est le plus comprimé, et la densité et la pression y sont maximales.",
+        "densityOpen": "L’ombrage bleu montre la densité de l’air. À l’extrémité ouverte, l’air voisin sort ensemble, les écarts entre particules changent à peine : la densité reste proche de la normale, tout comme la pression."
       },
       "controls": {
         "launchPulse": "Lancer une impulsion",
         "farEnd": "Extrémité éloignée du tuyau",
-        "compare": "Comparer les deux extrémités éloignées"
+        "compare": "Comparer les deux extrémités éloignées",
+        "showDensity": "Afficher la densité de l’air"
       }
     },
     "phaseRelationships": {
@@ -122,35 +134,41 @@
       },
       "currentDetails": {
         "forward": "L'onde se propage vers l'extrémité éloignée. Vitesse et pression sont en phase : l'air se déplace le plus vite vers l'extrémité éloignée exactement là où il est le plus comprimé.",
-        "backward": "L'onde se propage vers l'extrémité proche. Vitesse et pression sont en opposition de phase : l'air se déplace le plus vite vers l'extrémité éloignée exactement là où il est le plus dilaté."
+        "backward": "L'onde se propage vers l'extrémité proche. Vitesse et pression sont en opposition de phase : l'air se déplace le plus vite vers l'extrémité éloignée exactement là où il est le plus dilaté.",
+        "density": "L’ombrage bleu montre la densité de l’air. Il est le plus foncé là où des particules voisines se sont rapprochées, exactement là où la pression est la plus forte.",
+        "neighbourPair": "Deux particules voisines sont marquées. Elles bougent avec un décalage de {{value}} degrés, donc l’écart entre elles s’ouvre et se referme sans cesse ; si elles bougeaient en phase, l’écart ne changerait jamais et l’air ne serait pas comprimé."
       },
       "controls": {
         "direction": "Sens de propagation",
         "wavelength": "Longueur d'onde",
         "showEquations": "Afficher les équations",
         "showReferencePoint": "Afficher le point de référence",
-        "referencePoint": "Point de référence le long du tuyau"
+        "referencePoint": "Point de référence le long du tuyau",
+        "showDensity": "Afficher la densité de l’air",
+        "showNeighbourPair": "Afficher une paire de voisines",
+        "neighbourPair": "Paire de particules voisines le long du tuyau"
       }
     },
     "standingWaves": {
       "screenSummary": {
         "playArea": "Un tuyau dont chacune des deux extrémités peut être fermée ou ouverte, excité à une extrémité. À l'intérieur, une onde stationnaire en déplacement et en pression, avec des repères sur les nœuds et les ventres. À côté, l'échelle des harmoniques que ce tuyau peut produire.",
-        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, des curseurs de réglage général et fin de la fréquence d'excitation, une échelle d'harmoniques, une commande de longueur du tuyau, une case à cocher pour les repères de nœuds, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
+        "controlArea": "La zone de commande comporte une commande de terminaison des extrémités, un curseur de fréquence d'excitation avec des boutons fléchés de réglage fin et grossier, une échelle d'harmoniques, une commande de longueur du tuyau, des cases à cocher pour les repères de nœuds et la densité de l'air, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
         "interactionHint": "Choisissez une terminaison, puis balayez la fréquence pour trouver une résonance — ou alignez-vous directement sur une harmonique."
       },
       "currentDetails": {
         "atResonance": "Le tuyau est en résonance sur l'harmonique {{harmonic}}, à {{frequency}} hertz. Une onde stationnaire remplit le tuyau.",
         "offResonance": "Le tuyau est hors résonance à {{frequency}} hertz, entre deux harmoniques. Très peu d'onde stationnaire s'établit.",
+        "density": "L’ombrage bleu montre la densité de l’air. Elle varie le plus aux nœuds de déplacement, où l’air voisin arrive des deux côtés puis s’en éloigne, et reste presque normale aux ventres de déplacement, où les voisins bougent ensemble.",
         "silent": "L'excitation est coupée et le tuyau s'amortit."
       },
       "controls": {
         "termination": "Terminaison du tuyau",
         "driveFrequency": "Fréquence d'excitation",
-        "fineTune": "Réglage fin de la fréquence d'excitation",
         "harmonicLadder": "Harmonique cible",
         "pipeLength": "Longueur du tuyau",
         "driverOn": "Excitation active",
-        "showNodes": "Marquer nœuds et ventres"
+        "showNodes": "Marquer nœuds et ventres",
+        "showDensity": "Afficher la densité de l’air"
       }
     },
     "instruments": {

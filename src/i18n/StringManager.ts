@@ -118,6 +118,11 @@ export class StringManager {
     return stringProperties.quantities;
   }
 
+  /** The density shading shared by the Reflection, Phase and Standing Waves screens. */
+  public getDensityStrings() {
+    return stringProperties.density;
+  }
+
   /** Axis titles shared by the trace strips and the spectrum. */
   public getAxes() {
     return stringProperties.axes;

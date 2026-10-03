@@ -76,7 +76,7 @@ full a11y wiring all pass Baton's compliance check as-is.
 
 ## Testing
 
-174 vitest specs; `happy-dom`, template `tests/setup.ts`.
+175 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|

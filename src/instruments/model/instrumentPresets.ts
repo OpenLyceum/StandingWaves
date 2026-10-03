@@ -30,8 +30,12 @@ import { PipeTermination } from "../../common/model/PipeTermination.js";
 /** The bore length shared by the flute and the clarinet (m). */
 const WOODWIND_LENGTH_M = 0.6;
 
-/** Bore length of the two organ pipes (m). */
-const ORGAN_LENGTH_M = 0.45;
+/**
+ * Bore length of the two organ pipes (m): a 4-ft stop, the commonest organ pitch
+ * after 8 ft. Every preset must lie inside PIPE_LENGTH_RANGE_M, since it is written
+ * into the same pipeLengthProperty the Standing Waves slider drives.
+ */
+const ORGAN_LENGTH_M = 1.22;
 
 export const InstrumentPreset = {
   OPEN_ORGAN_PIPE: "openOrganPipe",

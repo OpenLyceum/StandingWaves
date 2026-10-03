@@ -178,7 +178,7 @@ between rungs and after a ring-down. They rebuild only when that Property change
 
 ## Testing
 
-174 vitest specs; `happy-dom`, template `tests/setup.ts`.
+175 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|

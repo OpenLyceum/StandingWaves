@@ -23,7 +23,7 @@ import {
   InstrumentPresetValues,
   specFor,
 } from "../src/instruments/model/instrumentPresets.js";
-import { SOUND_SPEED_MPS } from "../src/StandingWavesConstants.js";
+import { PIPE_LENGTH_RANGE_M, SOUND_SPEED_MPS } from "../src/StandingWavesConstants.js";
 
 describe("the preset table", () => {
   it("describes every instrument with only a length and a termination", () => {
@@ -34,6 +34,14 @@ describe("the preset table", () => {
     }
     // Four presets, no more: a fifth would need a rung on the radio group.
     expect(Object.keys(INSTRUMENT_SPECS)).toHaveLength(4);
+  });
+
+  it("keeps every preset inside the pipe-length range the shared pipe accepts", () => {
+    // A preset outside it trips the pipeLengthProperty range assertion the moment it
+    // is selected, and with assertions off silently leaves the slider out of range.
+    for (const preset of InstrumentPresetValues) {
+      expect(PIPE_LENGTH_RANGE_M.contains(specFor(preset).pipeLength)).toBe(true);
+    }
   });
 
   it("gives the flute and the clarinet the same bore length", () => {

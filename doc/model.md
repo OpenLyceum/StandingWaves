@@ -241,6 +241,21 @@ attributable to the termination alone.
 Bar heights in the spectrum are the pipe's own resonant response under an equal-per-mode excitation,
 which falls as Qₕ/ωₕ² ∝ 1/h. That rolloff is derived, not a timbre curve drawn to look plausible.
 
+**Choosing the mode.** The pipe sounds one of its own modes: the fundamental, any bar the learner
+clicks, or the **register key**'s mode, which is simply the pipe's second rung — h = 2 (an octave) on
+an open pipe, h = 3 (a twelfth, 3:1) on a stopped one, because a stopped pipe has no h = 2. A held
+register key stays held across presets, so flute → clarinet compares the two jumps. The even slots of
+a stopped pipe are drawn as empty sockets and answer "no mode here" when clicked.
+
+**Compare.** The same-length partner's bars are overlaid as dashed outlines, normalised the same way.
+An open pipe's bars land exactly in its stopped partner's empty sockets (2·c/4L = c/2L).
+
+**The tone.** "Play sound" plays the sounding mode h at its true SI frequency, together with every
+mode the pipe has at a whole multiple of it, each weighted by its bar height (h/m relative to the
+sounding mode). A tone at f can only contain multiples of f, and the pipe only reinforces those it
+has modes at. On the fundamental this gives the textbook series: 1, 1/3, 1/5, … for a stopped pipe (a
+square wave) and 1, 1/2, 1/3, … for an open one (a sawtooth). It sounds only while the clock runs.
+
 **Known simplifications.** A real clarinet is not a cylinder with a rigid cap, a real flute has an
 embouchure hole rather than a plain open end, and both have end corrections that flatten the ideal
 frequencies by a few percent. Neither the reed's nor the jet's own harmonic envelope is modelled. What

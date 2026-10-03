@@ -153,8 +153,20 @@ export const CHAIN_STABILITY_SAFETY = 0.5;
  * a mode it overlaps, and the visible pattern is dominated by whichever mode is
  * near resonance, so a dozen is plenty — it covers the whole overtone ladder a
  * learner can select and keeps the off-resonance response honest.
+ *
+ * Not more: each extra mode adds an off-resonant pressure of order 1/h at the
+ * pressure nodes, so the tail sums slowly, and with twenty modes it holds a
+ * sweeping pipe's pressure nodes above STANDING_MODE_MAX_IMPURITY from h = 3 up.
  */
 export const MODE_COUNT = 12;
+
+/**
+ * Modes carried by the Instruments pipe: enough for each instrument's series to run
+ * well past its first few harmonics (twenty bars on the open organ pipe, ten on a
+ * stopped one). That screen marks no nodes, so the slow pressure tail that keeps
+ * MODE_COUNT at twelve does not apply.
+ */
+export const INSTRUMENTS_MODE_COUNT = 20;
 
 /**
  * Quality factor Q₁ of a pipe's fundamental; harmonic h has Qₕ = h·Q₁, so every
@@ -284,6 +296,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   PULSE_AMPLITUDE_CELLS,
   CHAIN_STABILITY_SAFETY,
   MODE_COUNT,
+  INSTRUMENTS_MODE_COUNT,
   FUNDAMENTAL_QUALITY_FACTOR,
   DRIVE_FREQUENCY_RANGE_HARMONICS,
   RESONANCE_BANDWIDTH_FRACTION,

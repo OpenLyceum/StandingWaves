@@ -44,6 +44,9 @@ current and specific; neither is a stub.
 | Themed slider | `src/common/view/StandingWavesNumberControl.ts` |
 | Drive-frequency slider (per-pipe range, mode ticks) | `src/standing-waves/view/DriveFrequencyControl.ts` |
 | Automatic frequency sweep (model: `isSweepingProperty`, `getSweepRate`) | `src/common/model/PipeModalModel.ts`, `src/standing-waves/view/SweepButton.ts` |
+| Instruments: sounding harmonic, register key, tone partials | `src/instruments/model/InstrumentsModel.ts` |
+| Clickable spectrum + partner overlay | `src/instruments/view/HarmonicSpectrumNode.ts` |
+| Instrument tone (tambo, true SI pitch) | `src/instruments/view/InstrumentToneGenerator.ts` |
 | Constants (SI + layout px) | `src/StandingWavesConstants.ts` |
 | Colors | `src/StandingWavesColors.ts` |
 
@@ -76,7 +79,7 @@ full a11y wiring all pass Baton's compliance check as-is.
 
 ## Testing
 
-175 vitest specs; `happy-dom`, template `tests/setup.ts`.
+189 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -85,7 +88,7 @@ full a11y wiring all pass Baton's compliance check as-is.
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
 | `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range, the automatic sweep, when the pipe holds a standing mode |
-| `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
+| `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets; same-length partners; the register key (octave on an open pipe, twelfth on a stopped one); the tone's square-wave / sawtooth partials |
 | `tests/DriveFrequencyControl.test.ts` | each mode tick sits under the thumb for every pipe; odd-only ticks on a stopped pipe; manual tuning locked while sweeping |
 | `tests/PhaseModel.test.ts` | δρ/ρ = −∂ξ/∂x, peak kA, the pair's kΔx lag and finite-difference squeeze |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |

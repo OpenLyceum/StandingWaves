@@ -95,7 +95,16 @@
     "oddHarmonicsOnly": "Odd harmonics only",
     "fundamentalLabel": "f₁ = {{value}} Hz",
     "lengthLabel": "L = {{value}} m",
-    "sameLengthNote": "Same length, an octave apart"
+    "sameLengthNote": "Same length, an octave apart",
+    "spectrumHint": "Click a bar to sound it",
+    "soundingLabel": "Sounding: harmonic {{harmonic}}, {{value}} Hz",
+    "playTitle": "Play",
+    "registerKey": "Register key",
+    "registerKeyOctave": "Jumps an octave (× 2)",
+    "registerKeyTwelfth": "Jumps a twelfth (× 3)",
+    "compareWith": "Compare with {{instrument}}",
+    "playSound": "Play sound",
+    "noModeHere": "No mode at {{harmonic}} f₁: odd harmonics only"
   },
   "units": {
     "hertz": "{{value}} Hz",
@@ -176,15 +185,25 @@
     "instruments": {
       "screenSummary": {
         "playArea": "A pipe set up as one of four instruments, with its standing wave inside, beside a bar chart of the harmonics that pipe can sound.",
-        "controlArea": "The control area has a control that selects the instrument, playback controls with Normal and Slow speeds, and a Reset All button.",
-        "interactionHint": "Compare the flute with the clarinet: same length, but not the same harmonics."
+        "controlArea": "The control area has a control that selects the instrument, a register key, checkboxes to compare with the same-length partner and to play the sound, playback controls with Normal and Slow speeds, and a Reset All button.",
+        "interactionHint": "Compare the flute with the clarinet: same length, but not the same harmonics. Press the register key on each: the flute jumps an octave, the clarinet a twelfth."
       },
       "currentDetails": {
         "allHarmonics": "{{instrument}} is open at both ends, so it sounds every harmonic of {{frequency}} hertz.",
-        "oddHarmonics": "{{instrument}} is stopped at one end, so it sounds only the odd harmonics of {{frequency}} hertz — an octave below an open pipe of the same length."
+        "oddHarmonics": "{{instrument}} is stopped at one end, so it sounds only the odd harmonics of {{frequency}} hertz — an octave below an open pipe of the same length.",
+        "sounding": "It is sounding harmonic {{harmonic}}, {{frequency}} hertz.",
+        "comparing": "Dashed outlines show the {{instrument}}; its harmonics fall between these."
       },
       "controls": {
-        "instrument": "Instrument"
+        "instrument": "Instrument",
+        "harmonic": "Harmonic to sound",
+        "harmonicHelp": "Use arrow keys to step through the harmonics this pipe can sound.",
+        "harmonicResponse": "Harmonic {{harmonic}}, {{frequency}} hertz.",
+        "noModeResponse": "No mode at harmonic {{harmonic}}: a stopped pipe has odd harmonics only.",
+        "registerKey": "Register key",
+        "playSound": "Play sound",
+        "keyboardHelpTitle": "Harmonic Chart",
+        "keyboardHelpStep": "Choose a harmonic to sound"
       }
     }
   },

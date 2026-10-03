@@ -87,3 +87,17 @@ export const INSTRUMENT_SPECS: Readonly<Record<InstrumentPreset, InstrumentSpec>
 export function specFor(preset: InstrumentPreset): InstrumentSpec {
   return INSTRUMENT_SPECS[preset];
 }
+
+/**
+ * The same-length preset with the other termination: flute ↔ clarinet, open ↔
+ * stopped organ pipe. Every preset has exactly one, which is what the "Compare"
+ * overlay draws behind the current spectrum.
+ */
+export function partnerOf(preset: InstrumentPreset): InstrumentPreset {
+  return {
+    [InstrumentPreset.OPEN_ORGAN_PIPE]: InstrumentPreset.STOPPED_ORGAN_PIPE,
+    [InstrumentPreset.STOPPED_ORGAN_PIPE]: InstrumentPreset.OPEN_ORGAN_PIPE,
+    [InstrumentPreset.FLUTE]: InstrumentPreset.CLARINET,
+    [InstrumentPreset.CLARINET]: InstrumentPreset.FLUTE,
+  }[preset];
+}

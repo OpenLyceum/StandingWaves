@@ -95,7 +95,16 @@
     "oddHarmonicsOnly": "Solo armónicos impares",
     "fundamentalLabel": "f₁ = {{value}} Hz",
     "lengthLabel": "L = {{value}} m",
-    "sameLengthNote": "Misma longitud, una octava de diferencia"
+    "sameLengthNote": "Misma longitud, una octava de diferencia",
+    "spectrumHint": "Haga clic en una barra para sonarla",
+    "soundingLabel": "Sonando: armónico {{harmonic}}, {{value}} Hz",
+    "playTitle": "Tocar",
+    "registerKey": "Llave de registro",
+    "registerKeyOctave": "Sube una octava (× 2)",
+    "registerKeyTwelfth": "Sube una duodécima (× 3)",
+    "compareWith": "Comparar con {{instrument}}",
+    "playSound": "Reproducir sonido",
+    "noModeHere": "No hay modo en {{harmonic}} f₁: solo armónicos impares"
   },
   "units": {
     "hertz": "{{value}} Hz",
@@ -176,15 +185,25 @@
     "instruments": {
       "screenSummary": {
         "playArea": "Un tubo configurado como uno de cuatro instrumentos, con su onda estacionaria en el interior, junto a un diagrama de barras de los armónicos que ese tubo puede sonar.",
-        "controlArea": "El área de control tiene un control que selecciona el instrumento, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
-        "interactionHint": "Compare la flauta con el clarinete: misma longitud, pero no los mismos armónicos."
+        "controlArea": "El área de control tiene un control que selecciona el instrumento, una llave de registro, casillas para comparar con el instrumento de la misma longitud y para reproducir el sonido, controles de reproducción con las velocidades normal y lenta y un botón Reiniciar todo.",
+        "interactionHint": "Compare la flauta con el clarinete: misma longitud, pero no los mismos armónicos. Pulse la llave de registro en cada uno: la flauta sube una octava, el clarinete una duodécima."
       },
       "currentDetails": {
         "allHarmonics": "{{instrument}} está abierto por ambos extremos, así que suena todos los armónicos de {{frequency}} hercios.",
-        "oddHarmonics": "{{instrument}} está tapado por un extremo, así que solo suena los armónicos impares de {{frequency}} hercios — una octava por debajo de un tubo abierto de la misma longitud."
+        "oddHarmonics": "{{instrument}} está tapado por un extremo, así que solo suena los armónicos impares de {{frequency}} hercios — una octava por debajo de un tubo abierto de la misma longitud.",
+        "sounding": "Está sonando el armónico {{harmonic}}, {{frequency}} hercios.",
+        "comparing": "Los contornos discontinuos muestran {{instrument}}; sus armónicos caen entre estos."
       },
       "controls": {
-        "instrument": "Instrumento"
+        "instrument": "Instrumento",
+        "harmonic": "Armónico que suena",
+        "harmonicHelp": "Use las flechas para recorrer los armónicos que este tubo puede sonar.",
+        "harmonicResponse": "Armónico {{harmonic}}, {{frequency}} hercios.",
+        "noModeResponse": "No hay modo en el armónico {{harmonic}}: un tubo tapado solo tiene armónicos impares.",
+        "registerKey": "Llave de registro",
+        "playSound": "Reproducir sonido",
+        "keyboardHelpTitle": "Gráfico de armónicos",
+        "keyboardHelpStep": "Elegir el armónico que suena"
       }
     }
   },

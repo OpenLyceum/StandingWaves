@@ -171,9 +171,17 @@ describe("View nodes release the model Properties they linked", () => {
   });
 
   it("HarmonicSpectrumNode", () => {
-    const pipe = new PipeModalModel();
-    expectNoLeakedListeners(pipe, () => new HarmonicSpectrumNode(pipe, { viewWidth: 260, viewHeight: 150 }));
-    pipe.dispose();
+    const model = new InstrumentsModel();
+    // The screen-model Properties it also follows, counted the same way.
+    const screenWatched: readonly TReadOnlyProperty<unknown>[] = [
+      model.soundingHarmonicProperty,
+      model.partnerPresetProperty,
+      model.showPartnerProperty,
+    ];
+    const before = screenWatched.map(listenerCount);
+    expectNoLeakedListeners(model.pipe, () => new HarmonicSpectrumNode(model, { viewWidth: 260, viewHeight: 150 }));
+    expect(screenWatched.map(listenerCount)).toEqual(before);
+    model.dispose();
   });
 
   it("DriveFrequencyControl", () => {

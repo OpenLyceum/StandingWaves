@@ -95,7 +95,16 @@
     "oddHarmonicsOnly": "Harmoniques impaires seulement",
     "fundamentalLabel": "f₁ = {{value}} Hz",
     "lengthLabel": "L = {{value}} m",
-    "sameLengthNote": "Même longueur, une octave d'écart"
+    "sameLengthNote": "Même longueur, une octave d'écart",
+    "spectrumHint": "Cliquez sur une barre pour la faire sonner",
+    "soundingLabel": "Son : harmonique {{harmonic}}, {{value}} Hz",
+    "playTitle": "Jouer",
+    "registerKey": "Clé de registre",
+    "registerKeyOctave": "Monte d'une octave (× 2)",
+    "registerKeyTwelfth": "Monte d'une douzième (× 3)",
+    "compareWith": "Comparer avec {{instrument}}",
+    "playSound": "Jouer le son",
+    "noModeHere": "Aucun mode à {{harmonic}} f₁ : harmoniques impaires seulement"
   },
   "units": {
     "hertz": "{{value}} Hz",
@@ -176,15 +185,25 @@
     "instruments": {
       "screenSummary": {
         "playArea": "Un tuyau configuré comme l'un des quatre instruments, avec son onde stationnaire à l'intérieur, à côté d'un diagramme en barres des harmoniques que ce tuyau peut produire.",
-        "controlArea": "La zone de commande comporte une commande qui sélectionne l'instrument, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
-        "interactionHint": "Comparez la flûte et la clarinette : même longueur, mais pas les mêmes harmoniques."
+        "controlArea": "La zone de commande comporte une commande qui sélectionne l'instrument, une clé de registre, des cases pour comparer avec l'instrument de même longueur et pour jouer le son, des commandes de lecture avec les vitesses normale et lente et un bouton Tout réinitialiser.",
+        "interactionHint": "Comparez la flûte et la clarinette : même longueur, mais pas les mêmes harmoniques. Appuyez sur la clé de registre de chacune : la flûte monte d'une octave, la clarinette d'une douzième."
       },
       "currentDetails": {
         "allHarmonics": "{{instrument}} est ouvert aux deux extrémités : il produit donc toutes les harmoniques de {{frequency}} hertz.",
-        "oddHarmonics": "{{instrument}} est bouché à une extrémité : il ne produit donc que les harmoniques impaires de {{frequency}} hertz — une octave sous un tuyau ouvert de même longueur."
+        "oddHarmonics": "{{instrument}} est bouché à une extrémité : il ne produit donc que les harmoniques impaires de {{frequency}} hertz — une octave sous un tuyau ouvert de même longueur.",
+        "sounding": "Il produit l'harmonique {{harmonic}}, {{frequency}} hertz.",
+        "comparing": "Les contours pointillés montrent {{instrument}} ; ses harmoniques tombent entre celles-ci."
       },
       "controls": {
-        "instrument": "Instrument"
+        "instrument": "Instrument",
+        "harmonic": "Harmonique jouée",
+        "harmonicHelp": "Utilisez les flèches pour parcourir les harmoniques que ce tuyau peut produire.",
+        "harmonicResponse": "Harmonique {{harmonic}}, {{frequency}} hertz.",
+        "noModeResponse": "Aucun mode à l'harmonique {{harmonic}} : un tuyau bouché n'a que des harmoniques impaires.",
+        "registerKey": "Clé de registre",
+        "playSound": "Jouer le son",
+        "keyboardHelpTitle": "Diagramme des harmoniques",
+        "keyboardHelpStep": "Choisir l'harmonique jouée"
       }
     }
   },

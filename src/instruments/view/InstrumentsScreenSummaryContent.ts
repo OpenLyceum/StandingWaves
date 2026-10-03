@@ -8,14 +8,18 @@
  * sounds an octave below an open pipe of the same length. That last clause is the
  * conclusion a sighted learner draws by comparing two bar charts, so it has to be
  * stated rather than left to be inferred from two numbers read minutes apart.
+ *
+ * When the pipe is overblown it adds the mode it is sounding, and when the partner
+ * overlay is on it says where the partner's harmonics fall: between these ones.
  */
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
-import { isSymmetric, type PipeTermination } from "../../common/model/PipeTermination.js";
+import { isSymmetric } from "../../common/model/PipeTermination.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
-import { InstrumentPreset } from "../model/instrumentPresets.js";
+import { InstrumentPresetValues } from "../model/instrumentPresets.js";
+import { presetNameProperty } from "./presetNames.js";
 
 export class InstrumentsScreenSummaryContent extends ScreenSummaryContent {
   private readonly currentDetailsProperty: TReadOnlyProperty<string>;
@@ -23,42 +27,51 @@ export class InstrumentsScreenSummaryContent extends ScreenSummaryContent {
   public constructor(model: InstrumentsModel) {
     const strings = StringManager.getInstance();
     const a11y = strings.getInstrumentsA11yStrings();
-    const instruments = strings.getInstrumentsStrings();
     const details = a11y.currentDetails;
     const pipe = model.pipe;
 
-    const currentDetailsProperty = new DerivedProperty(
+    const currentDetailsProperty = DerivedProperty.deriveAny(
       [
         model.presetProperty,
+        model.partnerPresetProperty,
+        model.soundingHarmonicProperty,
+        model.showPartnerProperty,
         pipe.terminationProperty,
         pipe.fundamentalFrequencyProperty,
         details.allHarmonicsStringProperty,
         details.oddHarmonicsStringProperty,
-        instruments.openOrganPipeStringProperty,
-        instruments.stoppedOrganPipeStringProperty,
-        instruments.fluteStringProperty,
-        instruments.clarinetStringProperty,
+        details.soundingStringProperty,
+        details.comparingStringProperty,
+        ...InstrumentPresetValues.map(presetNameProperty),
       ],
-      (
-        preset: InstrumentPreset,
-        termination: PipeTermination,
-        fundamental: number,
-        allPattern: string,
-        oddPattern: string,
-        openOrgan: string,
-        stoppedOrgan: string,
-        flute: string,
-        clarinet: string,
-      ) => {
-        const name = {
-          [InstrumentPreset.OPEN_ORGAN_PIPE]: openOrgan,
-          [InstrumentPreset.STOPPED_ORGAN_PIPE]: stoppedOrgan,
-          [InstrumentPreset.FLUTE]: flute,
-          [InstrumentPreset.CLARINET]: clarinet,
-        }[preset];
+      () => {
+        const fundamental = pipe.fundamentalFrequencyProperty.value;
+        const pattern = isSymmetric(pipe.terminationProperty.value)
+          ? details.allHarmonicsStringProperty.value
+          : details.oddHarmonicsStringProperty.value;
+        const sentences = [
+          pattern
+            .replace("{{instrument}}", presetNameProperty(model.presetProperty.value).value)
+            .replace("{{frequency}}", StringUtils.toFixedLTR(fundamental, 0)),
+        ];
 
-        const pattern = isSymmetric(termination) ? allPattern : oddPattern;
-        return pattern.replace("{{instrument}}", name).replace("{{frequency}}", StringUtils.toFixedLTR(fundamental, 0));
+        const harmonic = model.soundingHarmonicProperty.value;
+        if (harmonic !== 1) {
+          sentences.push(
+            details.soundingStringProperty.value
+              .replace("{{harmonic}}", `${harmonic}`)
+              .replace("{{frequency}}", StringUtils.toFixedLTR(harmonic * fundamental, 0)),
+          );
+        }
+        if (model.showPartnerProperty.value) {
+          sentences.push(
+            details.comparingStringProperty.value.replace(
+              "{{instrument}}",
+              presetNameProperty(model.partnerPresetProperty.value).value,
+            ),
+          );
+        }
+        return sentences.join(" ");
       },
     );
 

@@ -17,10 +17,17 @@ import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { InstrumentPreset } from "../model/instrumentPresets.js";
+import { presetNameProperty } from "./presetNames.js";
 
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
 const LABEL_FONT = new PhetFont(14);
 const PANEL_WIDTH = 190;
+
+/**
+ * Outer width shared by both Instruments panels, so the column of controls has one
+ * width. Small enough that the column clears the pipe's right end.
+ */
+export const INSTRUMENTS_PANEL_MIN_WIDTH = 184;
 
 export class PresetPanel extends StandingWavesPanel {
   public readonly presetRadioButtons: Node;
@@ -36,13 +43,6 @@ export class PresetPanel extends StandingWavesPanel {
       maxWidth: PANEL_WIDTH,
     });
 
-    const nameFor = {
-      [InstrumentPreset.OPEN_ORGAN_PIPE]: instruments.openOrganPipeStringProperty,
-      [InstrumentPreset.STOPPED_ORGAN_PIPE]: instruments.stoppedOrganPipeStringProperty,
-      [InstrumentPreset.FLUTE]: instruments.fluteStringProperty,
-      [InstrumentPreset.CLARINET]: instruments.clarinetStringProperty,
-    } as const;
-
     const presetRadioButtons = new VerticalAquaRadioButtonGroup<InstrumentPreset>(
       model.presetProperty as Property<InstrumentPreset>,
       [
@@ -53,12 +53,12 @@ export class PresetPanel extends StandingWavesPanel {
       ].map((preset) => ({
         value: preset,
         createNode: () =>
-          new Text(nameFor[preset], {
+          new Text(presetNameProperty(preset), {
             font: LABEL_FONT,
             fill: StandingWavesColors.textColorProperty,
             maxWidth: PANEL_WIDTH - 30,
           }),
-        options: { accessibleName: nameFor[preset] },
+        options: { accessibleName: presetNameProperty(preset) },
       })),
       { spacing: 8, accessibleName: a11y.controls.instrumentStringProperty },
     );
@@ -69,6 +69,7 @@ export class PresetPanel extends StandingWavesPanel {
         spacing: 10,
         children: [label, presetRadioButtons],
       }),
+      { minWidth: INSTRUMENTS_PANEL_MIN_WIDTH },
     );
 
     this.presetRadioButtons = presetRadioButtons;

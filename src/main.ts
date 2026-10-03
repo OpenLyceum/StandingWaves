@@ -82,6 +82,10 @@ onReadyToLaunch(() => {
         // Adds a language picker in Preferences → Language
         supportsDynamicLocale: true,
       },
+      audioOptions: {
+        // Initializes tambo and the Audio preferences. Pair with supportsSound in src/init.ts.
+        supportsSound: true,
+      },
     }),
 
     // Optional: fill in credits shown in Help → About

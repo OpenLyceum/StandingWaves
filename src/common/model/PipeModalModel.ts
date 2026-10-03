@@ -122,6 +122,8 @@ export type PipeModalModelOptions = {
   pipeLength?: number;
   /** Quality factor shared by every mode. */
   qualityFactor?: number;
+  /** Highest mode number carried. Defaults to {@link MODE_COUNT}. */
+  modeCount?: number;
 };
 
 export class PipeModalModel {
@@ -185,6 +187,9 @@ export class PipeModalModel {
   /** Quality factor Q₁ of the fundamental; harmonic h has h·Q₁. */
   public readonly qualityFactor: number;
 
+  /** Highest mode number this pipe carries. */
+  public readonly modeCount: number;
+
   /**
    * Modal displacement amplitudes aₕ (m), indexed by harmonic number − 1.
    * Disallowed harmonics stay identically zero. Mutated in place each step; read
@@ -201,6 +206,7 @@ export class PipeModalModel {
   public constructor(providedOptions?: PipeModalModelOptions) {
     const termination = providedOptions?.termination;
     this.qualityFactor = providedOptions?.qualityFactor ?? FUNDAMENTAL_QUALITY_FACTOR;
+    this.modeCount = providedOptions?.modeCount ?? MODE_COUNT;
 
     this.pipeLengthProperty = new NumberProperty(providedOptions?.pipeLength ?? PIPE_LENGTH_DEFAULT_M, {
       range: PIPE_LENGTH_RANGE_M,
@@ -222,8 +228,8 @@ export class PipeModalModel {
     this.standingModeNumberProperty = new NumberProperty(0);
     this.standingModeProperty = this.standingModeNumberProperty;
 
-    this.amplitudes = new Float64Array(MODE_COUNT);
-    this.rates = new Float64Array(MODE_COUNT);
+    this.amplitudes = new Float64Array(this.modeCount);
+    this.rates = new Float64Array(this.modeCount);
 
     this.fundamentalFrequencyProperty = new DerivedProperty(
       [this.terminationProperty, this.pipeLengthProperty],
@@ -317,7 +323,7 @@ export class PipeModalModel {
 
   /** Harmonic numbers the current pipe supports, ascending. */
   public getAllowedHarmonics(): number[] {
-    return allowedHarmonics(this.terminationProperty.value, MODE_COUNT);
+    return allowedHarmonics(this.terminationProperty.value, this.modeCount);
   }
 
   /** Resonant frequency of harmonic h for the current pipe (Hz). */
@@ -327,7 +333,7 @@ export class PipeModalModel {
 
   /** Current modal displacement amplitude aₕ (m). Zero for a harmonic the pipe lacks. */
   public modalAmplitude(harmonicNumber: number): number {
-    if (harmonicNumber < 1 || harmonicNumber > MODE_COUNT) {
+    if (harmonicNumber < 1 || harmonicNumber > this.modeCount) {
       return 0;
     }
     return this.amplitudes[harmonicNumber - 1] ?? 0;
@@ -343,7 +349,16 @@ export class PipeModalModel {
    * on one honest scale.
    */
   public resonantAmplitude(harmonicNumber: number): number {
-    const frequency = this.getModeFrequency(harmonicNumber);
+    return this.resonantAmplitudeFor(harmonicNumber, this.terminationProperty.value, this.pipeLengthProperty.value);
+  }
+
+  /**
+   * {@link resonantAmplitude} for a pipe of a different geometry (m), with this
+   * pipe's drive and damping — so a second pipe can be drawn on the same footing as
+   * this one without being built.
+   */
+  public resonantAmplitudeFor(harmonicNumber: number, termination: PipeTermination, pipeLength: number): number {
+    const frequency = modeFrequency(harmonicNumber, termination, pipeLength);
     if (frequency <= 0) {
       return 0;
     }
@@ -408,7 +423,7 @@ export class PipeModalModel {
     const termination = this.terminationProperty.value;
     const length = this.pipeLengthProperty.value;
     let total = 0;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       const amplitude = this.amplitudes[h - 1] ?? 0;
       if (amplitude !== 0) {
         total += amplitude * displacementShape(h, termination, length, x);
@@ -428,7 +443,7 @@ export class PipeModalModel {
     const termination = this.terminationProperty.value;
     const length = this.pipeLengthProperty.value;
     let total = 0;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       const amplitude = this.amplitudes[h - 1] ?? 0;
       if (amplitude !== 0) {
         const k = modeWavenumber(h, termination, length);
@@ -443,7 +458,7 @@ export class PipeModalModel {
     const termination = this.terminationProperty.value;
     const length = this.pipeLengthProperty.value;
     let total = 0;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       const rate = this.rates[h - 1] ?? 0;
       if (rate !== 0) {
         total += rate * displacementShape(h, termination, length, x);
@@ -508,7 +523,7 @@ export class PipeModalModel {
     const termination = this.terminationProperty.value;
     const driveFrequency = this.driveFrequencyProperty.value;
     const omegaDrive = 2 * Math.PI * driveFrequency;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       if (isModeAllowed(h, termination)) {
         const amplitude = this.steadyStateAmplitude(h, driveFrequency);
         const lag = this.steadyStatePhaseLag(h, driveFrequency);
@@ -549,7 +564,7 @@ export class PipeModalModel {
     const omegaDrive = 2 * Math.PI * driveFrequency;
     const force = this.isDrivingProperty.value ? DRIVE_ACCELERATION_MPS2 : 0;
 
-    const highestFrequency = modeFrequency(MODE_COUNT, termination, length);
+    const highestFrequency = modeFrequency(this.modeCount, termination, length);
     const omegaMax = Math.max(2 * Math.PI * highestFrequency, omegaDrive);
     const subStepCount = Math.max(1, Math.ceil((omegaMax * dt) / MAX_PHASE_STEP));
     const subDt = dt / subStepCount;
@@ -557,7 +572,7 @@ export class PipeModalModel {
     let phase = this.drivePhaseProperty.value;
 
     for (let step = 0; step < subStepCount; step++) {
-      for (let h = 1; h <= MODE_COUNT; h++) {
+      for (let h = 1; h <= this.modeCount; h++) {
         if (!isModeAllowed(h, termination)) {
           continue;
         }
@@ -630,7 +645,7 @@ export class PipeModalModel {
   /** Silences any mode the current termination does not support. */
   private clearForbiddenModes(): void {
     const termination = this.terminationProperty.value;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       if (!isModeAllowed(h, termination)) {
         this.amplitudes[h - 1] = 0;
         this.rates[h - 1] = 0;
@@ -688,7 +703,7 @@ export class PipeModalModel {
     let worst = 0;
     for (const x of displacementNodePositions(harmonicNumber, termination, length)) {
       let residual = 0;
-      for (let j = 1; j <= MODE_COUNT; j++) {
+      for (let j = 1; j <= this.modeCount; j++) {
         if (j !== harmonicNumber) {
           residual += (envelopes[j - 1] ?? 0) * Math.abs(displacementShape(j, termination, length, x));
         }
@@ -697,7 +712,7 @@ export class PipeModalModel {
     }
     for (const x of pressureNodePositions(harmonicNumber, termination, length)) {
       let residual = 0;
-      for (let j = 1; j <= MODE_COUNT; j++) {
+      for (let j = 1; j <= this.modeCount; j++) {
         if (j !== harmonicNumber) {
           const k = modeWavenumber(j, termination, length);
           residual += k * (envelopes[j - 1] ?? 0) * Math.abs(pressureShape(j, termination, length, x));
@@ -713,7 +728,7 @@ export class PipeModalModel {
     const envelopes: number[] = [];
     let dominant = 0;
     let dominantFraction = 0;
-    for (let h = 1; h <= MODE_COUNT; h++) {
+    for (let h = 1; h <= this.modeCount; h++) {
       const envelope = this.modeEnvelope(h);
       envelopes.push(envelope);
       const fraction = envelope > 0 ? envelope / this.resonantAmplitude(h) : 0;
@@ -740,7 +755,7 @@ export class PipeModalModel {
   private findNearestHarmonic(termination: PipeTermination, length: number, driveFrequency: number): number {
     let best = 0;
     let bestDistance = Number.POSITIVE_INFINITY;
-    for (const h of allowedHarmonics(termination, MODE_COUNT)) {
+    for (const h of allowedHarmonics(termination, this.modeCount)) {
       const distance = Math.abs(modeFrequency(h, termination, length) - driveFrequency);
       if (distance < bestDistance) {
         bestDistance = distance;

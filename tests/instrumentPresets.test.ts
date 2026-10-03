@@ -21,9 +21,10 @@ import {
   INSTRUMENT_SPECS,
   InstrumentPreset,
   InstrumentPresetValues,
+  partnerOf,
   specFor,
 } from "../src/instruments/model/instrumentPresets.js";
-import { PIPE_LENGTH_RANGE_M, SOUND_SPEED_MPS } from "../src/StandingWavesConstants.js";
+import { INSTRUMENTS_MODE_COUNT, PIPE_LENGTH_RANGE_M, SOUND_SPEED_MPS } from "../src/StandingWavesConstants.js";
 
 describe("the preset table", () => {
   it("describes every instrument with only a length and a termination", () => {
@@ -169,6 +170,167 @@ describe("the screen model", () => {
     expect(model.pipe.modalAmplitude(2)).toBe(0);
     expect(model.pipe.modalAmplitude(4)).toBe(0);
     expect(Math.abs(model.pipe.modalAmplitude(1))).toBeGreaterThan(0);
+    model.dispose();
+  });
+});
+
+describe("the same-length partner", () => {
+  it("pairs each preset with the other termination at the same length, both ways", () => {
+    for (const preset of InstrumentPresetValues) {
+      const partner = partnerOf(preset);
+      expect(partnerOf(partner)).toBe(preset);
+      expect(specFor(partner).pipeLength).toBeCloseTo(specFor(preset).pipeLength, 12);
+      expect(isSymmetric(specFor(partner).termination)).toBe(!isSymmetric(specFor(preset).termination));
+    }
+  });
+});
+
+describe("choosing the harmonic the pipe sounds", () => {
+  it("sounds a chosen mode at once, at h times the fundamental", () => {
+    const model = new InstrumentsModel();
+    expect(model.selectHarmonic(3)).toBe(true);
+    expect(model.soundingHarmonicProperty.value).toBe(3);
+    const f1 = model.pipe.fundamentalFrequencyProperty.value;
+    expect(model.pipe.driveFrequencyProperty.value).toBeCloseTo(3 * f1, 6);
+    expect(model.pipe.isAtResonanceProperty.value).toBe(true);
+    model.dispose();
+  });
+
+  it("refuses an even harmonic on the clarinet and leaves the pipe as it was", () => {
+    const model = new InstrumentsModel();
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    const before = model.pipe.driveFrequencyProperty.value;
+    for (const harmonic of [2, 4, 6]) {
+      expect(model.selectHarmonic(harmonic)).toBe(false);
+    }
+    expect(model.soundingHarmonicProperty.value).toBe(1);
+    expect(model.pipe.driveFrequencyProperty.value).toBe(before);
+    model.dispose();
+  });
+
+  it("refuses a harmonic beyond the modes the model carries", () => {
+    const model = new InstrumentsModel();
+    expect(model.selectHarmonic(0)).toBe(false);
+    expect(model.selectHarmonic(99)).toBe(false);
+    expect(model.soundingHarmonicProperty.value).toBe(1);
+    model.dispose();
+  });
+});
+
+describe("the register key", () => {
+  it("overblows the flute an octave: to its second harmonic, f = 2·f₁", () => {
+    const model = new InstrumentsModel();
+    const f1 = SOUND_SPEED_MPS / (2 * 0.6);
+    model.registerKeyProperty.value = true;
+    expect(model.soundingHarmonicProperty.value).toBe(2);
+    expect(model.pipe.driveFrequencyProperty.value / f1).toBeCloseTo(2, 9);
+    model.dispose();
+  });
+
+  it("overblows the clarinet a twelfth: to its third harmonic, f = 3·f₁", () => {
+    // The textbook register-key fact: a stopped pipe has no second mode, so
+    // overblowing skips to the third — an octave and a fifth, 3:1 — not an octave.
+    const model = new InstrumentsModel();
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    const f1 = SOUND_SPEED_MPS / (4 * 0.6);
+    model.registerKeyProperty.value = true;
+    expect(model.soundingHarmonicProperty.value).toBe(3);
+    expect(model.pipe.driveFrequencyProperty.value / f1).toBeCloseTo(3, 9);
+    model.dispose();
+  });
+
+  it("falls back to the fundamental when released", () => {
+    const model = new InstrumentsModel();
+    model.registerKeyProperty.value = true;
+    model.registerKeyProperty.value = false;
+    expect(model.soundingHarmonicProperty.value).toBe(1);
+    expect(model.pipe.driveFrequencyProperty.value).toBeCloseTo(model.pipe.fundamentalFrequencyProperty.value, 6);
+    model.dispose();
+  });
+
+  it("stays held across instruments, so flute → clarinet compares an octave with a twelfth", () => {
+    const model = new InstrumentsModel();
+    model.registerKeyProperty.value = true;
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    expect(model.registerKeyProperty.value).toBe(true);
+    expect(model.soundingHarmonicProperty.value).toBe(3);
+    model.presetProperty.value = InstrumentPreset.OPEN_ORGAN_PIPE;
+    expect(model.soundingHarmonicProperty.value).toBe(2);
+    model.dispose();
+  });
+
+  it("reads as pressed exactly when the pipe sounds its second register", () => {
+    const model = new InstrumentsModel();
+    model.selectHarmonic(2);
+    expect(model.registerKeyProperty.value).toBe(true);
+    model.selectHarmonic(5);
+    expect(model.registerKeyProperty.value).toBe(false);
+    // Releasing it by choosing another bar must not echo into a second selection.
+    expect(model.soundingHarmonicProperty.value).toBe(5);
+    model.dispose();
+  });
+
+  it("is released, with the overlay and sound off, by Reset All", () => {
+    const model = new InstrumentsModel();
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    model.registerKeyProperty.value = true;
+    model.showPartnerProperty.value = true;
+    model.isToneOnProperty.value = true;
+    model.reset();
+    expect(model.registerKeyProperty.value).toBe(false);
+    expect(model.soundingHarmonicProperty.value).toBe(1);
+    expect(model.showPartnerProperty.value).toBe(false);
+    expect(model.isToneOnProperty.value).toBe(false);
+    expect(model.pipe.isAtResonanceProperty.value).toBe(true);
+    model.dispose();
+  });
+});
+
+describe("the tone", () => {
+  const ratiosAndWeights = (model: InstrumentsModel): [number, number][] => {
+    const base = model.pipe.driveFrequencyProperty.value;
+    return model.getTonePartials().map((partial) => [partial.frequency / base, partial.amplitude]);
+  };
+
+  it("gives the clarinet a square wave's series: odd multiples at 1/n", () => {
+    const model = new InstrumentsModel();
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    const partials = ratiosAndWeights(model);
+    expect(partials.map(([ratio]) => Math.round(ratio))).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19]);
+    for (const [ratio, weight] of partials) {
+      expect(weight).toBeCloseTo(1 / ratio, 9);
+    }
+    model.dispose();
+  });
+
+  it("gives the flute a sawtooth's series: every multiple at 1/n", () => {
+    const model = new InstrumentsModel();
+    const partials = ratiosAndWeights(model);
+    expect(partials.map(([ratio]) => Math.round(ratio))).toEqual(
+      Array.from({ length: INSTRUMENTS_MODE_COUNT }, (_, index) => index + 1),
+    );
+    for (const [ratio, weight] of partials) {
+      expect(weight).toBeCloseTo(1 / ratio, 9);
+    }
+    model.dispose();
+  });
+
+  it("plays only the pipe's modes at multiples of an overblown note", () => {
+    // Clarinet on harmonic 3: a tone at 3f₁ can hold 6f₁, 9f₁, 12f₁, 15f₁, 18f₁, of
+    // which the stopped pipe has only the odd ones, 9f₁ and 15f₁.
+    const model = new InstrumentsModel();
+    model.presetProperty.value = InstrumentPreset.CLARINET;
+    model.registerKeyProperty.value = true;
+    const partials = ratiosAndWeights(model);
+    expect(partials.map(([ratio]) => Math.round(ratio))).toEqual([1, 3, 5]);
+    expect(partials[1]?.[1]).toBeCloseTo(1 / 3, 9);
+    expect(partials[2]?.[1]).toBeCloseTo(1 / 5, 9);
+    model.dispose();
+  });
+
+  it("is pitched at true SI frequencies, not the slowed animation rate", () => {
+    const model = new InstrumentsModel();
+    expect(model.getTonePartials()[0]?.frequency).toBeCloseTo(SOUND_SPEED_MPS / 1.2, 6);
     model.dispose();
   });
 });

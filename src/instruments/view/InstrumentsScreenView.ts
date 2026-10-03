@@ -14,6 +14,10 @@
  * A readout under the spectrum names the two facts that produces — the fundamental,
  * and whether the series is complete or odd-only — because those are the two things
  * to take away.
+ *
+ * The spectrum is also the control for which mode the pipe sounds, and the Play
+ * panel under the preset list holds the register key, the partner overlay and the
+ * sound. None of them moves anything else on screen.
  */
 
 import { DerivedProperty } from "scenerystack/axon";
@@ -41,6 +45,8 @@ import {
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { createHarmonicSeriesLabelProperty, HarmonicSpectrumNode } from "./HarmonicSpectrumNode.js";
 import { InstrumentsScreenSummaryContent } from "./InstrumentsScreenSummaryContent.js";
+import { InstrumentToneGenerator } from "./InstrumentToneGenerator.js";
+import { PlayPanel } from "./PlayPanel.js";
 import { PresetPanel } from "./PresetPanel.js";
 
 const PIPE_VIEW_LENGTH = 770;
@@ -134,7 +140,7 @@ export class InstrumentsScreenView extends ScreenView {
     const pressureTrace: TraceSpec = {
       colorProperty: StandingWavesColors.pressureColorProperty,
       sample: (fraction) => pipe.pressureAt(atFraction(fraction)),
-      fullScale: () => TRACE_HEADROOM * pipe.resonantPressureAmplitude(1),
+      fullScale: () => TRACE_HEADROOM * pipe.resonantPressureAmplitude(model.soundingHarmonicProperty.value),
       caption: quantities.pressureStringProperty,
     };
 
@@ -175,10 +181,15 @@ export class InstrumentsScreenView extends ScreenView {
     presetPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
     this.addChild(presetPanel);
 
+    const playPanel = new PlayPanel(model);
+    playPanel.right = presetPanel.right;
+    playPanel.top = presetPanel.bottom + SCREEN_VIEW_MARGIN;
+    this.addChild(playPanel);
+
     // The spectrum sits below the pipe. Positioned by its plot origin (x = 0 is the
     // plot's left edge, not the node's bounds), with SPECTRUM_ORIGIN.x reserving the
     // room its rotated y-axis title needs.
-    const spectrum = new HarmonicSpectrumNode(pipe, {
+    const spectrum = new HarmonicSpectrumNode(model, {
       viewWidth: SPECTRUM_SIZE.width,
       viewHeight: SPECTRUM_SIZE.height,
     });
@@ -196,6 +207,13 @@ export class InstrumentsScreenView extends ScreenView {
       (length: number, pattern: string) => pattern.replace("{{value}}", StringUtils.toFixedLTR(length, 2)),
     );
     const seriesProperty = createHarmonicSeriesLabelProperty(pipe);
+    const soundingProperty = new DerivedProperty(
+      [model.soundingHarmonicProperty, pipe.fundamentalFrequencyProperty, instruments.soundingLabelStringProperty],
+      (harmonic: number, fundamental: number, pattern: string) =>
+        pattern
+          .replace("{{harmonic}}", `${harmonic}`)
+          .replace("{{value}}", StringUtils.toFixedLTR(harmonic * fundamental, 0)),
+    );
 
     const readout = new VBox({
       align: "left",
@@ -204,6 +222,11 @@ export class InstrumentsScreenView extends ScreenView {
         new Text(seriesProperty, {
           font: SERIES_FONT,
           fill: StandingWavesColors.pressureColorProperty,
+          maxWidth: READOUT_MAX_WIDTH,
+        }),
+        new Text(soundingProperty, {
+          font: READOUT_FONT,
+          fill: StandingWavesColors.textColorProperty,
           maxWidth: READOUT_MAX_WIDTH,
         }),
         new Text(fundamentalProperty, {
@@ -256,11 +279,24 @@ export class InstrumentsScreenView extends ScreenView {
 
     this.addChild(
       new Node({
-        pdomOrder: [presetPanel.presetRadioButtons, timeControl, resetAllButton],
+        pdomOrder: [
+          presetPanel.presetRadioButtons,
+          spectrum,
+          playPanel.registerKeyCheckbox,
+          playPanel.compareCheckbox,
+          playPanel.soundCheckbox,
+          timeControl,
+          resetAllButton,
+        ],
       }),
     );
 
+    const toneGenerator = new InstrumentToneGenerator(model, this);
+
     this.disposeInstrumentsScreenView = () => {
+      toneGenerator.dispose();
+      soundingProperty.dispose();
+      playPanel.dispose();
       pipe.terminationProperty.unlink(onTermination);
       seriesProperty.dispose();
       lengthProperty.dispose();
@@ -287,12 +323,13 @@ export class InstrumentsScreenView extends ScreenView {
   /**
    * Displacement that reaches the top of the strip (m).
    *
-   * Always the *fundamental's* resonant amplitude, because that is the note being
-   * sounded on this screen — and because a scale that tracked the mode would undo the
-   * fixed frame that makes the presets comparable.
+   * The resonant amplitude of the mode being sounded, as on the Standing Waves
+   * screen, so whatever mode the pipe sounds fills the strip. Resonant displacement
+   * falls as 1/h; a scale tied to the fundamental would shrink an overblown mode to
+   * a sliver.
    */
   private displacementScale(): number {
-    return TRACE_HEADROOM * this.model.pipe.resonantAmplitude(1);
+    return TRACE_HEADROOM * this.model.pipe.resonantAmplitude(this.model.soundingHarmonicProperty.value);
   }
 
   public override dispose(): void {

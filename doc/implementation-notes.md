@@ -178,7 +178,7 @@ between rungs and after a ring-down. They rebuild only when that Property change
 
 ## Testing
 
-175 vitest specs; `happy-dom`, template `tests/setup.ts`.
+189 vitest specs; `happy-dom`, template `tests/setup.ts`.
 
 | Path | Covers |
 |---|---|
@@ -187,7 +187,7 @@ between rungs and after a ring-down. They rebuild only when that Property change
 | `tests/modeShapes.test.ts` | boundary conditions, ψ = −(1/k)dφ/dx numerically, the quarter-wave offset |
 | `tests/SpringChainModel.test.ts` | energy conservation, wave speed, **the reflection signs**, free-end convergence |
 | `tests/PipeModalModel.test.ts` | Lorentzian, half-power points, Qₕ = h·Q₁, shared τ, ring-down, nodes held through the cycle, odd-only enforcement, per-pipe drive range, the automatic sweep, when the pipe holds a standing mode |
-| `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets |
+| `tests/instrumentPresets.test.ts` | the flute/clarinet octave and their harmonic sets; same-length partners; the register key (octave on an open pipe, twelfth on a stopped one); the tone's square-wave / sawtooth partials |
 | `tests/memory-leak.test.ts` | model collection after dispose; view nodes releasing linked Properties |
 
 Two habits worth keeping:

@@ -245,6 +245,15 @@ describe("build-up and ring-down timing", () => {
 });
 
 describe("retuning", () => {
+  it("turns the driver on when selecting a steady harmonic", () => {
+    const model = new PipeModalModel();
+    model.isDrivingProperty.value = false;
+    model.jumpToHarmonic(3);
+    expect(model.isDrivingProperty.value).toBe(true);
+    expect(model.driveFrequencyProperty.value).toBe(model.getModeFrequency(3));
+    model.dispose();
+  });
+
   it("clears an old mode when a frequency sweep selects a new harmonic", () => {
     const model = new PipeModalModel();
     model.jumpToHarmonic(1);

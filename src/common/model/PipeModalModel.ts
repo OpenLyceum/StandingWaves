@@ -492,6 +492,7 @@ export class PipeModalModel {
     if (!isModeAllowed(harmonicNumber, this.terminationProperty.value)) {
       return;
     }
+    this.isDrivingProperty.value = true;
     this.tuneToHarmonic(harmonicNumber);
     this.settleToSteadyState();
   }

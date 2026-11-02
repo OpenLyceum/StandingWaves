@@ -101,16 +101,9 @@ Two habits to keep:
   `PipeModalModel` puts its own `DerivedProperty`s on its geometry Properties, so those always carry
   listeners and `hasListeners()` can never fall to false however clean the node is.
 
-## Commands
-
-```bash
-npm run lint && npm run check && npm run build && npm test
-```
-
-Use `?screens=1` … `?screens=4` to open one screen directly — much faster than clicking through the
-home screen. `?showVelocityTrace=true` adds the velocity curve where it is optional.
-
 ## Development notes
+
+`?screens=1` through `?screens=4` opens one screen directly. `?showVelocityTrace=true` adds the velocity curve where it is optional.
 
 ### Things that will bite you
 

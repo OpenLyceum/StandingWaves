@@ -46,29 +46,6 @@ const stringProperties = LocalizedString.getNestedStringProperties({
 });
 
 /**
- * The `screenSummary` shape every screen's `a11y` subtree shares.
- *
- * Each screen adds its own `currentDetails` and `controls` keys on top, so the
- * per-screen getters below return the inferred subtree rather than this type.
- * This exists to state the part that must stay uniform.
- */
-export type StandingWavesScreenSummaryStrings = {
-  readonly screenSummary: {
-    readonly playAreaStringProperty: ReadOnlyProperty<string>;
-    readonly controlAreaStringProperty: ReadOnlyProperty<string>;
-    readonly interactionHintStringProperty: ReadOnlyProperty<string>;
-  };
-};
-
-/**
- * Explicit Preferences → Simulation labels from {@link StringManager.getPreferences}.
- */
-export type StandingWavesPreferenceStrings = {
-  readonly titleStringProperty: ReadOnlyProperty<string>;
-  readonly showVelocityTraceStringProperty: ReadOnlyProperty<string>;
-};
-
-/**
  * StringManager is a singleton that provides typed access to all localized
  * strings. Use `StringManager.getInstance()` everywhere — never construct it
  * directly.

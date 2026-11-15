@@ -14,7 +14,6 @@
  * place particles and curves in the same coordinates it uses for the pipe.
  */
 
-import type { TReadOnlyProperty } from "scenerystack/axon";
 import { Shape } from "scenerystack/kite";
 import { Node, Path, Rectangle } from "scenerystack/scenery";
 import StandingWavesColors from "../../StandingWavesColors.js";
@@ -132,29 +131,5 @@ export class PipeNode extends Node {
         }),
       );
     }
-  }
-}
-
-/**
- * A pair of labels naming what each end is, placed just outside the pipe.
- *
- * Kept separate from {@link PipeNode} so a screen can place them where its layout
- * has room — above a stacked pair of pipes, beside a single one — without the pipe
- * itself having to know.
- */
-export class PipeEndLabelsNode extends Node {
-  public constructor(
-    leftLabel: TReadOnlyProperty<string>,
-    rightLabel: TReadOnlyProperty<string>,
-    createLabel: (text: TReadOnlyProperty<string>) => Node,
-    viewLength: number,
-  ) {
-    super();
-    const left = createLabel(leftLabel);
-    const right = createLabel(rightLabel);
-    left.centerX = 0;
-    right.centerX = viewLength;
-    this.addChild(left);
-    this.addChild(right);
   }
 }

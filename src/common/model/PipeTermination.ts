@@ -53,6 +53,7 @@ export const PipeTermination = {
 
 export type PipeTermination = (typeof PipeTermination)[keyof typeof PipeTermination];
 
+/** @internal Exported for unit tests; not part of the application API. */
 export const PipeTerminationValues = [
   PipeTermination.CLOSED_CLOSED,
   PipeTermination.OPEN_OPEN,

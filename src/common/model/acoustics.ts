@@ -99,6 +99,7 @@ export function wavenumberFor(frequency: number): number {
  *
  * @param frequency - Hz
  * @returns λ in m
+ * @internal Exported for unit tests; not part of the application API.
  */
 export function wavelengthFor(frequency: number): number {
   return SOUND_SPEED_MPS / frequency;

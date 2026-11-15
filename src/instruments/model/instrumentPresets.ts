@@ -63,6 +63,7 @@ export type InstrumentSpec = {
 /**
  * The four pipes. Ordered so the two organ pipes sit together and the two woodwinds
  * sit together, since each pair is a same-length comparison.
+ * @internal Exported for unit tests; not part of the application API.
  */
 export const INSTRUMENT_SPECS: Readonly<Record<InstrumentPreset, InstrumentSpec>> = {
   [InstrumentPreset.OPEN_ORGAN_PIPE]: {

@@ -18,8 +18,8 @@
  * with a mouse is not a control for everyone.
  */
 
-import type { NumberProperty, TReadOnlyProperty } from "scenerystack/axon";
-import type { Range } from "scenerystack/dot";
+import { type NumberProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
+import { Bounds2, type Range, Vector2, Vector2Property } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Circle, DragListener, KeyboardDragListener, Node, Path, Text } from "scenerystack/scenery";
 import { ArrowNode, PhetFont } from "scenerystack/scenery-phet";
@@ -146,26 +146,41 @@ export class ReferenceMarkerNode extends Node {
     });
     this.addInputListener(dragListener);
 
-    // Keyboard drag on the same scalar the pointer writes. dragDelta is one abstract
-    // step (a twentieth of the pipe); shift is a fifth of that. Left/right only —
+    // Drive position through a Vector2Property so KeyboardDragListener never needs
+    // a drag: callback (under fuzzBoard, stepTimer can fire after the pointer is
+    // cleared and drag: would assert "pointer must be assigned"). Left/right only —
     // the pipe has one dimension, so up/down are not bound.
-    const coarseStep = options.positionRange.getLength() / 20;
+    const positionRange = options.positionRange;
+    const keyboardPositionProperty = new Vector2Property(new Vector2(options.positionProperty.value, 0));
+    const keyboardDragBoundsProperty = new Property(new Bounds2(positionRange.min, 0, positionRange.max, 0));
+    const syncMarkerFromKeyboard = (position: Vector2) => {
+      options.positionProperty.value = positionRange.constrainValue(position.x);
+    };
+    const syncKeyboardFromMarker = (position: number) => {
+      if (keyboardPositionProperty.value.x !== position) {
+        keyboardPositionProperty.value = new Vector2(position, 0);
+      }
+    };
+    keyboardPositionProperty.lazyLink(syncMarkerFromKeyboard);
+    options.positionProperty.lazyLink(syncKeyboardFromMarker);
+    const coarseStep = positionRange.getLength() / 20;
     const keyboardDragListener = new KeyboardDragListener({
+      positionProperty: keyboardPositionProperty,
+      dragBoundsProperty: keyboardDragBoundsProperty,
       keyboardDragDirection: "leftRight",
-      dragDelta: 1,
-      shiftDragDelta: 0.2,
-      drag: (_event, listener) => {
-        options.positionProperty.value = options.positionRange.constrainValue(
-          options.positionProperty.value + listener.modelDelta.x * coarseStep,
-        );
-      },
+      dragSpeed: coarseStep * 60,
+      shiftDragSpeed: coarseStep * 12,
     });
     this.addInputListener(keyboardDragListener);
 
     this.disposeReferenceMarkerNode = () => {
       options.positionProperty.unlink(onPosition);
+      keyboardPositionProperty.unlink(syncMarkerFromKeyboard);
+      options.positionProperty.unlink(syncKeyboardFromMarker);
       dragListener.dispose();
       keyboardDragListener.dispose();
+      keyboardPositionProperty.dispose();
+      keyboardDragBoundsProperty.dispose();
     };
   }
 

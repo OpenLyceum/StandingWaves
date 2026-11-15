@@ -21,8 +21,8 @@
  * Dragged like the reference marker, by pointer or by keyboard, on one scalar.
  */
 
-import { DerivedProperty } from "scenerystack/axon";
-import { toFixed } from "scenerystack/dot";
+import { DerivedProperty, Property } from "scenerystack/axon";
+import { Bounds2, toFixed, Vector2, Vector2Property } from "scenerystack/dot";
 import { Circle, DragListener, KeyboardDragListener, Node, Rectangle, Text, VBox } from "scenerystack/scenery";
 import { ArrowNode, PhetFont } from "scenerystack/scenery-phet";
 import { DENSITY_REST_ALPHA } from "../../common/view/DensitySlabsNode.js";
@@ -166,23 +166,39 @@ export class NeighbourPairNode extends Node {
     });
     this.addInputListener(dragListener);
 
+    // Drive position through a Vector2Property so KeyboardDragListener never needs
+    // a drag: callback (under fuzzBoard, stepTimer can fire after the pointer is
+    // cleared and drag: would assert "pointer must be assigned").
+    const keyboardPositionProperty = new Vector2Property(new Vector2(model.pairPositionProperty.value, 0));
+    const keyboardDragBoundsProperty = new Property(new Bounds2(range.min, 0, range.max, 0));
+    const syncPairFromKeyboard = (position: Vector2) => {
+      model.pairPositionProperty.value = range.constrainValue(position.x);
+    };
+    const syncKeyboardFromPair = (position: number) => {
+      if (keyboardPositionProperty.value.x !== position) {
+        keyboardPositionProperty.value = new Vector2(position, 0);
+      }
+    };
+    keyboardPositionProperty.lazyLink(syncPairFromKeyboard);
+    model.pairPositionProperty.lazyLink(syncKeyboardFromPair);
     const coarseStep = model.pipeLength / 20;
     const keyboardDragListener = new KeyboardDragListener({
+      positionProperty: keyboardPositionProperty,
+      dragBoundsProperty: keyboardDragBoundsProperty,
       keyboardDragDirection: "leftRight",
-      dragDelta: 1,
-      shiftDragDelta: 0.2,
-      drag: (_event, listener) => {
-        model.pairPositionProperty.value = range.constrainValue(
-          model.pairPositionProperty.value + listener.modelDelta.x * coarseStep,
-        );
-      },
+      dragSpeed: coarseStep * 60,
+      shiftDragSpeed: coarseStep * 12,
     });
     this.addInputListener(keyboardDragListener);
 
     this.disposeNeighbourPairNode = () => {
       model.pairPositionProperty.unlink(onPosition);
+      keyboardPositionProperty.unlink(syncPairFromKeyboard);
+      model.pairPositionProperty.unlink(syncKeyboardFromPair);
       dragListener.dispose();
       keyboardDragListener.dispose();
+      keyboardPositionProperty.dispose();
+      keyboardDragBoundsProperty.dispose();
       lagText.dispose();
       lagStringProperty.dispose();
     };

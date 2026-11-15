@@ -268,7 +268,8 @@ export class SpringChainModel {
       return;
     }
     const stepLimit = CHAIN_STABILITY_SAFETY * this.maxStableStep;
-    const subStepCount = Math.max(1, Math.ceil(dt / stepLimit));
+    // Cap sub-steps so a degenerate dt/stepLimit under fuzz cannot hang the frame.
+    const subStepCount = Math.min(2000, Math.max(1, Math.ceil(dt / stepLimit)));
     const subDt = dt / subStepCount;
     for (let step = 0; step < subStepCount; step++) {
       this.verletStep(subDt);

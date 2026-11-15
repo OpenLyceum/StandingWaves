@@ -128,11 +128,26 @@ export function pressureNodePositions(
  * (every closed end, and every pressure node of an open end) must be included,
  * and floating-point k·L lands a hair either side of the exact multiple.
  */
+/** Absolute ceiling on marker count: a physical mode of harmonic h has ~h+1 nodes. */
+const MAX_ZERO_NODES = 64;
+
 function zerosOf(wavenumber: number, offset: number, pipeLength: number): number[] {
+  // A non-positive or non-finite wavenumber makes spacing infinite/NaN; the loop
+  // below would never break (keyboard/pointer fuzz can hit degenerate pipe states).
+  if (!(wavenumber > 0 && Number.isFinite(wavenumber) && Number.isFinite(pipeLength)) || pipeLength < 0) {
+    return [];
+  }
   const spacing = Math.PI / wavenumber;
+  if (!(spacing > 0 && Number.isFinite(spacing))) {
+    return [];
+  }
   const epsilon = spacing * 1e-9;
   const positions: number[] = [];
-  for (let m = 0; ; m++) {
+  // Cap both by geometry and by an absolute bound: a tiny spacing (huge k from a
+  // degenerate L or harmonic under fuzz) would otherwise make ceil(L/spacing) huge
+  // enough to hang the animation frame for minutes.
+  const maxNodes = Math.min(MAX_ZERO_NODES, Math.max(1, Math.ceil(pipeLength / spacing) + 2));
+  for (let m = 0; m < maxNodes; m++) {
     const x = (m + offset) * spacing;
     if (x > pipeLength + epsilon) {
       break;

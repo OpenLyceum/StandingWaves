@@ -115,6 +115,9 @@ const DRIVE_ACCELERATION_MPS2 = 250;
  */
 const MAX_PHASE_STEP = 0.2;
 
+/** Hard cap on RK4 sub-steps per frame so a huge drive ω under fuzz cannot hang. */
+const MAX_SUB_STEPS = 500;
+
 export type PipeModalModelOptions = {
   /** Initial termination. Defaults to open–open, the plain flute/organ case. */
   termination?: PipeTermination;
@@ -567,7 +570,7 @@ export class PipeModalModel {
 
     const highestFrequency = modeFrequency(this.modeCount, termination, length);
     const omegaMax = Math.max(2 * Math.PI * highestFrequency, omegaDrive);
-    const subStepCount = Math.max(1, Math.ceil((omegaMax * dt) / MAX_PHASE_STEP));
+    const subStepCount = Math.min(MAX_SUB_STEPS, Math.max(1, Math.ceil((omegaMax * dt) / MAX_PHASE_STEP)));
     const subDt = dt / subStepCount;
 
     let phase = this.drivePhaseProperty.value;

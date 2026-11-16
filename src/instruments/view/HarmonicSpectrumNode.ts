@@ -44,7 +44,7 @@ import { HARMONIC_SPECTRUM_NODE_SETTINGS } from "../../StandingWavesConstants.js
 
 import { DerivedProperty, stepTimer, type TimerListener, type TReadOnlyProperty } from "scenerystack/axon";
 import { BarPlot } from "scenerystack/bamboo";
-import { Range, Vector2 } from "scenerystack/dot";
+import { Range, toFixed, Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { KeyboardListener, Node, Path, Rectangle, type SceneryEvent, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
@@ -216,7 +216,7 @@ export class HarmonicSpectrumNode extends Node {
     const harmonicResponse = (harmonic: number): string =>
       a11y.controls.harmonicResponseStringProperty.value
         .replace("{{harmonic}}", `${harmonic}`)
-        .replace("{{frequency}}", pipe.getModeFrequency(harmonic).toFixed(0));
+        .replace("{{frequency}}", toFixed(pipe.getModeFrequency(harmonic), 0));
 
     // Arrow keys walk the modes the pipe has, in either direction; Home and End jump
     // to the ends of the visible ladder.

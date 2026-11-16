@@ -363,7 +363,7 @@ export class StandingWavesScreenView extends ScreenView {
    */
   private referenceHarmonic(): number {
     const harmonic = this.model.pipe.nearestHarmonicProperty.value;
-    return harmonic >= 1 ? harmonic : 1;
+    return Math.max(harmonic, 1);
   }
 
   public override dispose(): void {

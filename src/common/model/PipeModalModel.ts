@@ -1,3 +1,4 @@
+import { PIPE_MODAL_MODEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PipeModalModel.ts
  *
@@ -106,17 +107,17 @@ import {
  * screen's spectrum shows: the ladder a broadband excitation produces is a
  * property of the pipe, not something painted on.
  */
-const DRIVE_ACCELERATION_MPS2 = 250;
+const DRIVE_ACCELERATION_MPS2: number = PIPE_MODAL_MODEL_SETTINGS.DRIVE_ACCELERATION_MPS2;
 
 /**
  * Largest dimensionless step ωₕ·dt taken by the integrator. RK4 stays stable
  * well past this; the bound is set for *accuracy*, so that a mode's phase does
  * not creep over the thousands of cycles a build-up takes.
  */
-const MAX_PHASE_STEP = 0.2;
+const MAX_PHASE_STEP: number = PIPE_MODAL_MODEL_SETTINGS.MAX_PHASE_STEP;
 
 /** Hard cap on RK4 sub-steps per frame so a huge drive ω under fuzz cannot hang. */
-const MAX_SUB_STEPS = 500;
+const MAX_SUB_STEPS: number = PIPE_MODAL_MODEL_SETTINGS.MAX_SUB_STEPS;
 
 export type PipeModalModelOptions = {
   /** Initial termination. Defaults to open–open, the plain flute/organ case. */
@@ -221,7 +222,10 @@ export class PipeModalModel {
     this.driveFrequencyProperty = new NumberProperty(initialFundamental, {
       // The reachable span moves with L and the termination, so this range is only
       // a generous outer bound; driveFrequencyRangeProperty is the live one.
-      range: new Range(20, 20000),
+      range: new Range(
+        PIPE_MODAL_MODEL_SETTINGS.DRIVE_FREQUENCY_RANGE_MIN,
+        PIPE_MODAL_MODEL_SETTINGS.DRIVE_FREQUENCY_RANGE_MAX,
+      ),
       units: "Hz",
     });
     this.isDrivingProperty = new BooleanProperty(true);

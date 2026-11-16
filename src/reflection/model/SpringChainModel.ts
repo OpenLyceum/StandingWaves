@@ -1,3 +1,4 @@
+import { SPRING_CHAIN_MODEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * SpringChainModel.ts
  *
@@ -64,7 +65,7 @@ import {
  * Exported because the screen model times the pulse's journey from it rather than
  * hunting for a peak on the chain.
  */
-export const LAUNCH_POSITION_FRACTION = 0.3;
+export const LAUNCH_POSITION_FRACTION: number = SPRING_CHAIN_MODEL_SETTINGS.LAUNCH_POSITION_FRACTION;
 
 /** Unit mass per lattice site (kg). Only the ratio k/m affects the dynamics. */
 const SITE_MASS_KG = 1;

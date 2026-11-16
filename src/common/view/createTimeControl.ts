@@ -1,3 +1,4 @@
+import { CREATE_TIME_CONTROL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * Play / pause / step plus SceneryStack's Normal and Slow speed radios.
  *
@@ -13,7 +14,7 @@ import {
 } from "../StandingWavesButtonOptions.js";
 import type { TimeModel } from "../TimeModel.js";
 
-const SPEED_RADIO_SPACING = 16;
+const SPEED_RADIO_SPACING: number = CREATE_TIME_CONTROL_SETTINGS.SPEED_RADIO_SPACING;
 
 export function createTimeControl(timer: TimeModel, stepListener: () => void): TimeControlNode {
   return new TimeControlNode(timer.isPlayingProperty, {

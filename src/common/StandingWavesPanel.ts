@@ -1,3 +1,4 @@
+import { STANDING_WAVES_PANEL_SETTINGS } from "../StandingWavesConstants.js";
 /**
  * StandingWavesPanel.ts
  *
@@ -40,8 +41,8 @@ export class StandingWavesPanel extends Panel {
         fill: StandingWavesColors.panelBackgroundColorProperty,
         stroke: StandingWavesColors.panelBorderColorProperty,
         cornerRadius: PANEL_CORNER_RADIUS,
-        xMargin: 12,
-        yMargin: 10,
+        xMargin: STANDING_WAVES_PANEL_SETTINGS.OPTIONS_X_MARGIN,
+        yMargin: STANDING_WAVES_PANEL_SETTINGS.OPTIONS_Y_MARGIN,
       },
       providedOptions,
     );

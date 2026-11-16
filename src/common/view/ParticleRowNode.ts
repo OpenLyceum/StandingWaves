@@ -1,3 +1,4 @@
+import { PARTICLE_ROW_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * ParticleRowNode.ts
  *
@@ -20,7 +21,7 @@ import type { Color } from "scenerystack/scenery";
 import { CanvasNode } from "scenerystack/scenery";
 
 /** Default marker radius in view pixels. */
-const DEFAULT_PARTICLE_RADIUS = 2.2;
+const DEFAULT_PARTICLE_RADIUS: number = PARTICLE_ROW_NODE_SETTINGS.DEFAULT_PARTICLE_RADIUS;
 
 export type ParticleRowNodeOptions = {
   /** Drawn length of the pipe bore, in view pixels. */

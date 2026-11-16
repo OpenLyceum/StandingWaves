@@ -1,3 +1,4 @@
+import { PLAY_PANEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PlayPanel.ts
  *
@@ -22,15 +23,15 @@ import { InstrumentPresetValues } from "../model/instrumentPresets.js";
 import { INSTRUMENTS_PANEL_MIN_WIDTH } from "./PresetPanel.js";
 import { presetNameProperty } from "./presetNames.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(14);
-const NOTE_FONT = new PhetFont(11);
+const TITLE_FONT = new PhetFont({ size: PLAY_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(PLAY_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const NOTE_FONT = new PhetFont(PLAY_PANEL_SETTINGS.NOTE_FONT_SIZE);
 /** The panel content inside StandingWavesPanel's 12 px side margins. */
 const CONTENT_WIDTH = INSTRUMENTS_PANEL_MIN_WIDTH - 24;
 const LABEL_MAX_WIDTH = CONTENT_WIDTH - 30;
 
 /** Indent of the register-key note, so it sits under the label rather than the box. */
-const NOTE_INDENT = 26;
+const NOTE_INDENT: number = PLAY_PANEL_SETTINGS.NOTE_INDENT;
 
 export class PlayPanel extends StandingWavesPanel {
   public readonly registerKeyCheckbox: Node;
@@ -104,10 +105,14 @@ export class PlayPanel extends StandingWavesPanel {
     super(
       new VBox({
         align: "left",
-        spacing: 10,
+        spacing: PLAY_PANEL_SETTINGS.CONSTRUCTOR_SPACING,
         children: [
           title,
-          new VBox({ align: "left", spacing: 3, children: [registerKeyCheckbox, registerNote] }),
+          new VBox({
+            align: "left",
+            spacing: PLAY_PANEL_SETTINGS.ITEM_2_SPACING,
+            children: [registerKeyCheckbox, registerNote],
+          }),
           compareCheckbox,
           soundCheckbox,
         ],

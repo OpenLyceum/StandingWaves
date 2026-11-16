@@ -1,3 +1,4 @@
+import { REFLECTION_MODEL_SETTINGS, REFLECTIONMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
 /**
  * ReflectionModel.ts
  *
@@ -51,7 +52,7 @@ export type PulseStage = (typeof PulseStage)[keyof typeof PulseStage];
  * Roughly the half-width of the launched pulse, so the stage reads REFLECTING for
  * about as long as the pulse is actually touching the boundary.
  */
-const REFLECTION_ZONE_FRACTION = 0.12;
+const REFLECTION_ZONE_FRACTION: number = REFLECTION_MODEL_SETTINGS.REFLECTION_ZONE_FRACTION;
 
 export class ReflectionModel implements TModel {
   public readonly timer = new TimeModel(true);
@@ -160,7 +161,7 @@ export class ReflectionModel implements TModel {
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
-    const modelDt = this.toModelTime(1 / 60);
+    const modelDt = this.toModelTime(REFLECTIONMODEL_MANUAL_TIME_STEP.SECONDS);
     this.timer.stepForward(modelDt);
     this.advanceChains(modelDt);
   }

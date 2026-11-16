@@ -1,3 +1,4 @@
+import { PHASE_SCREEN_VIEW_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PhaseScreenView.ts
  *
@@ -45,17 +46,17 @@ import { EquationReadoutNode, PhaseControlPanel } from "./PhaseControlPanel.js";
 import { PhaseScreenSummaryContent } from "./PhaseScreenSummaryContent.js";
 import { ReferenceMarkerNode } from "./ReferenceMarkerNode.js";
 
-const PIPE_VIEW_LENGTH = 700;
+const PIPE_VIEW_LENGTH: number = PHASE_SCREEN_VIEW_SETTINGS.PIPE_VIEW_LENGTH;
 
 /** Plot height of each of the three trace strips. */
-const STRIP_HEIGHT = 128;
+const STRIP_HEIGHT: number = PHASE_SCREEN_VIEW_SETTINGS.STRIP_HEIGHT;
 
 /** Plot origin of the pipe stack: room on the left for the open end's flare. */
-const STACK_ORIGIN_X = 34;
-const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
+const STACK_ORIGIN_X: number = PHASE_SCREEN_VIEW_SETTINGS.STACK_ORIGIN_X;
+const AXIS_TITLE_FONT = new PhetFont({ size: PHASE_SCREEN_VIEW_SETTINGS.AXIS_TITLE_FONT_SIZE, weight: "bold" });
 
 /** Rows of particle markers stacked across the bore. */
-const PARTICLE_ROW_COUNT = 3;
+const PARTICLE_ROW_COUNT: number = PHASE_SCREEN_VIEW_SETTINGS.PARTICLE_ROW_COUNT;
 
 export type PhaseScreenViewOptions = ScreenViewOptions;
 
@@ -116,7 +117,10 @@ export class PhaseScreenView extends ScreenView {
       columnCount: PARTICLE_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
       displacementAt: drawnDisplacementAt,
-      radius: Math.min(2.2, columnSpacingPx * 0.18),
+      radius: Math.min(
+        PHASE_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS,
+        columnSpacingPx * PHASE_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS_FACTOR,
+      ),
     });
     pipe.boreLayer.addChild(this.particles);
 
@@ -219,8 +223,11 @@ export class PhaseScreenView extends ScreenView {
     const stripsBottom = y - STRIP_SPACING;
     const referenceLine = new Path(Shape.lineSegment(0, stripsTop, 0, stripsBottom), {
       stroke: StandingWavesColors.nodeMarkerColorProperty,
-      lineWidth: 1.5,
-      lineDash: [4, 3],
+      lineWidth: PHASE_SCREEN_VIEW_SETTINGS.REFERENCE_LINE_LINE_WIDTH,
+      lineDash: [
+        PHASE_SCREEN_VIEW_SETTINGS.REFERENCE_LINE_LINE_DASH_DASH,
+        PHASE_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_REFERENCE_LINE_LINE_DASH_DASH,
+      ],
       pickable: false,
       visibleProperty: model.showReferencePointProperty,
     });
@@ -233,7 +240,7 @@ export class PhaseScreenView extends ScreenView {
     const axisLabel = new Text(strings.getAxes().positionAlongPipeStringProperty, {
       font: AXIS_TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: PIPE_VIEW_LENGTH * 0.8,
+      maxWidth: PIPE_VIEW_LENGTH * PHASE_SCREEN_VIEW_SETTINGS.AXIS_LABEL_MAX_WIDTH_FACTOR,
     });
     axisLabel.centerX = PIPE_VIEW_LENGTH / 2;
     axisLabel.top = y + STRIP_SPACING;

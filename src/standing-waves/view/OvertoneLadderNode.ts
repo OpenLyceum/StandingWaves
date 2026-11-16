@@ -1,3 +1,4 @@
+import { OVERTONE_LADDER_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * OvertoneLadderNode.ts
  *
@@ -29,8 +30,8 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import { DRIVE_FREQUENCY_RANGE_HARMONICS } from "../../StandingWavesConstants.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
 
-const RUNG_FONT = new PhetFont(12);
-const TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
+const RUNG_FONT = new PhetFont(OVERTONE_LADDER_NODE_SETTINGS.RUNG_FONT_SIZE);
+const TITLE_FONT = new PhetFont({ size: OVERTONE_LADDER_NODE_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
 
 /**
  * How many harmonics the ladder shows: exactly those the frequency slider reaches.
@@ -40,7 +41,7 @@ const TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
 const LADDER_RUNGS = Math.floor(DRIVE_FREQUENCY_RANGE_HARMONICS.max);
 
 /** Width of a rung's content, in view pixels. */
-const RUNG_CONTENT_WIDTH = 108;
+const RUNG_CONTENT_WIDTH: number = OVERTONE_LADDER_NODE_SETTINGS.RUNG_CONTENT_WIDTH;
 
 export class OvertoneLadderNode extends Node {
   private readonly disposeOvertoneLadderNode: () => void;
@@ -56,7 +57,7 @@ export class OvertoneLadderNode extends Node {
     const title = new Text(standingWaves.overtonesStringProperty, {
       font: TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: RUNG_CONTENT_WIDTH + 20,
+      maxWidth: RUNG_CONTENT_WIDTH + OVERTONE_LADDER_NODE_SETTINGS.TITLE_MAX_WIDTH_OFFSET,
     });
 
     const rungs: LadderRung[] = [];
@@ -71,7 +72,7 @@ export class OvertoneLadderNode extends Node {
     this.addChild(
       new VBox({
         align: "left",
-        spacing: 3,
+        spacing: OVERTONE_LADDER_NODE_SETTINGS.CONSTRUCTOR_SPACING,
         children: [title, ...rungs],
       }),
     );
@@ -120,7 +121,7 @@ class LadderRung extends RectangularPushButton {
     const frequencyText = new Text(frequencyProperty, {
       font: RUNG_FONT,
       fill: LIGHT_SURFACE_TEXT_FILL,
-      maxWidth: RUNG_CONTENT_WIDTH - 30,
+      maxWidth: RUNG_CONTENT_WIDTH - OVERTONE_LADDER_NODE_SETTINGS.FREQUENCY_TEXT_MAX_WIDTH_OFFSET,
     });
 
     // A strike-through over the whole rung, shown only where the pipe has no mode.
@@ -128,7 +129,7 @@ class LadderRung extends RectangularPushButton {
     // this harmonic" and "this control happens to be greyed" must not look the same.
     const strike = new Path(Shape.lineSegment(0, 0, RUNG_CONTENT_WIDTH, 0), {
       stroke: LIGHT_SURFACE_TEXT_FILL,
-      lineWidth: 1.5,
+      lineWidth: OVERTONE_LADDER_NODE_SETTINGS.STRIKE_LINE_WIDTH,
     });
 
     // spaceBetween against a fixed preferred width puts the harmonic number hard
@@ -148,8 +149,8 @@ class LadderRung extends RectangularPushButton {
       ...FLAT_RECTANGULAR_BUTTON_OPTIONS,
       content,
       baseColor: StandingWavesColors.controlSurfaceColorProperty,
-      xMargin: 6,
-      yMargin: 3,
+      xMargin: OVERTONE_LADDER_NODE_SETTINGS.CONSTRUCTOR_X_MARGIN,
+      yMargin: OVERTONE_LADDER_NODE_SETTINGS.CONSTRUCTOR_Y_MARGIN,
       enabledProperty: isAllowedProperty,
       // jumpToHarmonic, not tuneToHarmonic: pressing a rung means "show me this mode",
       // and a mode the pipe was already ringing in would otherwise linger for seconds

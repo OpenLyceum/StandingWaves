@@ -1,3 +1,4 @@
+import { SWEEP_BUTTON_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * SweepButton.ts
  *
@@ -18,14 +19,14 @@ import { BooleanRectangularToggleButton } from "scenerystack/sun";
 import { FLAT_RECTANGULAR_BUTTON_OPTIONS, LIGHT_SURFACE_TEXT_FILL } from "../../common/StandingWavesButtonOptions.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 
-const ICON_WIDTH = 26;
-const ICON_HEIGHT = 12;
-const ICON_LINE_WIDTH = 1.8;
+const ICON_WIDTH: number = SWEEP_BUTTON_SETTINGS.ICON_WIDTH;
+const ICON_HEIGHT: number = SWEEP_BUTTON_SETTINGS.ICON_HEIGHT;
+const ICON_LINE_WIDTH: number = SWEEP_BUTTON_SETTINGS.ICON_LINE_WIDTH;
 
 /** Cycles per icon width at its left and right edges. */
-const CHIRP_START_CYCLES = 1.2;
-const CHIRP_END_CYCLES = 5;
-const CHIRP_POINT_COUNT = 60;
+const CHIRP_START_CYCLES: number = SWEEP_BUTTON_SETTINGS.CHIRP_START_CYCLES;
+const CHIRP_END_CYCLES: number = SWEEP_BUTTON_SETTINGS.CHIRP_END_CYCLES;
+const CHIRP_POINT_COUNT: number = SWEEP_BUTTON_SETTINGS.CHIRP_POINT_COUNT;
 
 /** Sine whose instantaneous frequency rises linearly across the icon. */
 function createChirpShape(): Shape {
@@ -62,8 +63,8 @@ export class SweepButton extends BooleanRectangularToggleButton {
     super(isSweepingProperty, stopIcon, chirpIcon, {
       ...FLAT_RECTANGULAR_BUTTON_OPTIONS,
       baseColor: StandingWavesColors.controlSurfaceColorProperty,
-      xMargin: 6,
-      yMargin: 5,
+      xMargin: SWEEP_BUTTON_SETTINGS.CONSTRUCTOR_X_MARGIN,
+      yMargin: SWEEP_BUTTON_SETTINGS.CONSTRUCTOR_Y_MARGIN,
       accessibleName,
     });
   }

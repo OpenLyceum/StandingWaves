@@ -1,3 +1,4 @@
+import { STANDING_WAVES_SCREEN_VIEW_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * StandingWavesScreenView.ts
  *
@@ -51,22 +52,25 @@ import { OvertoneLadderNode } from "./OvertoneLadderNode.js";
 import { StandingWavesControlPanel } from "./StandingWavesControlPanel.js";
 import { StandingWavesScreenSummaryContent } from "./StandingWavesScreenSummaryContent.js";
 
-const PIPE_VIEW_LENGTH = 600;
+const PIPE_VIEW_LENGTH: number = STANDING_WAVES_SCREEN_VIEW_SETTINGS.PIPE_VIEW_LENGTH;
 
 /** Plot height of the displacement and pressure strips. */
-const STRIP_HEIGHT = 160;
+const STRIP_HEIGHT: number = STANDING_WAVES_SCREEN_VIEW_SETTINGS.STRIP_HEIGHT;
 
 /** Plot origin of the pipe stack: room on the left for a closed end's cap. */
-const STACK_ORIGIN_X = 30;
-const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
-const PARTICLE_ROW_COUNT = 3;
+const STACK_ORIGIN_X: number = STANDING_WAVES_SCREEN_VIEW_SETTINGS.STACK_ORIGIN_X;
+const AXIS_TITLE_FONT = new PhetFont({
+  size: STANDING_WAVES_SCREEN_VIEW_SETTINGS.AXIS_TITLE_FONT_SIZE,
+  weight: "bold",
+});
+const PARTICLE_ROW_COUNT: number = STANDING_WAVES_SCREEN_VIEW_SETTINGS.PARTICLE_ROW_COUNT;
 
 /**
  * Headroom above the resonant amplitude. A little over 1: on resonance the pipe
  * settles *at* that amplitude, and a scale of exactly 1 would clip it whenever the
  * transient overshoots.
  */
-const TRACE_HEADROOM = 1.25;
+const TRACE_HEADROOM: number = STANDING_WAVES_SCREEN_VIEW_SETTINGS.TRACE_HEADROOM;
 
 export type StandingWavesScreenViewOptions = ScreenViewOptions;
 
@@ -156,7 +160,10 @@ export class StandingWavesScreenView extends ScreenView {
       columnCount: PARTICLE_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
       displacementAt: drawnDisplacementAt,
-      radius: Math.min(2.2, columnSpacingPx * 0.18),
+      radius: Math.min(
+        STANDING_WAVES_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS,
+        columnSpacingPx * STANDING_WAVES_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS_FACTOR,
+      ),
     });
 
     const markers = new NodeMarkersNode(pipe, { viewLength: PIPE_VIEW_LENGTH });
@@ -183,7 +190,7 @@ export class StandingWavesScreenView extends ScreenView {
       fullScale: () => this.currentVelocityScale(),
       caption: quantities.velocityStringProperty,
       visibleProperty: preferences.showVelocityTraceProperty,
-      lineWidth: 1.5,
+      lineWidth: STANDING_WAVES_SCREEN_VIEW_SETTINGS.VELOCITY_TRACE_LINE_WIDTH,
     };
     const pressureTrace: TraceSpec = {
       colorProperty: StandingWavesColors.pressureColorProperty,
@@ -198,13 +205,13 @@ export class StandingWavesScreenView extends ScreenView {
         viewWidth: PIPE_VIEW_LENGTH,
         viewHeight: STRIP_HEIGHT,
         xRange: new Range(0, 1),
-        xSpacing: 0.25,
+        xSpacing: STANDING_WAVES_SCREEN_VIEW_SETTINGS.MAKE_STRIP_X_SPACING,
         showXTickLabels: isBottom,
         // Ticks read as *fractions of the pipe*, not metres: the pipe length is a
         // control here, and a node at "half way along" is the fact worth reading.
         createXTickLabel: (value: number) =>
           new Text(value === 0 ? "0" : value === 1 ? "L" : `${value}L`, {
-            font: new PhetFont(11),
+            font: new PhetFont(STANDING_WAVES_SCREEN_VIEW_SETTINGS.MAKE_STRIP_FONT_SIZE),
             fill: StandingWavesColors.axisColorProperty,
           }),
         note: showsDensity ? strings.getDensityStrings().densityFollowsPressureStringProperty : undefined,
@@ -234,7 +241,7 @@ export class StandingWavesScreenView extends ScreenView {
     const axisLabel = new Text(strings.getAxes().positionAlongPipeStringProperty, {
       font: AXIS_TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: PIPE_VIEW_LENGTH * 0.9,
+      maxWidth: PIPE_VIEW_LENGTH * STANDING_WAVES_SCREEN_VIEW_SETTINGS.AXIS_LABEL_MAX_WIDTH_FACTOR,
     });
     axisLabel.centerX = PIPE_VIEW_LENGTH / 2;
     axisLabel.top = y + STRIP_SPACING;

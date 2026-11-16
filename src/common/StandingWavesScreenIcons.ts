@@ -18,6 +18,7 @@ import { Shape } from "scenerystack/kite";
 import { Circle, Line, Node, Path, Rectangle } from "scenerystack/scenery";
 import { ScreenIcon } from "scenerystack/sim";
 import StandingWavesColors from "../StandingWavesColors.js";
+import { STANDING_WAVES_SCREEN_ICONS_SETTINGS } from "../StandingWavesConstants.js";
 import { EndCondition } from "./model/PipeTermination.js";
 import { PipeNode } from "./view/PipeNode.js";
 
@@ -25,22 +26,22 @@ const W = 548;
 const H = 373;
 
 /** Samples along each drawn curve; enough that a spindle reads as smooth. */
-const CURVE_SAMPLES = 96;
+const CURVE_SAMPLES: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.CURVE_SAMPLES;
 
 // ── Layout for the three pipe-over-trace icons ────────────────────────────────
-const PIPE_LENGTH = 440;
+const PIPE_LENGTH: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.PIPE_LENGTH;
 const PIPE_X = (W - PIPE_LENGTH) / 2;
-const PIPE_Y = 128;
-const TRACE_Y = 262;
+const PIPE_Y: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.PIPE_Y;
+const TRACE_Y: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.TRACE_Y;
 
 // ── Layout for the Instruments icon ───────────────────────────────────────────
-const INST_PIPE_LENGTH = 240;
-const INST_PIPE_X = 60;
-const INST_PIPE_Y = 150;
-const SPECTRUM_X = 350;
-const SPECTRUM_BASELINE_Y = 300;
-const SPECTRUM_BAR_WIDTH = 22;
-const SPECTRUM_BAR_GAP = 6;
+const INST_PIPE_LENGTH: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.INST_PIPE_LENGTH;
+const INST_PIPE_X: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.INST_PIPE_X;
+const INST_PIPE_Y: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.INST_PIPE_Y;
+const SPECTRUM_X: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.SPECTRUM_X;
+const SPECTRUM_BASELINE_Y: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.SPECTRUM_BASELINE_Y;
+const SPECTRUM_BAR_WIDTH: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.SPECTRUM_BAR_WIDTH;
+const SPECTRUM_BAR_GAP: number = STANDING_WAVES_SCREEN_ICONS_SETTINGS.SPECTRUM_BAR_GAP;
 const SPECTRUM_STEP = SPECTRUM_BAR_WIDTH + SPECTRUM_BAR_GAP;
 
 function background(): Rectangle {
@@ -134,11 +135,14 @@ export function createReflectionIcon(): ScreenIcon {
   const trace = new Node({ x: PIPE_X, y: TRACE_Y });
   trace.addChild(baseline(PIPE_LENGTH));
   trace.addChild(
-    new Path(gaussianPulsePath(PIPE_LENGTH, 50, 0.38, 0.09), {
-      stroke: StandingWavesColors.displacementColorProperty,
-      lineWidth: 3,
-      lineJoin: "round",
-    }),
+    new Path(
+      gaussianPulsePath(PIPE_LENGTH, 50, 0.38, STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_REFLECTION_ICON_WIDTH_FRAC),
+      {
+        stroke: StandingWavesColors.displacementColorProperty,
+        lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_REFLECTION_ICON_LINE_WIDTH,
+        lineJoin: "round",
+      },
+    ),
   );
 
   return iconFrom(
@@ -157,21 +161,21 @@ export function createPhaseIcon(): ScreenIcon {
   trace.addChild(
     new Path(sinePath(PIPE_LENGTH, 48, 2, 0), {
       stroke: StandingWavesColors.displacementColorProperty,
-      lineWidth: 3,
+      lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_PHASE_ICON_LINE_WIDTH,
       lineJoin: "round",
     }),
   );
   trace.addChild(
     new Path(sinePath(PIPE_LENGTH, 48, 2, Math.PI / 2), {
       stroke: StandingWavesColors.velocityColorProperty,
-      lineWidth: 3,
+      lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_PHASE_ICON_LINE_WIDTH,
       lineJoin: "round",
     }),
   );
   trace.addChild(
     new Path(sinePath(PIPE_LENGTH, 48, 2, Math.PI / 2 + 0.45), {
       stroke: StandingWavesColors.pressureColorProperty,
-      lineWidth: 3,
+      lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_PHASE_ICON_LINE_WIDTH,
       lineJoin: "round",
     }),
   );
@@ -192,14 +196,14 @@ export function createStandingWavesIcon(): ScreenIcon {
   trace.addChild(
     new Path(upper, {
       stroke: StandingWavesColors.displacementColorProperty,
-      lineWidth: 3,
+      lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_STANDING_WAVES_ICON_LINE_WIDTH,
       lineJoin: "round",
     }),
   );
   trace.addChild(
     new Path(lower, {
       stroke: StandingWavesColors.displacementColorProperty,
-      lineWidth: 3,
+      lineWidth: STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_STANDING_WAVES_ICON_LINE_WIDTH,
       lineJoin: "round",
     }),
   );
@@ -207,7 +211,7 @@ export function createStandingWavesIcon(): ScreenIcon {
   // screen its name and distinguishes its icon from the travelling-wave sinusoids.
   for (let n = 0; n <= antinodes; n++) {
     trace.addChild(
-      new Circle(4, {
+      new Circle(STANDING_WAVES_SCREEN_ICONS_SETTINGS.CREATE_STANDING_WAVES_ICON_RADIUS, {
         fill: StandingWavesColors.nodeMarkerColorProperty,
         centerX: (n / antinodes) * PIPE_LENGTH,
         centerY: 0,

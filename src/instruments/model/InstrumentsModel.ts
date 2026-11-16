@@ -1,3 +1,4 @@
+import { INSTRUMENTSMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
 /**
  * InstrumentsModel.ts
  *
@@ -174,7 +175,7 @@ export class InstrumentsModel implements TModel {
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
-    const modelDt = this.toModelTime(1 / 60);
+    const modelDt = this.toModelTime(INSTRUMENTSMODEL_MANUAL_TIME_STEP.SECONDS);
     this.timer.stepForward(modelDt);
     this.pipe.step(modelDt);
   }

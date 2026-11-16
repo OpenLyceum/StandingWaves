@@ -1,3 +1,4 @@
+import { INSTRUMENTS_SCREEN_VIEW_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * InstrumentsScreenView.ts
  *
@@ -49,9 +50,12 @@ import { InstrumentToneGenerator } from "./InstrumentToneGenerator.js";
 import { PlayPanel } from "./PlayPanel.js";
 import { PresetPanel } from "./PresetPanel.js";
 
-const PIPE_VIEW_LENGTH = 770;
-const STRIP_HEIGHT = 110;
-const SPECTRUM_SIZE = { width: 420, height: 150 };
+const PIPE_VIEW_LENGTH: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.PIPE_VIEW_LENGTH;
+const STRIP_HEIGHT: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.STRIP_HEIGHT;
+const SPECTRUM_SIZE = {
+  width: INSTRUMENTS_SCREEN_VIEW_SETTINGS.SPECTRUM_SIZE_WIDTH,
+  height: INSTRUMENTS_SCREEN_VIEW_SETTINGS.SPECTRUM_SIZE_HEIGHT,
+};
 
 // Everything on this screen is positioned by its **plot origin** (`.x`/`.y`) rather
 // than by its bounds (`.left`/`.top`). Both the pipe stack and the spectrum have
@@ -62,16 +66,22 @@ const SPECTRUM_SIZE = { width: 420, height: 150 };
 //
 // The pipe and its traces run across the top, left of the preset list; the
 // spectrum and the readout that summarises it share the row beneath.
-const PIPE_ORIGIN = { x: 30, y: 34 };
-const SPECTRUM_ORIGIN = { x: 80, y: 400 };
-const READOUT_GAP = 50;
-const READOUT_MAX_WIDTH = 300;
-const READOUT_FONT = new PhetFont(13);
-const SERIES_FONT = new PhetFont({ size: 14, weight: "bold" });
-const PARTICLE_ROW_COUNT = 3;
+const PIPE_ORIGIN = {
+  x: INSTRUMENTS_SCREEN_VIEW_SETTINGS.PIPE_ORIGIN_X,
+  y: INSTRUMENTS_SCREEN_VIEW_SETTINGS.PIPE_ORIGIN_Y,
+};
+const SPECTRUM_ORIGIN = {
+  x: INSTRUMENTS_SCREEN_VIEW_SETTINGS.SPECTRUM_ORIGIN_X,
+  y: INSTRUMENTS_SCREEN_VIEW_SETTINGS.SPECTRUM_ORIGIN_Y,
+};
+const READOUT_GAP: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.READOUT_GAP;
+const READOUT_MAX_WIDTH: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.READOUT_MAX_WIDTH;
+const READOUT_FONT = new PhetFont(INSTRUMENTS_SCREEN_VIEW_SETTINGS.READOUT_FONT_SIZE);
+const SERIES_FONT = new PhetFont({ size: INSTRUMENTS_SCREEN_VIEW_SETTINGS.SERIES_FONT_SIZE, weight: "bold" });
+const PARTICLE_ROW_COUNT: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.PARTICLE_ROW_COUNT;
 
 /** Headroom above the resonant amplitude the traces are scaled against. */
-const TRACE_HEADROOM = 1.25;
+const TRACE_HEADROOM: number = INSTRUMENTS_SCREEN_VIEW_SETTINGS.TRACE_HEADROOM;
 
 export type InstrumentsScreenViewOptions = ScreenViewOptions;
 
@@ -125,7 +135,10 @@ export class InstrumentsScreenView extends ScreenView {
           ? (pipe.displacementAt(fraction * pipe.pipeLengthProperty.value) / scale) * particleAmplitudePx
           : 0;
       },
-      radius: Math.min(2.2, columnSpacingPx * 0.18),
+      radius: Math.min(
+        INSTRUMENTS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS,
+        columnSpacingPx * INSTRUMENTS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_RADIUS_FACTOR,
+      ),
     });
     pipeLayer.addChild(this.particles);
 
@@ -149,11 +162,11 @@ export class InstrumentsScreenView extends ScreenView {
         viewWidth: PIPE_VIEW_LENGTH,
         viewHeight: STRIP_HEIGHT,
         xRange: new Range(0, 1),
-        xSpacing: 0.25,
+        xSpacing: INSTRUMENTS_SCREEN_VIEW_SETTINGS.MAKE_STRIP_X_SPACING,
         showXTickLabels: isBottom,
         createXTickLabel: (value: number) =>
           new Text(value === 0 ? "0" : value === 1 ? "L" : `${value}L`, {
-            font: new PhetFont(11),
+            font: new PhetFont(INSTRUMENTS_SCREEN_VIEW_SETTINGS.MAKE_STRIP_FONT_SIZE),
             fill: StandingWavesColors.axisColorProperty,
           }),
       });
@@ -217,7 +230,7 @@ export class InstrumentsScreenView extends ScreenView {
 
     const readout = new VBox({
       align: "left",
-      spacing: 3,
+      spacing: INSTRUMENTS_SCREEN_VIEW_SETTINGS.READOUT_SPACING,
       children: [
         new Text(seriesProperty, {
           font: SERIES_FONT,
@@ -240,7 +253,7 @@ export class InstrumentsScreenView extends ScreenView {
           maxWidth: READOUT_MAX_WIDTH,
         }),
         new Text(instruments.sameLengthNoteStringProperty, {
-          font: new PhetFont(11),
+          font: new PhetFont(INSTRUMENTS_SCREEN_VIEW_SETTINGS.READOUT_FONT_SIZE_SEGMENT_2),
           fill: StandingWavesColors.axisColorProperty,
           maxWidth: READOUT_MAX_WIDTH,
         }),

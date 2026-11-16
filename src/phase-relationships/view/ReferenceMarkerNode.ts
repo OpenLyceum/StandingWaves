@@ -1,3 +1,4 @@
+import { REFERENCE_MARKER_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * ReferenceMarkerNode.ts
  *
@@ -26,19 +27,19 @@ import { ArrowNode, PhetFont } from "scenerystack/scenery-phet";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import { PIPE_BORE_HEIGHT } from "../../StandingWavesConstants.js";
 
-const LABEL_FONT = new PhetFont({ size: 11, weight: "bold" });
+const LABEL_FONT = new PhetFont({ size: REFERENCE_MARKER_NODE_SETTINGS.LABEL_FONT_SIZE, weight: "bold" });
 
 /** Radius of the dot marking the particle being followed. */
-const DOT_RADIUS = 4.5;
+const DOT_RADIUS: number = REFERENCE_MARKER_NODE_SETTINGS.DOT_RADIUS;
 
 /** Vertical offsets of the two arrows from the bore centreline, in view pixels. */
 const DISPLACEMENT_ARROW_Y = -PIPE_BORE_HEIGHT * 0.28;
 const VELOCITY_ARROW_Y = PIPE_BORE_HEIGHT * 0.28;
 
 const ARROW_OPTIONS = {
-  headHeight: 8,
-  headWidth: 9,
-  tailWidth: 3,
+  headHeight: REFERENCE_MARKER_NODE_SETTINGS.ARROW_OPTIONS_HEAD_HEIGHT,
+  headWidth: REFERENCE_MARKER_NODE_SETTINGS.ARROW_OPTIONS_HEAD_WIDTH,
+  tailWidth: REFERENCE_MARKER_NODE_SETTINGS.ARROW_OPTIONS_TAIL_WIDTH,
 } as const;
 
 export type ReferenceMarkerNodeOptions = {
@@ -90,7 +91,10 @@ export class ReferenceMarkerNode extends Node {
     const guide = new Path(Shape.lineSegment(0, -PIPE_BORE_HEIGHT / 2, 0, PIPE_BORE_HEIGHT / 2), {
       stroke: StandingWavesColors.nodeMarkerColorProperty,
       lineWidth: 1,
-      lineDash: [3, 3],
+      lineDash: [
+        REFERENCE_MARKER_NODE_SETTINGS.GUIDE_LINE_DASH_DASH,
+        REFERENCE_MARKER_NODE_SETTINGS.GUIDE_LINE_DASH_DASH,
+      ],
     });
     this.addChild(guide);
 
@@ -116,8 +120,8 @@ export class ReferenceMarkerNode extends Node {
       font: LABEL_FONT,
       fill: StandingWavesColors.nodeMarkerColorProperty,
       centerX: 0,
-      bottom: -PIPE_BORE_HEIGHT / 2 - 3,
-      maxWidth: 120,
+      bottom: -PIPE_BORE_HEIGHT / 2 - REFERENCE_MARKER_NODE_SETTINGS.CAPTION_BOTTOM_OFFSET,
+      maxWidth: REFERENCE_MARKER_NODE_SETTINGS.CAPTION_MAX_WIDTH,
     });
     this.addChild(caption);
 

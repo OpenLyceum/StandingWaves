@@ -1,3 +1,4 @@
+import { CHAIN_PIPE_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * ChainPipeNode.ts
  *
@@ -26,11 +27,11 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import { PARTICLE_AMPLITUDE_SPACINGS, STRIP_SPACING } from "../../StandingWavesConstants.js";
 import type { SpringChainModel } from "../model/SpringChainModel.js";
 
-const HEADING_FONT = new PhetFont({ size: 14, weight: "bold" });
-const RULE_FONT = new PhetFont(12);
+const HEADING_FONT = new PhetFont({ size: CHAIN_PIPE_NODE_SETTINGS.HEADING_FONT_SIZE, weight: "bold" });
+const RULE_FONT = new PhetFont(CHAIN_PIPE_NODE_SETTINGS.RULE_FONT_SIZE);
 
 /** Rows of particle markers stacked across the bore. */
-const PARTICLE_ROW_COUNT = 3;
+const PARTICLE_ROW_COUNT: number = CHAIN_PIPE_NODE_SETTINGS.PARTICLE_ROW_COUNT;
 
 /**
  * Markers along the pipe.
@@ -40,7 +41,7 @@ const PARTICLE_ROW_COUNT = 3;
  * at its compression reads as crowding. Many more and the markers would be closer
  * together than their own displacement, and the row would blur instead.
  */
-const PARTICLE_COLUMN_COUNT = 40;
+const PARTICLE_COLUMN_COUNT: number = CHAIN_PIPE_NODE_SETTINGS.PARTICLE_COLUMN_COUNT;
 
 /**
  * Headroom on the trace scales, as a multiple of the incident pulse amplitude.
@@ -50,7 +51,7 @@ const PARTICLE_COLUMN_COUNT = 40;
  * the moment the screen is trying to show. Slightly over two leaves the doubled
  * peak visible with a margin.
  */
-const TRACE_HEADROOM = 2.4;
+const TRACE_HEADROOM: number = CHAIN_PIPE_NODE_SETTINGS.TRACE_HEADROOM;
 
 export type ChainPipeNodeOptions = {
   /** Drawn length of the bore, in view pixels. */
@@ -120,7 +121,10 @@ export class ChainPipeNode extends Node {
       columnCount: PARTICLE_COLUMN_COUNT,
       colorProperty: StandingWavesColors.particleColorProperty,
       displacementAt: (fraction) => this.chainDisplacementAt(chain, fraction) * displacementToPixels,
-      radius: Math.min(2.4, columnSpacingPx * 0.18),
+      radius: Math.min(
+        CHAIN_PIPE_NODE_SETTINGS.CONSTRUCTOR_RADIUS,
+        columnSpacingPx * CHAIN_PIPE_NODE_SETTINGS.CONSTRUCTOR_RADIUS_FACTOR,
+      ),
     });
     pipe.boreLayer.addChild(this.particles);
 
@@ -141,7 +145,7 @@ export class ChainPipeNode extends Node {
       fullScale: () => TRACE_HEADROOM * chain.launchPeakVelocity,
       caption: quantities.velocityStringProperty,
       visibleProperty: options.showVelocityProperty,
-      lineWidth: 1.5,
+      lineWidth: CHAIN_PIPE_NODE_SETTINGS.VELOCITY_TRACE_LINE_WIDTH,
     };
     const pressureTrace: TraceSpec = {
       colorProperty: StandingWavesColors.pressureColorProperty,
@@ -189,12 +193,12 @@ export class ChainPipeNode extends Node {
           new Text(isClosed ? reflection.closedFarEndStringProperty : reflection.openFarEndStringProperty, {
             font: HEADING_FONT,
             fill: StandingWavesColors.textColorProperty,
-            maxWidth: options.viewLength * 0.6,
+            maxWidth: options.viewLength * CHAIN_PIPE_NODE_SETTINGS.HEADING_MAX_WIDTH_FACTOR,
           }),
           new Text(isClosed ? reflection.closedRuleStringProperty : reflection.openRuleStringProperty, {
             font: RULE_FONT,
             fill: StandingWavesColors.axisColorProperty,
-            maxWidth: options.viewLength * 0.9,
+            maxWidth: options.viewLength * CHAIN_PIPE_NODE_SETTINGS.CONSTRUCTOR_HEADING_MAX_WIDTH_FACTOR,
           }),
         ],
       });

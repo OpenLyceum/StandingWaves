@@ -1,3 +1,4 @@
+import { STANDING_WAVES_CONTROL_PANEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * StandingWavesControlPanel.ts
  *
@@ -35,11 +36,11 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import type { StandingWavesModel } from "../model/StandingWavesModel.js";
 import { DriveFrequencyControl } from "./DriveFrequencyControl.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(14);
-const BADGE_FONT = new PhetFont({ size: 13, weight: "bold" });
+const TITLE_FONT = new PhetFont({ size: STANDING_WAVES_CONTROL_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(STANDING_WAVES_CONTROL_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const BADGE_FONT = new PhetFont({ size: STANDING_WAVES_CONTROL_PANEL_SETTINGS.BADGE_FONT_SIZE, weight: "bold" });
 
-const PANEL_WIDTH = 200;
+const PANEL_WIDTH: number = STANDING_WAVES_CONTROL_PANEL_SETTINGS.PANEL_WIDTH;
 
 export class StandingWavesControlPanel extends StandingWavesPanel {
   public readonly terminationRadioButtons: Node;
@@ -97,7 +98,10 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
           options: { accessibleName: terminations.closedOpenStringProperty },
         },
       ],
-      { spacing: 6, accessibleName: a11y.controls.terminationStringProperty },
+      {
+        spacing: STANDING_WAVES_CONTROL_PANEL_SETTINGS.TERMINATION_RADIO_BUTTONS_SPACING,
+        accessibleName: a11y.controls.terminationStringProperty,
+      },
     );
 
     const frequencyControl = new DriveFrequencyControl(
@@ -116,7 +120,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
         accessibleName: a11y.controls.pipeLengthStringProperty,
         valuePattern: units.metresStringProperty,
         decimals: 2,
-        delta: 0.01,
+        delta: STANDING_WAVES_CONTROL_PANEL_SETTINGS.LENGTH_CONTROL_DELTA,
         trackWidth: PANEL_WIDTH - 70,
       },
     );
@@ -126,7 +130,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       new Text(standingWaves.driverOnStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - STANDING_WAVES_CONTROL_PANEL_SETTINGS.DRIVER_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -140,7 +144,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       new Text(standingWaves.showNodesStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - STANDING_WAVES_CONTROL_PANEL_SETTINGS.NODES_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -154,7 +158,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
       new Text(strings.getDensityStrings().showDensityStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - STANDING_WAVES_CONTROL_PANEL_SETTINGS.DENSITY_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -195,7 +199,7 @@ export class StandingWavesControlPanel extends StandingWavesPanel {
     super(
       new VBox({
         align: "left",
-        spacing: 11,
+        spacing: STANDING_WAVES_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_SPACING,
         children: [
           terminationLabel,
           terminationRadioButtons,

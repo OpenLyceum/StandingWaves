@@ -1,3 +1,4 @@
+import { MODE_SHAPES_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * modeShapes.ts
  *
@@ -129,7 +130,7 @@ export function pressureNodePositions(
  * and floating-point k·L lands a hair either side of the exact multiple.
  */
 /** Absolute ceiling on marker count: a physical mode of harmonic h has ~h+1 nodes. */
-const MAX_ZERO_NODES = 64;
+const MAX_ZERO_NODES: number = MODE_SHAPES_SETTINGS.MAX_ZERO_NODES;
 
 function zerosOf(wavenumber: number, offset: number, pipeLength: number): number[] {
   // A non-positive or non-finite wavenumber makes spacing infinite/NaN; the loop
@@ -141,7 +142,7 @@ function zerosOf(wavenumber: number, offset: number, pipeLength: number): number
   if (!(spacing > 0 && Number.isFinite(spacing))) {
     return [];
   }
-  const epsilon = spacing * 1e-9;
+  const epsilon = spacing * MODE_SHAPES_SETTINGS.NODE_SPACING_TOLERANCE;
   const positions: number[] = [];
   // Cap both by geometry and by an absolute bound: a tiny spacing (huge k from a
   // degenerate L or harmonic under fuzz) would otherwise make ceil(L/spacing) huge

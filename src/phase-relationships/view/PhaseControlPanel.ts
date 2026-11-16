@@ -1,3 +1,4 @@
+import { PHASE_CONTROL_PANEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PhaseControlPanel.ts
  *
@@ -21,12 +22,12 @@ import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import type { PhaseModel } from "../model/PhaseModel.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(14);
-const VERDICT_FONT = new PhetFont({ size: 13, weight: "bold" });
-const NOTE_FONT = new PhetFont(11);
+const TITLE_FONT = new PhetFont({ size: PHASE_CONTROL_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(PHASE_CONTROL_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const VERDICT_FONT = new PhetFont({ size: PHASE_CONTROL_PANEL_SETTINGS.VERDICT_FONT_SIZE, weight: "bold" });
+const NOTE_FONT = new PhetFont(PHASE_CONTROL_PANEL_SETTINGS.NOTE_FONT_SIZE);
 
-const PANEL_WIDTH = 210;
+const PANEL_WIDTH: number = PHASE_CONTROL_PANEL_SETTINGS.PANEL_WIDTH;
 
 export class PhaseControlPanel extends StandingWavesPanel {
   public readonly directionRadioButtons: Node;
@@ -65,7 +66,10 @@ export class PhaseControlPanel extends StandingWavesPanel {
           options: { accessibleName: phase.backwardStringProperty },
         },
       ],
-      { spacing: 6, accessibleName: a11y.controls.directionStringProperty },
+      {
+        spacing: PHASE_CONTROL_PANEL_SETTINGS.DIRECTION_RADIO_BUTTONS_SPACING,
+        accessibleName: a11y.controls.directionStringProperty,
+      },
     );
 
     // The verdict. Coloured by neither quantity — it is a statement about the pair.
@@ -88,7 +92,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
         accessibleName: a11y.controls.wavelengthStringProperty,
         valuePattern: strings.getUnits().metresStringProperty,
         decimals: 2,
-        delta: 0.01,
+        delta: PHASE_CONTROL_PANEL_SETTINGS.WAVELENGTH_CONTROL_DELTA,
         trackWidth: PANEL_WIDTH - 70,
       },
     );
@@ -98,7 +102,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
       new Text(phase.showEquationsStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - PHASE_CONTROL_PANEL_SETTINGS.EQUATIONS_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -112,7 +116,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
       new Text(phase.showReferencePointStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - PHASE_CONTROL_PANEL_SETTINGS.REFERENCE_POINT_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -126,7 +130,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
       new Text(strings.getDensityStrings().showDensityStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - PHASE_CONTROL_PANEL_SETTINGS.DENSITY_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -140,7 +144,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
       new Text(phase.showNeighbourPairStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: PANEL_WIDTH - 30,
+        maxWidth: PANEL_WIDTH - PHASE_CONTROL_PANEL_SETTINGS.NEIGHBOUR_PAIR_CHECKBOX_MAX_WIDTH_OFFSET,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -175,7 +179,7 @@ export class PhaseControlPanel extends StandingWavesPanel {
     super(
       new VBox({
         align: "left",
-        spacing: 12,
+        spacing: PHASE_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_SPACING,
         children: [
           directionLabel,
           directionRadioButtons,
@@ -230,17 +234,17 @@ export class EquationReadoutNode extends StandingWavesPanel {
     super(
       new VBox({
         align: "left",
-        spacing: 4,
+        spacing: PHASE_CONTROL_PANEL_SETTINGS.SPACING,
         children: [
           new Text(pressureProperty, {
-            font: new PhetFont(14),
+            font: new PhetFont(PHASE_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_FONT_SIZE),
             fill: StandingWavesColors.pressureColorProperty,
-            maxWidth: 260,
+            maxWidth: PHASE_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_MAX_WIDTH,
           }),
           new Text(velocityProperty, {
-            font: new PhetFont(14),
+            font: new PhetFont(PHASE_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_FONT_SIZE),
             fill: StandingWavesColors.velocityColorProperty,
-            maxWidth: 260,
+            maxWidth: PHASE_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_MAX_WIDTH,
           }),
         ],
       }),

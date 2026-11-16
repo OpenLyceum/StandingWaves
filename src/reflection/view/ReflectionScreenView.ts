@@ -1,3 +1,4 @@
+import { REFLECTION_SCREEN_VIEW_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * ReflectionScreenView.ts
  *
@@ -35,19 +36,19 @@ import { ReflectionControlPanel } from "./ReflectionControlPanel.js";
 import { ReflectionScreenSummaryContent } from "./ReflectionScreenSummaryContent.js";
 
 /** Drawn length of a pipe bore, in view pixels. */
-const PIPE_VIEW_LENGTH = 720;
+const PIPE_VIEW_LENGTH: number = REFLECTION_SCREEN_VIEW_SETTINGS.PIPE_VIEW_LENGTH;
 
 /** Plot origin of the pipe stack: room on the left for the closed end's cap. */
-const STACK_ORIGIN_X = 30;
+const STACK_ORIGIN_X: number = REFLECTION_SCREEN_VIEW_SETTINGS.STACK_ORIGIN_X;
 
 /** Trace-strip height when one assembly is showing. */
-const SINGLE_STRIP_HEIGHT = 150;
+const SINGLE_STRIP_HEIGHT: number = REFLECTION_SCREEN_VIEW_SETTINGS.SINGLE_STRIP_HEIGHT;
 
 /** Bore and strip heights when two assemblies share the screen. */
-const COMPARE_BORE_HEIGHT = 44;
-const COMPARE_STRIP_HEIGHT = 72;
+const COMPARE_BORE_HEIGHT: number = REFLECTION_SCREEN_VIEW_SETTINGS.COMPARE_BORE_HEIGHT;
+const COMPARE_STRIP_HEIGHT: number = REFLECTION_SCREEN_VIEW_SETTINGS.COMPARE_STRIP_HEIGHT;
 
-const AXIS_TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
+const AXIS_TITLE_FONT = new PhetFont({ size: REFLECTION_SCREEN_VIEW_SETTINGS.AXIS_TITLE_FONT_SIZE, weight: "bold" });
 
 export type ReflectionScreenViewOptions = ScreenViewOptions;
 
@@ -97,7 +98,7 @@ export class ReflectionScreenView extends ScreenView {
       assembly.y = 0;
       pipeLayer.addChild(assembly);
     }
-    compareOpen.y = compareClosed.height + STRIP_SPACING * 3;
+    compareOpen.y = compareClosed.height + STRIP_SPACING * REFLECTION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_Y_FACTOR;
     this.addChild(pipeLayer);
 
     // One position-axis title for the whole stack, under whichever assembly is
@@ -105,7 +106,7 @@ export class ReflectionScreenView extends ScreenView {
     const axisLabel = new Text(StringManager.getInstance().getAxes().positionAlongPipeStringProperty, {
       font: AXIS_TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: PIPE_VIEW_LENGTH * 0.8,
+      maxWidth: PIPE_VIEW_LENGTH * REFLECTION_SCREEN_VIEW_SETTINGS.AXIS_LABEL_MAX_WIDTH_FACTOR,
     });
     pipeLayer.addChild(axisLabel);
 

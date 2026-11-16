@@ -1,3 +1,4 @@
+import { NEIGHBOUR_PAIR_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * NeighbourPairNode.ts
  *
@@ -31,13 +32,13 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import { PIPE_BORE_HEIGHT } from "../../StandingWavesConstants.js";
 import type { PhaseModel } from "../model/PhaseModel.js";
 
-const CAPTION_FONT = new PhetFont({ size: 11, weight: "bold" });
-const LAG_FONT = new PhetFont(11);
+const CAPTION_FONT = new PhetFont({ size: NEIGHBOUR_PAIR_NODE_SETTINGS.CAPTION_FONT_SIZE, weight: "bold" });
+const LAG_FONT = new PhetFont(NEIGHBOUR_PAIR_NODE_SETTINGS.LAG_FONT_SIZE);
 
-const DOT_RADIUS = 4.5;
+const DOT_RADIUS: number = NEIGHBOUR_PAIR_NODE_SETTINGS.DOT_RADIUS;
 
 /** Peak velocity-arrow length, in view pixels. Short enough that the two arrows do not meet. */
-const MAX_ARROW_LENGTH = 26;
+const MAX_ARROW_LENGTH: number = NEIGHBOUR_PAIR_NODE_SETTINGS.MAX_ARROW_LENGTH;
 
 /** Vertical offset of the velocity arrows below the centreline. */
 const VELOCITY_ARROW_Y = PIPE_BORE_HEIGHT * 0.3;
@@ -49,12 +50,12 @@ const PARCEL_HALF_HEIGHT = PIPE_BORE_HEIGHT * 0.2;
  * How far the gap must close or open, as a fraction of its own peak, before the
  * caption calls the parcel squeezed or stretched rather than near its rest spacing.
  */
-const STATE_THRESHOLD = 0.3;
+const STATE_THRESHOLD: number = NEIGHBOUR_PAIR_NODE_SETTINGS.STATE_THRESHOLD;
 
 const ARROW_OPTIONS = {
-  headHeight: 7,
-  headWidth: 8,
-  tailWidth: 2.5,
+  headHeight: NEIGHBOUR_PAIR_NODE_SETTINGS.ARROW_OPTIONS_HEAD_HEIGHT,
+  headWidth: NEIGHBOUR_PAIR_NODE_SETTINGS.ARROW_OPTIONS_HEAD_WIDTH,
+  tailWidth: NEIGHBOUR_PAIR_NODE_SETTINGS.ARROW_OPTIONS_TAIL_WIDTH,
 } as const;
 
 export type NeighbourPairNodeOptions = {
@@ -101,7 +102,7 @@ export class NeighbourPairNode extends Node {
     // The outline is a separate node so the tint's opacity does not fade it too.
     this.parcelOutline = new Rectangle(0, -PARCEL_HALF_HEIGHT, 1, 2 * PARCEL_HALF_HEIGHT, {
       stroke: StandingWavesColors.pressureColorProperty,
-      lineWidth: 1.5,
+      lineWidth: NEIGHBOUR_PAIR_NODE_SETTINGS.PARCEL_OUTLINE_LINE_WIDTH,
     });
 
     const makeArrow = (): ArrowNode =>
@@ -120,7 +121,7 @@ export class NeighbourPairNode extends Node {
     this.stateText = new Text("", {
       font: CAPTION_FONT,
       fill: StandingWavesColors.nodeMarkerColorProperty,
-      maxWidth: 220,
+      maxWidth: NEIGHBOUR_PAIR_NODE_SETTINGS.STATE_TEXT_MAX_WIDTH,
     });
     const lagStringProperty = new DerivedProperty(
       [model.pairPhaseLagProperty, phase.phaseLagStringProperty],
@@ -129,12 +130,12 @@ export class NeighbourPairNode extends Node {
     const lagText = new Text(lagStringProperty, {
       font: LAG_FONT,
       fill: StandingWavesColors.nodeMarkerColorProperty,
-      maxWidth: 220,
+      maxWidth: NEIGHBOUR_PAIR_NODE_SETTINGS.LAG_TEXT_MAX_WIDTH,
     });
     const caption = new VBox({ spacing: 1, children: [this.stateText, lagText] });
     caption.localBoundsProperty.link(() => {
       caption.centerX = 0;
-      caption.bottom = -PIPE_BORE_HEIGHT / 2 - 3;
+      caption.bottom = -PIPE_BORE_HEIGHT / 2 - NEIGHBOUR_PAIR_NODE_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
     });
 
     this.children = [

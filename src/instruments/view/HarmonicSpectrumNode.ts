@@ -1,3 +1,4 @@
+import { HARMONIC_SPECTRUM_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * HarmonicSpectrumNode.ts
  *
@@ -55,46 +56,46 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { type InstrumentPreset, specFor } from "../model/instrumentPresets.js";
 
-const TITLE_FONT = new PhetFont({ size: 13, weight: "bold" });
-const HINT_FONT = new PhetFont(11);
-const TICK_FONT = new PhetFont(10);
-const MESSAGE_FONT = new PhetFont({ size: 12, weight: "bold" });
+const TITLE_FONT = new PhetFont({ size: HARMONIC_SPECTRUM_NODE_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const HINT_FONT = new PhetFont(HARMONIC_SPECTRUM_NODE_SETTINGS.HINT_FONT_SIZE);
+const TICK_FONT = new PhetFont(HARMONIC_SPECTRUM_NODE_SETTINGS.TICK_FONT_SIZE);
+const MESSAGE_FONT = new PhetFont({ size: HARMONIC_SPECTRUM_NODE_SETTINGS.MESSAGE_FONT_SIZE, weight: "bold" });
 
 /**
  * Bar width in view pixels. Narrow enough that a pipe's bars and its partner's
  * outlines, which interleave one slot apart, stay separate on the stopped organ
  * pipe, whose slots are closest (70 Hz, about 8 px).
  */
-const BAR_WIDTH = 4;
+const BAR_WIDTH: number = HARMONIC_SPECTRUM_NODE_SETTINGS.BAR_WIDTH;
 
 /** Partner outlines match the bars: the two sets interleave and never coincide. */
 const GHOST_WIDTH = BAR_WIDTH;
 
 /** Gap between a sounding bar and its selection outline, in view pixels. */
-const OUTLINE_PAD = 2;
+const OUTLINE_PAD: number = HARMONIC_SPECTRUM_NODE_SETTINGS.OUTLINE_PAD;
 
 /** Height of an empty socket, in view pixels. */
-const SOCKET_HEIGHT = 10;
+const SOCKET_HEIGHT: number = HARMONIC_SPECTRUM_NODE_SETTINGS.SOCKET_HEIGHT;
 
 /** Opacity of a bar that is not part of the note being sounded. */
-const DIMMED_OPACITY = 0.35;
+const DIMMED_OPACITY: number = HARMONIC_SPECTRUM_NODE_SETTINGS.DIMMED_OPACITY;
 
 /** How long the "no mode here" message stays up (ms of wall time). */
-const MESSAGE_DURATION_MS = 2500;
+const MESSAGE_DURATION_MS: number = HARMONIC_SPECTRUM_NODE_SETTINGS.MESSAGE_DURATION_MS;
 
 /**
  * Top of the frequency axis (Hz). Fixed across every preset — a per-instrument axis
  * would rescale under the learner and destroy the comparison the screen exists for.
  * Wide enough to hold the first several harmonics of the longest pipe here.
  */
-const MAX_FREQUENCY_HZ = 3500;
+const MAX_FREQUENCY_HZ: number = HARMONIC_SPECTRUM_NODE_SETTINGS.MAX_FREQUENCY_HZ;
 
 /**
  * Top of the amplitude axis. Heights are normalised against the pipe's own
  * fundamental, so the tallest bar is 1; the margin above it leaves room inside the
  * clipped plot for the selection outline.
  */
-const MAX_RELATIVE_AMPLITUDE = 1.12;
+const MAX_RELATIVE_AMPLITUDE: number = HARMONIC_SPECTRUM_NODE_SETTINGS.MAX_RELATIVE_AMPLITUDE;
 
 export type HarmonicSpectrumNodeOptions = {
   viewWidth: number;
@@ -125,12 +126,12 @@ export class HarmonicSpectrumNode extends Node {
     const title = new Text(instruments.spectrumTitleStringProperty, {
       font: TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: options.viewWidth * 0.6,
+      maxWidth: options.viewWidth * HARMONIC_SPECTRUM_NODE_SETTINGS.TITLE_MAX_WIDTH_FACTOR,
     });
     const hint = new Text(instruments.spectrumHintStringProperty, {
       font: HINT_FONT,
       fill: StandingWavesColors.axisColorProperty,
-      maxWidth: options.viewWidth * 0.38,
+      maxWidth: options.viewWidth * HARMONIC_SPECTRUM_NODE_SETTINGS.HINT_MAX_WIDTH_FACTOR,
     });
 
     this.frame = new ChartFrame({
@@ -138,7 +139,7 @@ export class HarmonicSpectrumNode extends Node {
       viewHeight: options.viewHeight,
       xRange: new Range(0, MAX_FREQUENCY_HZ),
       yRange: new Range(0, MAX_RELATIVE_AMPLITUDE),
-      xSpacing: 500,
+      xSpacing: HARMONIC_SPECTRUM_NODE_SETTINGS.FRAME_X_SPACING,
       xLabel: strings.getAxes().frequencyStringProperty,
       yLabel: strings.getAxes().relativeAmplitudeStringProperty,
       showZeroLine: false,
@@ -150,7 +151,7 @@ export class HarmonicSpectrumNode extends Node {
     this.ghostPath = new Path(null, {
       stroke: StandingWavesColors.pressureColorProperty,
       lineWidth: 1,
-      lineDash: [3, 2],
+      lineDash: [HARMONIC_SPECTRUM_NODE_SETTINGS.CONSTRUCTOR_LINE_DASH_DASH, 2],
     });
     this.socketsPath = new Path(null, {
       stroke: StandingWavesColors.forbiddenHarmonicColorProperty,
@@ -165,13 +166,13 @@ export class HarmonicSpectrumNode extends Node {
     this.soundingBars = new BarPlot(this.frame.chartTransform, [], barOptions);
     this.selectionOutline = new Path(null, {
       stroke: StandingWavesColors.textColorProperty,
-      lineWidth: 1.5,
+      lineWidth: HARMONIC_SPECTRUM_NODE_SETTINGS.SELECTION_OUTLINE_LINE_WIDTH,
     });
 
     this.message = new Text("", {
       font: MESSAGE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: options.viewWidth - 20,
+      maxWidth: options.viewWidth - HARMONIC_SPECTRUM_NODE_SETTINGS.CONSTRUCTOR_MAX_WIDTH_OFFSET,
       visible: false,
     });
 
@@ -187,12 +188,12 @@ export class HarmonicSpectrumNode extends Node {
 
     plot.children = [this.ghostPath, this.socketsPath, this.otherBars, this.soundingBars, this.selectionOutline];
     this.message.centerX = options.viewWidth / 2;
-    this.message.top = 4;
+    this.message.top = HARMONIC_SPECTRUM_NODE_SETTINGS.TOP_TOP;
     this.frame.addChild(this.message);
     this.frame.addChild(hitArea);
 
     title.left = 0;
-    title.bottom = -6;
+    title.bottom = HARMONIC_SPECTRUM_NODE_SETTINGS.BOTTOM_BOTTOM;
     hint.right = options.viewWidth;
     hint.bottom = title.bottom;
     this.addChild(title);

@@ -1,3 +1,4 @@
+import { TRACE_STRIP_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * TraceStripNode.ts
  *
@@ -37,9 +38,9 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import { TRACE_SAMPLE_COUNT } from "../../StandingWavesConstants.js";
 import { ChartFrame } from "./ChartFrame.js";
 
-const CAPTION_FONT = new PhetFont({ size: 12, weight: "bold" });
-const CAPTION_MARGIN = 6;
-const NOTE_FONT = new PhetFont(11);
+const CAPTION_FONT = new PhetFont({ size: TRACE_STRIP_NODE_SETTINGS.CAPTION_FONT_SIZE, weight: "bold" });
+const CAPTION_MARGIN: number = TRACE_STRIP_NODE_SETTINGS.CAPTION_MARGIN;
+const NOTE_FONT = new PhetFont(TRACE_STRIP_NODE_SETTINGS.NOTE_FONT_SIZE);
 
 export type TraceSpec = {
   /** Colour of the curve and of its caption. */
@@ -137,7 +138,7 @@ export class TraceStripNode extends Node {
           const text = new Text(trace.caption as TReadOnlyProperty<string>, {
             font: CAPTION_FONT,
             fill: trace.colorProperty,
-            maxWidth: options.viewWidth * 0.45,
+            maxWidth: options.viewWidth * TRACE_STRIP_NODE_SETTINGS.TEXT_MAX_WIDTH_FACTOR,
           });
           if (trace.visibleProperty) {
             text.visibleProperty = trace.visibleProperty;
@@ -154,7 +155,7 @@ export class TraceStripNode extends Node {
       const note = new Text(options.note, {
         font: NOTE_FONT,
         fill: StandingWavesColors.axisColorProperty,
-        maxWidth: options.viewWidth * 0.45,
+        maxWidth: options.viewWidth * TRACE_STRIP_NODE_SETTINGS.NOTE_MAX_WIDTH_FACTOR,
       });
       if (options.noteVisibleProperty) {
         note.visibleProperty = options.noteVisibleProperty;

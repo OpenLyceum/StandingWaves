@@ -23,14 +23,14 @@ import { Orientation } from "scenerystack/phet-core";
 import { Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import StandingWavesColors from "../../StandingWavesColors.js";
-import { PANEL_CORNER_RADIUS } from "../../StandingWavesConstants.js";
+import { CHART_FRAME_SETTINGS, PANEL_CORNER_RADIUS } from "../../StandingWavesConstants.js";
 
-const TICK_LENGTH = 5;
-const Y_TITLE_GUTTER = 34;
-const X_TITLE_GUTTER = 28;
+const TICK_LENGTH: number = CHART_FRAME_SETTINGS.TICK_LENGTH;
+const Y_TITLE_GUTTER: number = CHART_FRAME_SETTINGS.Y_TITLE_GUTTER;
+const X_TITLE_GUTTER: number = CHART_FRAME_SETTINGS.X_TITLE_GUTTER;
 
-const AXIS_LABEL_FONT = new PhetFont({ size: 13, weight: "bold" });
-const TICK_FONT = new PhetFont(11);
+const AXIS_LABEL_FONT = new PhetFont({ size: CHART_FRAME_SETTINGS.AXIS_LABEL_FONT_SIZE, weight: "bold" });
+const TICK_FONT = new PhetFont(CHART_FRAME_SETTINGS.TICK_FONT_SIZE);
 
 // The optional fields spell out `| undefined` because the sim compiles with
 // `exactOptionalPropertyTypes`, and callers forward their own optionals straight
@@ -100,7 +100,7 @@ export class ChartFrame extends Node {
       this.addChild(
         new GridLineSet(transform, Orientation.HORIZONTAL, options.xSpacing, {
           stroke: StandingWavesColors.gridLineColorProperty,
-          lineWidth: 0.5,
+          lineWidth: CHART_FRAME_SETTINGS.CONSTRUCTOR_LINE_WIDTH,
         }),
       );
     }
@@ -108,7 +108,7 @@ export class ChartFrame extends Node {
       this.addChild(
         new GridLineSet(transform, Orientation.VERTICAL, options.ySpacing, {
           stroke: StandingWavesColors.gridLineColorProperty,
-          lineWidth: 0.5,
+          lineWidth: CHART_FRAME_SETTINGS.CONSTRUCTOR_LINE_WIDTH,
         }),
       );
     }
@@ -168,7 +168,7 @@ export class ChartFrame extends Node {
         new Text(options.xLabel, {
           font: AXIS_LABEL_FONT,
           fill: StandingWavesColors.textColorProperty,
-          maxWidth: options.viewWidth * 0.8,
+          maxWidth: options.viewWidth * CHART_FRAME_SETTINGS.CONSTRUCTOR_MAX_WIDTH_FACTOR,
           centerX: options.viewWidth / 2,
           top: xTitleTop,
         }),
@@ -178,7 +178,7 @@ export class ChartFrame extends Node {
       const yTitle = new Text(options.yLabel, {
         font: AXIS_LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: options.viewHeight * 0.9,
+        maxWidth: options.viewHeight * CHART_FRAME_SETTINGS.Y_TITLE_MAX_WIDTH_FACTOR,
         rotation: -Math.PI / 2,
       });
       yTitle.right = -Y_TITLE_GUTTER;

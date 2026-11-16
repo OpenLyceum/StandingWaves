@@ -276,6 +276,633 @@ export const TRACE_SAMPLE_COUNT = 240;
  */
 export const MAX_FRAME_DT_S = 0.1;
 
+/** Settings for common/StandingWavesPanel.ts. */
+export const STANDING_WAVES_PANEL_SETTINGS = {
+  /** Options x margin (px). */
+  OPTIONS_X_MARGIN: 12,
+  /** Options y margin (px). */
+  OPTIONS_Y_MARGIN: 10,
+} as const;
+
+/** Settings for common/StandingWavesScreenIcons.ts. */
+export const STANDING_WAVES_SCREEN_ICONS_SETTINGS = {
+  CREATE_REFLECTION_ICON_WIDTH_FRAC: 0.09, // px
+
+  /** Samples along each drawn curve; enough that a spindle reads as smooth. */
+  CURVE_SAMPLES: 96,
+  /** Pipe length (px). */
+  PIPE_LENGTH: 440,
+  /** Pipe y (px). */
+  PIPE_Y: 128,
+  /** Trace y (px). */
+  TRACE_Y: 262,
+  /** Inst pipe length (px). */
+  INST_PIPE_LENGTH: 240,
+  /** Inst pipe x (px). */
+  INST_PIPE_X: 60,
+  /** Inst pipe y (px). */
+  INST_PIPE_Y: 150,
+  /** Spectrum x (px). */
+  SPECTRUM_X: 350,
+  /** Spectrum baseline y (px). */
+  SPECTRUM_BASELINE_Y: 300,
+  /** Spectrum bar width (px). */
+  SPECTRUM_BAR_WIDTH: 22,
+  /** Spectrum bar gap (px). */
+  SPECTRUM_BAR_GAP: 6,
+  /** Create reflection icon line width (px). */
+  CREATE_REFLECTION_ICON_LINE_WIDTH: 3,
+  /** Create phase icon line width (px). */
+  CREATE_PHASE_ICON_LINE_WIDTH: 3,
+  /** Create standing waves icon line width (px). */
+  CREATE_STANDING_WAVES_ICON_LINE_WIDTH: 3,
+  /** Create standing waves icon radius (px). */
+  CREATE_STANDING_WAVES_ICON_RADIUS: 4,
+} as const;
+
+/** Settings for common/model/PipeModalModel.ts. */
+export const PIPE_MODAL_MODEL_SETTINGS = {
+  /** Drive acceleration mps2 (m/s²). */
+  DRIVE_ACCELERATION_MPS2: 250,
+  /** * Largest dimensionless step ωₕ·dt taken by the integrator. RK4 stays stable well past this; the bound is set for *accuracy*, so that a mode's phase does not creep over the thousands of cycles a build-up takes. */
+  MAX_PHASE_STEP: 0.2,
+  /** Hard cap on RK4 sub-steps per frame so a huge drive ω under fuzz cannot hang. */
+  MAX_SUB_STEPS: 500,
+  /** Drive frequency range min (Hz). */
+  DRIVE_FREQUENCY_RANGE_MIN: 20,
+  /** Drive frequency range max (Hz). */
+  DRIVE_FREQUENCY_RANGE_MAX: 20000,
+} as const;
+
+/** Settings for common/model/modeShapes.ts. */
+export const MODE_SHAPES_SETTINGS = {
+  /** Node endpoint tolerance relative to node spacing (dimensionless). */
+  NODE_SPACING_TOLERANCE: 1e-9,
+  /** Absolute ceiling on marker count: a physical mode of harmonic h has ~h+1 nodes. */
+  MAX_ZERO_NODES: 64,
+} as const;
+
+/** Settings for common/view/ChartFrame.ts. */
+export const CHART_FRAME_SETTINGS = {
+  CONSTRUCTOR_MAX_WIDTH_FACTOR: 0.8, // dimensionless
+  Y_TITLE_MAX_WIDTH_FACTOR: 0.9, // dimensionless
+
+  /** Tick length (px). */
+  TICK_LENGTH: 5,
+  /** Y title gutter (px). */
+  Y_TITLE_GUTTER: 34,
+  /** X title gutter (px). */
+  X_TITLE_GUTTER: 28,
+  /** Axis label font size (px). */
+  AXIS_LABEL_FONT_SIZE: 13,
+  /** Tick font size (px). */
+  TICK_FONT_SIZE: 11,
+  /** Constructor line width (px). */
+  CONSTRUCTOR_LINE_WIDTH: 0.5,
+} as const;
+
+/** Settings for common/view/DensitySlabsNode.ts. */
+export const DENSITY_SLABS_NODE_SETTINGS = {
+  /** Density rest alpha (dimensionless). */
+  DENSITY_REST_ALPHA: 0.34,
+  /** Opacity of the slab walls. Faint: they are a frame of reference, not a subject. */
+  WALL_ALPHA: 0.35,
+} as const;
+
+/** Settings for common/view/ParticleRowNode.ts. */
+export const PARTICLE_ROW_NODE_SETTINGS = {
+  /** Default marker radius in view pixels. */
+  DEFAULT_PARTICLE_RADIUS: 2.2,
+} as const;
+
+/** Settings for common/view/PipeNode.ts. */
+export const PIPE_NODE_SETTINGS = {
+  /** How far the flare at an open end rises above the wall, in view pixels. */
+  FLARE_RISE: 7,
+  /** How far back along the pipe the flare is drawn, in view pixels. */
+  FLARE_RUN: 14,
+} as const;
+
+/** Settings for common/view/StandingWavesNumberControl.ts. */
+export const STANDING_WAVES_NUMBER_CONTROL_SETTINGS = {
+  OPTIONS_ITEM_3_SPACING: 6, // px
+
+  /** Track size width (px). */
+  TRACK_SIZE_WIDTH: 140,
+  /** Track size height (px). */
+  TRACK_SIZE_HEIGHT: 3,
+  /** Thumb size width (px). */
+  THUMB_SIZE_WIDTH: 13,
+  /** Thumb size height (px). */
+  THUMB_SIZE_HEIGHT: 24,
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 13,
+  /** Value font size (px). */
+  VALUE_FONT_SIZE: 13,
+  /** Options spacing (px). */
+  OPTIONS_SPACING: 4,
+  /** Options vertical spacing (px). */
+  OPTIONS_VERTICAL_SPACING: 2,
+  /** Options max width (px). */
+  OPTIONS_MAX_WIDTH: 130,
+} as const;
+
+/** Settings for common/view/TraceStripNode.ts. */
+export const TRACE_STRIP_NODE_SETTINGS = {
+  TEXT_MAX_WIDTH_FACTOR: 0.45, // dimensionless
+  NOTE_MAX_WIDTH_FACTOR: 0.45, // dimensionless
+
+  /** Caption font size (px). */
+  CAPTION_FONT_SIZE: 12,
+  /** Caption margin (px). */
+  CAPTION_MARGIN: 6,
+  /** Note font size (px). */
+  NOTE_FONT_SIZE: 11,
+} as const;
+
+/** Settings for common/view/createTimeControl.ts. */
+export const CREATE_TIME_CONTROL_SETTINGS = {
+  /** Speed radio spacing (px). */
+  SPEED_RADIO_SPACING: 16,
+} as const;
+
+/** Settings for instruments/model/instrumentPresets.ts. */
+export const INSTRUMENT_PRESETS_SETTINGS = {
+  /** The bore length shared by the flute and the clarinet (m). */
+  WOODWIND_LENGTH_M: 0.6,
+  /** * Bore length of the two organ pipes (m): a 4-ft stop, the commonest organ pitch after 8 ft. Every preset must lie inside PIPE_LENGTH_RANGE_M, since it is written into the same pipeLengthProperty the Standing Waves slider drives. */
+  ORGAN_LENGTH_M: 1.22,
+} as const;
+
+/** Settings for instruments/view/HarmonicSpectrumNode.ts. */
+export const HARMONIC_SPECTRUM_NODE_SETTINGS = {
+  TITLE_MAX_WIDTH_FACTOR: 0.6, // dimensionless
+  HINT_MAX_WIDTH_FACTOR: 0.38, // dimensionless
+  CONSTRUCTOR_LINE_DASH_DASH: 3, // px
+  CONSTRUCTOR_MAX_WIDTH_OFFSET: 20, // px
+
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 13,
+  /** Hint font size (px). */
+  HINT_FONT_SIZE: 11,
+  /** Tick font size (px). */
+  TICK_FONT_SIZE: 10,
+  /** Message font size (px). */
+  MESSAGE_FONT_SIZE: 12,
+  /** * Bar width in view pixels. Narrow enough that a pipe's bars and its partner's outlines, which interleave one slot apart, stay separate on the stopped organ pipe, whose slots are closest (70 Hz, about 8 px). */
+  BAR_WIDTH: 4,
+  /** Gap between a sounding bar and its selection outline, in view pixels. */
+  OUTLINE_PAD: 2,
+  /** Height of an empty socket, in view pixels. */
+  SOCKET_HEIGHT: 10,
+  /** Opacity of a bar that is not part of the note being sounded. */
+  DIMMED_OPACITY: 0.35,
+  /** How long the "no mode here" message stays up (ms of wall time). */
+  MESSAGE_DURATION_MS: 2500,
+  /** * Top of the frequency axis (Hz). Fixed across every preset — a per-instrument axis would rescale under the learner and destroy the comparison the screen exists for. Wide enough to hold the first several harmonics of the longest pipe here. */
+  MAX_FREQUENCY_HZ: 3500,
+  /** * Top of the amplitude axis. Heights are normalised against the pipe's own fundamental, so the tallest bar is 1; the margin above it leaves room inside the clipped plot for the selection outline. */
+  MAX_RELATIVE_AMPLITUDE: 1.12,
+  /** Frame x spacing (px). */
+  FRAME_X_SPACING: 500,
+  /** Selection outline line width (px). */
+  SELECTION_OUTLINE_LINE_WIDTH: 1.5,
+  /** Top top (px). */
+  TOP_TOP: 4,
+  /** Bottom bottom (px). */
+  BOTTOM_BOTTOM: -6,
+} as const;
+
+/** Settings for instruments/view/InstrumentToneGenerator.ts. */
+export const INSTRUMENT_TONE_GENERATOR_SETTINGS = {
+  /** * Sum of all partial gains. Bounding the sum, not each gain, bounds the waveform's peak however many partials the note has. */
+  TOTAL_GAIN: 0.3,
+  /** Time constant of every gain and frequency change (s): fast, but click-free. */
+  RAMP_TIME_CONSTANT_S: 0.02,
+} as const;
+
+/** Settings for instruments/view/InstrumentsScreenView.ts. */
+export const INSTRUMENTS_SCREEN_VIEW_SETTINGS = {
+  CONSTRUCTOR_RADIUS: 2.2, // px
+  CONSTRUCTOR_RADIUS_FACTOR: 0.18, // dimensionless
+
+  READOUT_FONT_SIZE_SEGMENT_2: 11, // px
+
+  /** Pipe view length (px). */
+  PIPE_VIEW_LENGTH: 770,
+  /** Strip height (px). */
+  STRIP_HEIGHT: 110,
+  /** Spectrum size width (px). */
+  SPECTRUM_SIZE_WIDTH: 420,
+  /** Spectrum size height (px). */
+  SPECTRUM_SIZE_HEIGHT: 150,
+  /** Pipe origin x (px). */
+  PIPE_ORIGIN_X: 30,
+  /** Pipe origin y (px). */
+  PIPE_ORIGIN_Y: 34,
+  /** Spectrum origin x (px). */
+  SPECTRUM_ORIGIN_X: 80,
+  /** Spectrum origin y (px). */
+  SPECTRUM_ORIGIN_Y: 400,
+  /** Readout gap (px). */
+  READOUT_GAP: 50,
+  /** Readout max width (px). */
+  READOUT_MAX_WIDTH: 300,
+  /** Readout font size (px). */
+  READOUT_FONT_SIZE: 13,
+  /** Series font size (px). */
+  SERIES_FONT_SIZE: 14,
+  /** Particle row count (count). */
+  PARTICLE_ROW_COUNT: 3,
+  /** Headroom above the resonant amplitude the traces are scaled against. */
+  TRACE_HEADROOM: 1.25,
+  /** Make strip x spacing (px). */
+  MAKE_STRIP_X_SPACING: 0.25,
+  /** Make strip font size (px). */
+  MAKE_STRIP_FONT_SIZE: 11,
+  /** Readout spacing (px). */
+  READOUT_SPACING: 3,
+} as const;
+
+/** Settings for instruments/view/PlayPanel.ts. */
+export const PLAY_PANEL_SETTINGS = {
+  ITEM_2_SPACING: 3, // px
+
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 14,
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 14,
+  /** Note font size (px). */
+  NOTE_FONT_SIZE: 11,
+  /** Indent of the register-key note, so it sits under the label rather than the box. */
+  NOTE_INDENT: 26,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 10,
+} as const;
+
+/** Settings for instruments/view/PresetPanel.ts. */
+export const PRESET_PANEL_SETTINGS = {
+  PRESET_RADIO_BUTTONS_MAX_WIDTH_OFFSET: 30, // px
+
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 14,
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 14,
+  /** Panel width (px). */
+  PANEL_WIDTH: 190,
+  /** Instruments panel min width (px). */
+  INSTRUMENTS_PANEL_MIN_WIDTH: 184,
+  /** Preset radio buttons spacing (px). */
+  PRESET_RADIO_BUTTONS_SPACING: 8,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 10,
+} as const;
+
+/** Settings for phase-relationships/model/PhaseModel.ts. */
+export const PHASE_MODEL_SETTINGS = {
+  /** Initial reference position as a fraction of pipe length (dimensionless). */
+  REFERENCE_POSITION_FRACTION: 0.35,
+  /** Initial neighbour-pair position as a fraction of pipe length (dimensionless). */
+  PAIR_POSITION_FRACTION: 0.65,
+  /** * Peak particle displacement (m). Arbitrary — the system is linear and nothing on this screen reads an absolute amplitude — but a real acoustic value keeps the derived velocity and pressure in a plausible range for the readouts. */
+  AMPLITUDE_M: 1e-3,
+} as const;
+
+/** Settings for phase-relationships/view/NeighbourPairNode.ts. */
+export const NEIGHBOUR_PAIR_NODE_SETTINGS = {
+  CONSTRUCTOR_BOTTOM_OFFSET: 3, // px
+
+  /** Caption font size (px). */
+  CAPTION_FONT_SIZE: 11,
+  /** Lag font size (px). */
+  LAG_FONT_SIZE: 11,
+  /** Dot radius (px). */
+  DOT_RADIUS: 4.5,
+  /** Peak velocity-arrow length, in view pixels. Short enough that the two arrows do not meet. */
+  MAX_ARROW_LENGTH: 26,
+  /** * How far the gap must close or open, as a fraction of its own peak, before the caption calls the parcel squeezed or stretched rather than near its rest spacing. */
+  STATE_THRESHOLD: 0.3,
+  /** Arrow options head height (px). */
+  ARROW_OPTIONS_HEAD_HEIGHT: 7,
+  /** Arrow options head width (px). */
+  ARROW_OPTIONS_HEAD_WIDTH: 8,
+  /** Arrow options tail width (px). */
+  ARROW_OPTIONS_TAIL_WIDTH: 2.5,
+  /** Parcel outline line width (px). */
+  PARCEL_OUTLINE_LINE_WIDTH: 1.5,
+  /** State text max width (px). */
+  STATE_TEXT_MAX_WIDTH: 220,
+  /** Lag text max width (px). */
+  LAG_TEXT_MAX_WIDTH: 220,
+} as const;
+
+/** Settings for phase-relationships/view/PhaseControlPanel.ts. */
+export const PHASE_CONTROL_PANEL_SETTINGS = {
+  EQUATIONS_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+  REFERENCE_POINT_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+  DENSITY_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+  NEIGHBOUR_PAIR_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+
+  SPACING: 4, // px
+
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 14,
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 14,
+  /** Verdict font size (px). */
+  VERDICT_FONT_SIZE: 13,
+  /** Note font size (px). */
+  NOTE_FONT_SIZE: 11,
+  /** Panel width (px). */
+  PANEL_WIDTH: 210,
+  /** Direction radio buttons spacing (px). */
+  DIRECTION_RADIO_BUTTONS_SPACING: 6,
+  /** Wavelength control delta (control/model units). */
+  WAVELENGTH_CONTROL_DELTA: 0.01,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 12,
+  /** Constructor font size (px). */
+  CONSTRUCTOR_FONT_SIZE: 14,
+  /** Constructor max width (px). */
+  CONSTRUCTOR_MAX_WIDTH: 260,
+} as const;
+
+/** Settings for phase-relationships/view/PhaseScreenView.ts. */
+export const PHASE_SCREEN_VIEW_SETTINGS = {
+  CONSTRUCTOR_RADIUS: 2.2, // px
+  CONSTRUCTOR_RADIUS_FACTOR: 0.18, // dimensionless
+  REFERENCE_LINE_LINE_DASH_DASH: 4, // px
+  CONSTRUCTOR_REFERENCE_LINE_LINE_DASH_DASH: 3, // px
+  AXIS_LABEL_MAX_WIDTH_FACTOR: 0.8, // dimensionless
+
+  /** Pipe view length (px). */
+  PIPE_VIEW_LENGTH: 700,
+  /** Plot height of each of the three trace strips. */
+  STRIP_HEIGHT: 128,
+  /** Plot origin of the pipe stack: room on the left for the open end's flare. */
+  STACK_ORIGIN_X: 34,
+  /** Axis title font size (px). */
+  AXIS_TITLE_FONT_SIZE: 13,
+  /** Rows of particle markers stacked across the bore. */
+  PARTICLE_ROW_COUNT: 3,
+  /** Reference line line width (px). */
+  REFERENCE_LINE_LINE_WIDTH: 1.5,
+} as const;
+
+/** Settings for phase-relationships/view/ReferenceMarkerNode.ts. */
+export const REFERENCE_MARKER_NODE_SETTINGS = {
+  GUIDE_LINE_DASH_DASH: 3, // px
+  CAPTION_BOTTOM_OFFSET: 3, // px
+
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 11,
+  /** Radius of the dot marking the particle being followed. */
+  DOT_RADIUS: 4.5,
+  /** Arrow options head height (px). */
+  ARROW_OPTIONS_HEAD_HEIGHT: 8,
+  /** Arrow options head width (px). */
+  ARROW_OPTIONS_HEAD_WIDTH: 9,
+  /** Arrow options tail width (px). */
+  ARROW_OPTIONS_TAIL_WIDTH: 3,
+  /** Caption max width (px). */
+  CAPTION_MAX_WIDTH: 120,
+} as const;
+
+/** Settings for preferences/StandingWavesPreferencesNode.ts. */
+export const STANDING_WAVES_PREFERENCES_NODE_SETTINGS = {
+  /** Header font size (px). */
+  HEADER_FONT_SIZE: 18,
+  /** Show velocity trace checkbox font size (px). */
+  SHOW_VELOCITY_TRACE_CHECKBOX_FONT_SIZE: 14,
+  /** Show velocity trace checkbox spacing (px). */
+  SHOW_VELOCITY_TRACE_CHECKBOX_SPACING: 8,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 12,
+} as const;
+
+/** Settings for reflection/model/ReflectionModel.ts. */
+export const REFLECTION_MODEL_SETTINGS = {
+  /** * Fraction of the pipe length within which the pulse counts as "at the far end". Roughly the half-width of the launched pulse, so the stage reads REFLECTING for about as long as the pulse is actually touching the boundary. */
+  REFLECTION_ZONE_FRACTION: 0.12,
+} as const;
+
+/** Settings for reflection/model/SpringChainModel.ts. */
+export const SPRING_CHAIN_MODEL_SETTINGS = {
+  /** Launch position fraction (dimensionless). */
+  LAUNCH_POSITION_FRACTION: 0.3,
+} as const;
+
+/** Settings for reflection/view/ChainPipeNode.ts. */
+export const CHAIN_PIPE_NODE_SETTINGS = {
+  CONSTRUCTOR_RADIUS: 2.4, // px
+  CONSTRUCTOR_RADIUS_FACTOR: 0.18, // dimensionless
+  HEADING_MAX_WIDTH_FACTOR: 0.6, // dimensionless
+  CONSTRUCTOR_HEADING_MAX_WIDTH_FACTOR: 0.9, // dimensionless
+
+  /** Heading font size (px). */
+  HEADING_FONT_SIZE: 14,
+  /** Rule font size (px). */
+  RULE_FONT_SIZE: 12,
+  /** Rows of particle markers stacked across the bore. */
+  PARTICLE_ROW_COUNT: 3,
+  /** Particle column count (count). */
+  PARTICLE_COLUMN_COUNT: 40,
+  /** Trace headroom (px). */
+  TRACE_HEADROOM: 2.4,
+  /** Velocity trace line width (px). */
+  VELOCITY_TRACE_LINE_WIDTH: 1.5,
+} as const;
+
+/** Settings for reflection/view/ReflectionControlPanel.ts. */
+export const REFLECTION_CONTROL_PANEL_SETTINGS = {
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 14,
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 14,
+  /** Far end label max width (px). */
+  FAR_END_LABEL_MAX_WIDTH: 180,
+  /** Far end radio buttons spacing (px). */
+  FAR_END_RADIO_BUTTONS_SPACING: 6,
+  /** Compare checkbox max width (px). */
+  COMPARE_CHECKBOX_MAX_WIDTH: 180,
+  /** Density checkbox max width (px). */
+  DENSITY_CHECKBOX_MAX_WIDTH: 180,
+  /** Launch button max width (px). */
+  LAUNCH_BUTTON_MAX_WIDTH: 170,
+  /** Hint font size (px). */
+  HINT_FONT_SIZE: 11,
+  /** Hint max width (px). */
+  HINT_MAX_WIDTH: 190,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 10,
+} as const;
+
+/** Settings for reflection/view/ReflectionScreenView.ts. */
+export const REFLECTION_SCREEN_VIEW_SETTINGS = {
+  CONSTRUCTOR_Y_FACTOR: 3, // dimensionless
+  AXIS_LABEL_MAX_WIDTH_FACTOR: 0.8, // dimensionless
+
+  /** Drawn length of a pipe bore, in view pixels. */
+  PIPE_VIEW_LENGTH: 720,
+  /** Plot origin of the pipe stack: room on the left for the closed end's cap. */
+  STACK_ORIGIN_X: 30,
+  /** Trace-strip height when one assembly is showing. */
+  SINGLE_STRIP_HEIGHT: 150,
+  /** Bore and strip heights when two assemblies share the screen. */
+  COMPARE_BORE_HEIGHT: 44,
+  /** Compare strip height (px). */
+  COMPARE_STRIP_HEIGHT: 72,
+  /** Axis title font size (px). */
+  AXIS_TITLE_FONT_SIZE: 13,
+} as const;
+
+/** Settings for standing-waves/view/DriveFrequencyControl.ts. */
+export const DRIVE_FREQUENCY_CONTROL_SETTINGS = {
+  ITEM_3_SPACING: 6, // px
+
+  /** * The coarse arrows' step (Hz). Every resonance is f₁/Q₁ wide — about 14 Hz at the default pipe — so both arrow steps stay under it and neither can jump over a peak. */
+  COARSE_STEP_HZ: 10,
+  /** Tick length above the top of the track (view px), clear of the thumb's top. */
+  TICK_LENGTH: 16,
+  /** Tick label font size (px). */
+  TICK_LABEL_FONT_SIZE: 10,
+  /** Number display range max (control/model units). */
+  NUMBER_DISPLAY_RANGE_MAX: 9999,
+  /** Slider page keyboard step (control/model units). */
+  SLIDER_PAGE_KEYBOARD_STEP: 50,
+  /** Title text max width (px). */
+  TITLE_TEXT_MAX_WIDTH: 130,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 4,
+} as const;
+
+/** Settings for standing-waves/view/NodeMarkersNode.ts. */
+export const NODE_MARKERS_NODE_SETTINGS = {
+  ADD_MARKERS_LINE_DASH_DASH: 4, // px
+
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 10,
+  /** How far the tick extends above and below the bore, in view pixels. */
+  TICK_OVERSHOOT: 5,
+  /** Add markers line width (px). */
+  ADD_MARKERS_LINE_WIDTH: 1.5,
+  /** Text max width (px). */
+  TEXT_MAX_WIDTH: 110,
+} as const;
+
+/** Settings for standing-waves/view/OvertoneLadderNode.ts. */
+export const OVERTONE_LADDER_NODE_SETTINGS = {
+  TITLE_MAX_WIDTH_OFFSET: 20, // px
+  FREQUENCY_TEXT_MAX_WIDTH_OFFSET: 30, // px
+
+  /** Rung font size (px). */
+  RUNG_FONT_SIZE: 12,
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 13,
+  /** Width of a rung's content, in view pixels. */
+  RUNG_CONTENT_WIDTH: 108,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 3,
+  /** Strike line width (px). */
+  STRIKE_LINE_WIDTH: 1.5,
+  /** Constructor x margin (px). */
+  CONSTRUCTOR_X_MARGIN: 6,
+  /** Constructor y margin (px). */
+  CONSTRUCTOR_Y_MARGIN: 3,
+} as const;
+
+/** Settings for standing-waves/view/StandingWavesControlPanel.ts. */
+export const STANDING_WAVES_CONTROL_PANEL_SETTINGS = {
+  DRIVER_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+  NODES_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+  DENSITY_CHECKBOX_MAX_WIDTH_OFFSET: 30, // px
+
+  /** Title font size (px). */
+  TITLE_FONT_SIZE: 14,
+  /** Label font size (px). */
+  LABEL_FONT_SIZE: 14,
+  /** Badge font size (px). */
+  BADGE_FONT_SIZE: 13,
+  /** Panel width (px). */
+  PANEL_WIDTH: 200,
+  /** Termination radio buttons spacing (px). */
+  TERMINATION_RADIO_BUTTONS_SPACING: 6,
+  /** Length control delta (control/model units). */
+  LENGTH_CONTROL_DELTA: 0.01,
+  /** Constructor spacing (px). */
+  CONSTRUCTOR_SPACING: 11,
+} as const;
+
+/** Settings for standing-waves/view/StandingWavesScreenView.ts. */
+export const STANDING_WAVES_SCREEN_VIEW_SETTINGS = {
+  CONSTRUCTOR_RADIUS: 2.2, // px
+  CONSTRUCTOR_RADIUS_FACTOR: 0.18, // dimensionless
+  AXIS_LABEL_MAX_WIDTH_FACTOR: 0.9, // dimensionless
+
+  /** Pipe view length (px). */
+  PIPE_VIEW_LENGTH: 600,
+  /** Plot height of the displacement and pressure strips. */
+  STRIP_HEIGHT: 160,
+  /** Plot origin of the pipe stack: room on the left for a closed end's cap. */
+  STACK_ORIGIN_X: 30,
+  /** Axis title font size (px). */
+  AXIS_TITLE_FONT_SIZE: 13,
+  /** Particle row count (count). */
+  PARTICLE_ROW_COUNT: 3,
+  /** * Headroom above the resonant amplitude. A little over 1: on resonance the pipe settles *at* that amplitude, and a scale of exactly 1 would clip it whenever the transient overshoots. */
+  TRACE_HEADROOM: 1.25,
+  /** Velocity trace line width (px). */
+  VELOCITY_TRACE_LINE_WIDTH: 1.5,
+  /** Make strip x spacing (px). */
+  MAKE_STRIP_X_SPACING: 0.25,
+  /** Make strip font size (px). */
+  MAKE_STRIP_FONT_SIZE: 11,
+} as const;
+
+/** Settings for standing-waves/view/SweepButton.ts. */
+export const SWEEP_BUTTON_SETTINGS = {
+  /** Icon width (px). */
+  ICON_WIDTH: 26,
+  /** Icon height (px). */
+  ICON_HEIGHT: 12,
+  /** Icon line width (px). */
+  ICON_LINE_WIDTH: 1.8,
+  /** Cycles per icon width at its left and right edges. */
+  CHIRP_START_CYCLES: 1.2,
+  /** Chirp end cycles (px). */
+  CHIRP_END_CYCLES: 5,
+  /** Chirp point count (count). */
+  CHIRP_POINT_COUNT: 60,
+  /** Constructor x margin (px). */
+  CONSTRUCTOR_X_MARGIN: 6,
+  /** Constructor y margin (px). */
+  CONSTRUCTOR_Y_MARGIN: 5,
+} as const;
+
+/** Settings for standing-waves/model/StandingWavesModel.ts; units are documented per value. */
+export const MANUAL_TIME_STEP = {
+  /** Wall-clock interval advanced by Step Forward (s). */
+  SECONDS: 1 / 60,
+} as const;
+
+/** Settings for phase-relationships/model/PhaseModel.ts; units are documented per value. */
+export const PHASEMODEL_MANUAL_TIME_STEP = {
+  /** Wall-clock interval advanced by Step Forward (s). */
+  SECONDS: 1 / 60,
+} as const;
+
+/** Settings for instruments/model/InstrumentsModel.ts; units are documented per value. */
+export const INSTRUMENTSMODEL_MANUAL_TIME_STEP = {
+  /** Wall-clock interval advanced by Step Forward (s). */
+  SECONDS: 1 / 60,
+} as const;
+
+/** Settings for reflection/model/ReflectionModel.ts; units are documented per value. */
+export const REFLECTIONMODEL_MANUAL_TIME_STEP = {
+  /** Wall-clock interval advanced by Step Forward (s). */
+  SECONDS: 1 / 60,
+} as const;
+
 StandingWavesNamespace.register("StandingWavesConstants", {
   SCREEN_VIEW_MARGIN,
   PANEL_CORNER_RADIUS,

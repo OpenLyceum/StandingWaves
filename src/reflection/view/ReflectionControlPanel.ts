@@ -1,3 +1,4 @@
+import { REFLECTION_CONTROL_PANEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * ReflectionControlPanel.ts
  *
@@ -16,8 +17,8 @@ import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import type { ReflectionModel } from "../model/ReflectionModel.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(14);
+const TITLE_FONT = new PhetFont({ size: REFLECTION_CONTROL_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(REFLECTION_CONTROL_PANEL_SETTINGS.LABEL_FONT_SIZE);
 
 export class ReflectionControlPanel extends StandingWavesPanel {
   /** The far-end selector, for the screen's pdomOrder. */
@@ -41,7 +42,7 @@ export class ReflectionControlPanel extends StandingWavesPanel {
     const farEndLabel = new Text(reflection.farEndStringProperty, {
       font: TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: 180,
+      maxWidth: REFLECTION_CONTROL_PANEL_SETTINGS.FAR_END_LABEL_MAX_WIDTH,
     });
 
     const farEndRadioButtons = new VerticalAquaRadioButtonGroup<EndCondition>(
@@ -61,7 +62,7 @@ export class ReflectionControlPanel extends StandingWavesPanel {
         },
       ],
       {
-        spacing: 6,
+        spacing: REFLECTION_CONTROL_PANEL_SETTINGS.FAR_END_RADIO_BUTTONS_SPACING,
         accessibleName: a11y.controls.farEndStringProperty,
       },
     );
@@ -71,7 +72,7 @@ export class ReflectionControlPanel extends StandingWavesPanel {
       new Text(reflection.compareBothEndsStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: 180,
+        maxWidth: REFLECTION_CONTROL_PANEL_SETTINGS.COMPARE_CHECKBOX_MAX_WIDTH,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -85,7 +86,7 @@ export class ReflectionControlPanel extends StandingWavesPanel {
       new Text(strings.getDensityStrings().showDensityStringProperty, {
         font: LABEL_FONT,
         fill: StandingWavesColors.textColorProperty,
-        maxWidth: 180,
+        maxWidth: REFLECTION_CONTROL_PANEL_SETTINGS.DENSITY_CHECKBOX_MAX_WIDTH,
       }),
       {
         checkboxColor: StandingWavesColors.textColorProperty,
@@ -99,7 +100,7 @@ export class ReflectionControlPanel extends StandingWavesPanel {
       content: new Text(reflection.launchPulseStringProperty, {
         font: TITLE_FONT,
         fill: LIGHT_SURFACE_TEXT_FILL,
-        maxWidth: 170,
+        maxWidth: REFLECTION_CONTROL_PANEL_SETTINGS.LAUNCH_BUTTON_MAX_WIDTH,
       }),
       listener: () => model.launchPulse(),
       accessibleName: a11y.controls.launchPulseStringProperty,
@@ -113,15 +114,15 @@ export class ReflectionControlPanel extends StandingWavesPanel {
     });
 
     const hint = new Text(reflection.hintStringProperty, {
-      font: new PhetFont(11),
+      font: new PhetFont(REFLECTION_CONTROL_PANEL_SETTINGS.HINT_FONT_SIZE),
       fill: StandingWavesColors.axisColorProperty,
-      maxWidth: 190,
+      maxWidth: REFLECTION_CONTROL_PANEL_SETTINGS.HINT_MAX_WIDTH,
     });
 
     super(
       new VBox({
         align: "left",
-        spacing: 10,
+        spacing: REFLECTION_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_SPACING,
         children: [launchButton, farEndLabel, farEndRadioButtons, compareCheckbox, densityCheckbox, hint],
       }),
     );

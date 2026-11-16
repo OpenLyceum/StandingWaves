@@ -1,3 +1,4 @@
+import { STANDING_WAVES_PREFERENCES_NODE_SETTINGS } from "../StandingWavesConstants.js";
 /**
  * StandingWavesPreferencesNode.ts
  *
@@ -23,27 +24,27 @@ export class StandingWavesPreferencesNode extends VBox {
     // colors (readable on white in both default and projector profiles), not textColorProperty
     // (which is near-white in default mode and would be invisible on the white dialog).
     const header = new Text(prefStrings.titleStringProperty, {
-      font: new PhetFont({ size: 18, weight: "bold" }),
+      font: new PhetFont({ size: STANDING_WAVES_PREFERENCES_NODE_SETTINGS.HEADER_FONT_SIZE, weight: "bold" }),
       fill: StandingWavesColors.controlSurfaceTextColorProperty,
     });
 
     const showVelocityTraceCheckbox = new Checkbox(
       preferencesModel.showVelocityTraceProperty,
       new Text(prefStrings.showVelocityTraceStringProperty, {
-        font: new PhetFont(14),
+        font: new PhetFont(STANDING_WAVES_PREFERENCES_NODE_SETTINGS.SHOW_VELOCITY_TRACE_CHECKBOX_FONT_SIZE),
         fill: StandingWavesColors.controlSurfaceTextColorProperty,
       }),
       {
         checkboxColor: StandingWavesColors.controlSurfaceTextColorProperty,
         checkboxColorBackground: StandingWavesColors.controlSurfaceColorProperty,
-        spacing: 8,
+        spacing: STANDING_WAVES_PREFERENCES_NODE_SETTINGS.SHOW_VELOCITY_TRACE_CHECKBOX_SPACING,
         ...(tandem && { tandem: tandem.createTandem("showVelocityTraceCheckbox") }),
       },
     );
 
     super({
       align: "left",
-      spacing: 12,
+      spacing: STANDING_WAVES_PREFERENCES_NODE_SETTINGS.CONSTRUCTOR_SPACING,
       children: [header, showVelocityTraceCheckbox],
     });
   }

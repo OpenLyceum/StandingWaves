@@ -1,3 +1,4 @@
+import { PHASE_MODEL_SETTINGS, PHASEMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
 /**
  * PhaseModel.ts
  *
@@ -51,7 +52,7 @@ import {
  * this screen reads an absolute amplitude — but a real acoustic value keeps the
  * derived velocity and pressure in a plausible range for the readouts.
  */
-const AMPLITUDE_M = 1e-3;
+const AMPLITUDE_M: number = PHASE_MODEL_SETTINGS.AMPLITUDE_M;
 
 /**
  * Equilibrium distance between the two particles of the neighbour pair, as a
@@ -118,14 +119,17 @@ export class PhaseModel implements TModel {
     });
     this.showEquationsProperty = new BooleanProperty(true);
     this.showReferencePointProperty = new BooleanProperty(false);
-    this.referencePositionProperty = new NumberProperty(0.35 * this.pipeLength, {
-      range: new Range(0, this.pipeLength),
-      units: "m",
-    });
+    this.referencePositionProperty = new NumberProperty(
+      PHASE_MODEL_SETTINGS.REFERENCE_POSITION_FRACTION * this.pipeLength,
+      {
+        range: new Range(0, this.pipeLength),
+        units: "m",
+      },
+    );
     this.showDensityProperty = new BooleanProperty(false);
     this.showNeighbourPairProperty = new BooleanProperty(false);
     this.pairSeparation = PAIR_SEPARATION_FRACTION * this.pipeLength;
-    this.pairPositionProperty = new NumberProperty(0.65 * this.pipeLength, {
+    this.pairPositionProperty = new NumberProperty(PHASE_MODEL_SETTINGS.PAIR_POSITION_FRACTION * this.pipeLength, {
       range: new Range(this.pairSeparation / 2, this.pipeLength - this.pairSeparation / 2),
       units: "m",
     });
@@ -219,7 +223,7 @@ export class PhaseModel implements TModel {
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
-    const modelDt = this.toModelTime(1 / 60);
+    const modelDt = this.toModelTime(PHASEMODEL_MANUAL_TIME_STEP.SECONDS);
     this.timer.stepForward(modelDt);
     this.advancePhase(modelDt);
   }

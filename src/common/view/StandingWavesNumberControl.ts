@@ -1,3 +1,4 @@
+import { STANDING_WAVES_NUMBER_CONTROL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * StandingWavesNumberControl.ts
  *
@@ -34,13 +35,22 @@ import StandingWavesColors from "../../StandingWavesColors.js";
 import { FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../StandingWavesButtonOptions.js";
 
 /** Track size shared by every slider in the sim, view pixels. */
-export const TRACK_SIZE = new Dimension2(140, 3);
+export const TRACK_SIZE = new Dimension2(
+  STANDING_WAVES_NUMBER_CONTROL_SETTINGS.TRACK_SIZE_WIDTH,
+  STANDING_WAVES_NUMBER_CONTROL_SETTINGS.TRACK_SIZE_HEIGHT,
+);
 
 /** Thumb size shared by every slider in the sim, view pixels. */
-export const THUMB_SIZE = new Dimension2(13, 24);
+export const THUMB_SIZE = new Dimension2(
+  STANDING_WAVES_NUMBER_CONTROL_SETTINGS.THUMB_SIZE_WIDTH,
+  STANDING_WAVES_NUMBER_CONTROL_SETTINGS.THUMB_SIZE_HEIGHT,
+);
 
-export const TITLE_FONT = new PhetFont(13);
-export const VALUE_FONT = new PhetFont({ size: 13, weight: "bold" });
+export const TITLE_FONT = new PhetFont(STANDING_WAVES_NUMBER_CONTROL_SETTINGS.TITLE_FONT_SIZE);
+export const VALUE_FONT = new PhetFont({
+  size: STANDING_WAVES_NUMBER_CONTROL_SETTINGS.VALUE_FONT_SIZE,
+  weight: "bold",
+});
 
 type SelfOptions = {
   /** Accessible name; required, since every control needs one. */
@@ -117,12 +127,12 @@ export class StandingWavesNumberControl extends NumberControl {
               coarseButtons.increment.setScaleMagnitude(scale);
               titleNode.layoutOptions = { align: "left" };
               return new VBox({
-                spacing: 4,
+                spacing: STANDING_WAVES_NUMBER_CONTROL_SETTINGS.OPTIONS_SPACING,
                 children: [
                   titleNode,
                   slider,
                   new HBox({
-                    spacing: 6,
+                    spacing: STANDING_WAVES_NUMBER_CONTROL_SETTINGS.OPTIONS_ITEM_3_SPACING,
                     children: [
                       coarseButtons.decrement,
                       ...(decrementButton ? [decrementButton] : []),
@@ -134,12 +144,14 @@ export class StandingWavesNumberControl extends NumberControl {
                 ],
               });
             }
-          : NumberControl.createLayoutFunction4({ verticalSpacing: 2 }),
+          : NumberControl.createLayoutFunction4({
+              verticalSpacing: STANDING_WAVES_NUMBER_CONTROL_SETTINGS.OPTIONS_VERTICAL_SPACING,
+            }),
         delta,
         titleNodeOptions: {
           font: TITLE_FONT,
           fill: StandingWavesColors.textColorProperty,
-          maxWidth: 130,
+          maxWidth: STANDING_WAVES_NUMBER_CONTROL_SETTINGS.OPTIONS_MAX_WIDTH,
         },
         numberDisplayOptions: {
           decimalPlaces: providedOptions.decimals ?? 1,

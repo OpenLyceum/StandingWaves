@@ -1,3 +1,4 @@
+import { DENSITY_SLABS_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * DensitySlabsNode.ts
  *
@@ -39,10 +40,10 @@ import { CanvasNode } from "scenerystack/scenery";
  * Tint opacity of air at rest. A full compression doubles it; a full rarefaction
  * clears it. Exported so anything else tinted by density reads on the same scale.
  */
-export const DENSITY_REST_ALPHA = 0.34;
+export const DENSITY_REST_ALPHA: number = DENSITY_SLABS_NODE_SETTINGS.DENSITY_REST_ALPHA;
 
 /** Opacity of the slab walls. Faint: they are a frame of reference, not a subject. */
-const WALL_ALPHA = 0.35;
+const WALL_ALPHA: number = DENSITY_SLABS_NODE_SETTINGS.WALL_ALPHA;
 
 export type DensitySlabsNodeOptions = {
   /** Drawn length of the bore, in view pixels. */

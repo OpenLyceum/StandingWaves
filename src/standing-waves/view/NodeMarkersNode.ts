@@ -1,3 +1,4 @@
+import { NODE_MARKERS_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * NodeMarkersNode.ts
  *
@@ -39,10 +40,10 @@ import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import { PIPE_BORE_HEIGHT } from "../../StandingWavesConstants.js";
 
-const LABEL_FONT = new PhetFont({ size: 10, weight: "bold" });
+const LABEL_FONT = new PhetFont({ size: NODE_MARKERS_NODE_SETTINGS.LABEL_FONT_SIZE, weight: "bold" });
 
 /** How far the tick extends above and below the bore, in view pixels. */
-const TICK_OVERSHOOT = 5;
+const TICK_OVERSHOOT: number = NODE_MARKERS_NODE_SETTINGS.TICK_OVERSHOOT;
 
 export type NodeMarkersNodeOptions = {
   /** Drawn length of the bore, in view pixels. */
@@ -136,8 +137,8 @@ function addMarkers(
     layer.addChild(
       new Path(Shape.lineSegment(x, -half, x, half), {
         stroke: StandingWavesColors.nodeMarkerColorProperty,
-        lineWidth: 1.5,
-        lineDash: above ? [] : [4, 3],
+        lineWidth: NODE_MARKERS_NODE_SETTINGS.ADD_MARKERS_LINE_WIDTH,
+        lineDash: above ? [] : [NODE_MARKERS_NODE_SETTINGS.ADD_MARKERS_LINE_DASH_DASH, 3],
       }),
     );
 
@@ -148,7 +149,7 @@ function addMarkers(
       const text = new Text(label, {
         font: LABEL_FONT,
         fill: StandingWavesColors.nodeMarkerColorProperty,
-        maxWidth: 110,
+        maxWidth: NODE_MARKERS_NODE_SETTINGS.TEXT_MAX_WIDTH,
       });
       // Centred on the marker, but kept inside the pipe: the first node of a set is
       // often at x = 0 (every closed end, and every open end's pressure node), where

@@ -1,3 +1,4 @@
+import { PRESET_PANEL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PresetPanel.ts
  *
@@ -19,15 +20,15 @@ import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { InstrumentPreset } from "../model/instrumentPresets.js";
 import { presetNameProperty } from "./presetNames.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(14);
-const PANEL_WIDTH = 190;
+const TITLE_FONT = new PhetFont({ size: PRESET_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(PRESET_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const PANEL_WIDTH: number = PRESET_PANEL_SETTINGS.PANEL_WIDTH;
 
 /**
  * Outer width shared by both Instruments panels, so the column of controls has one
  * width. Small enough that the column clears the pipe's right end.
  */
-export const INSTRUMENTS_PANEL_MIN_WIDTH = 184;
+export const INSTRUMENTS_PANEL_MIN_WIDTH: number = PRESET_PANEL_SETTINGS.INSTRUMENTS_PANEL_MIN_WIDTH;
 
 export class PresetPanel extends StandingWavesPanel {
   public readonly presetRadioButtons: Node;
@@ -56,17 +57,20 @@ export class PresetPanel extends StandingWavesPanel {
           new Text(presetNameProperty(preset), {
             font: LABEL_FONT,
             fill: StandingWavesColors.textColorProperty,
-            maxWidth: PANEL_WIDTH - 30,
+            maxWidth: PANEL_WIDTH - PRESET_PANEL_SETTINGS.PRESET_RADIO_BUTTONS_MAX_WIDTH_OFFSET,
           }),
         options: { accessibleName: presetNameProperty(preset) },
       })),
-      { spacing: 8, accessibleName: a11y.controls.instrumentStringProperty },
+      {
+        spacing: PRESET_PANEL_SETTINGS.PRESET_RADIO_BUTTONS_SPACING,
+        accessibleName: a11y.controls.instrumentStringProperty,
+      },
     );
 
     super(
       new VBox({
         align: "left",
-        spacing: 10,
+        spacing: PRESET_PANEL_SETTINGS.CONSTRUCTOR_SPACING,
         children: [label, presetRadioButtons],
       }),
       { minWidth: INSTRUMENTS_PANEL_MIN_WIDTH },

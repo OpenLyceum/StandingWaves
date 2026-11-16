@@ -1,3 +1,4 @@
+import { DRIVE_FREQUENCY_CONTROL_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * DriveFrequencyControl.ts
  *
@@ -54,7 +55,7 @@ const FINE_STEP_HZ = 1;
  * the default pipe — so both arrow steps stay under it and neither can jump over
  * a peak.
  */
-const COARSE_STEP_HZ = 10;
+const COARSE_STEP_HZ: number = DRIVE_FREQUENCY_CONTROL_SETTINGS.COARSE_STEP_HZ;
 
 /**
  * Stroke of the slider track. Set explicitly because Slider maps the range onto
@@ -63,9 +64,9 @@ const COARSE_STEP_HZ = 10;
 const TRACK_LINE_WIDTH = 1;
 
 /** Tick length above the top of the track (view px), clear of the thumb's top. */
-const TICK_LENGTH = 16;
+const TICK_LENGTH: number = DRIVE_FREQUENCY_CONTROL_SETTINGS.TICK_LENGTH;
 
-const TICK_LABEL_FONT = new PhetFont(10);
+const TICK_LABEL_FONT = new PhetFont(DRIVE_FREQUENCY_CONTROL_SETTINGS.TICK_LABEL_FONT_SIZE);
 
 export type DriveFrequencyControlOptions = {
   /** Width of the slider track, view pixels. */
@@ -104,13 +105,17 @@ export class DriveFrequencyControl extends VBox {
     const rangeProperty = pipe.driveFrequencyRangeProperty;
 
     // Sized for the widest value any pipe can reach, so the layout never jumps.
-    const numberDisplay = new NumberDisplay(frequencyProperty, new Range(0, 9999), {
-      decimalPlaces: 0,
-      valuePattern,
-      textOptions: { font: VALUE_FONT, fill: StandingWavesColors.accentColorProperty },
-      backgroundFill: null,
-      backgroundStroke: null,
-    });
+    const numberDisplay = new NumberDisplay(
+      frequencyProperty,
+      new Range(0, DRIVE_FREQUENCY_CONTROL_SETTINGS.NUMBER_DISPLAY_RANGE_MAX),
+      {
+        decimalPlaces: 0,
+        valuePattern,
+        textOptions: { font: VALUE_FONT, fill: StandingWavesColors.accentColorProperty },
+        backgroundFill: null,
+        backgroundStroke: null,
+      },
+    );
 
     // The slider gets a proxy of the model's range, owned and disposed here, for
     // two reasons: given only a range Property, Slider adopts it as its enabled
@@ -136,7 +141,7 @@ export class DriveFrequencyControl extends VBox {
       constrainValue: (value: number) => roundToInterval(value, FINE_STEP_HZ),
       keyboardStep: COARSE_STEP_HZ,
       shiftKeyboardStep: FINE_STEP_HZ,
-      pageKeyboardStep: 50,
+      pageKeyboardStep: DRIVE_FREQUENCY_CONTROL_SETTINGS.SLIDER_PAGE_KEYBOARD_STEP,
       accessibleName,
       pdomCreateAriaValueText: () => numberDisplay.accessibleValueStringProperty.value,
       pdomDependencies: [numberDisplay.accessibleValueStringProperty],
@@ -220,7 +225,7 @@ export class DriveFrequencyControl extends VBox {
     const titleText = new Text(title, {
       font: TITLE_FONT,
       fill: StandingWavesColors.textColorProperty,
-      maxWidth: 130,
+      maxWidth: DRIVE_FREQUENCY_CONTROL_SETTINGS.TITLE_TEXT_MAX_WIDTH,
     });
 
     // Title hard left, sweep button hard right over the end of the track. Placed
@@ -232,12 +237,12 @@ export class DriveFrequencyControl extends VBox {
 
     super({
       align: "left",
-      spacing: 4,
+      spacing: DRIVE_FREQUENCY_CONTROL_SETTINGS.CONSTRUCTOR_SPACING,
       children: [
         titleRow,
         sliderWithTicks,
         new HBox({
-          spacing: 6,
+          spacing: DRIVE_FREQUENCY_CONTROL_SETTINGS.ITEM_3_SPACING,
           children: [coarseDecrement, fineDecrement, numberDisplay, fineIncrement, coarseIncrement],
           layoutOptions: { align: "center" },
         }),

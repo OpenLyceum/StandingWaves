@@ -1,3 +1,4 @@
+import { PIPE_NODE_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * PipeNode.ts
  *
@@ -21,10 +22,10 @@ import { PIPE_BORE_HEIGHT, PIPE_WALL_THICKNESS } from "../../StandingWavesConsta
 import { EndCondition } from "../model/PipeTermination.js";
 
 /** How far the flare at an open end rises above the wall, in view pixels. */
-const FLARE_RISE = 7;
+const FLARE_RISE: number = PIPE_NODE_SETTINGS.FLARE_RISE;
 
 /** How far back along the pipe the flare is drawn, in view pixels. */
-const FLARE_RUN = 14;
+const FLARE_RUN: number = PIPE_NODE_SETTINGS.FLARE_RUN;
 
 export type PipeNodeOptions = {
   /** Drawn length of the bore, in view pixels. */

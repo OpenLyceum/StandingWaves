@@ -1,3 +1,4 @@
+import { INSTRUMENT_TONE_GENERATOR_SETTINGS } from "../../StandingWavesConstants.js";
 /**
  * InstrumentToneGenerator.ts
  *
@@ -26,10 +27,10 @@ import type { InstrumentsModel } from "../model/InstrumentsModel.js";
  * Sum of all partial gains. Bounding the sum, not each gain, bounds the waveform's
  * peak however many partials the note has.
  */
-const TOTAL_GAIN = 0.3;
+const TOTAL_GAIN: number = INSTRUMENT_TONE_GENERATOR_SETTINGS.TOTAL_GAIN;
 
 /** Time constant of every gain and frequency change (s): fast, but click-free. */
-const RAMP_TIME_CONSTANT_S = 0.02;
+const RAMP_TIME_CONSTANT_S: number = INSTRUMENT_TONE_GENERATOR_SETTINGS.RAMP_TIME_CONSTANT_S;
 
 type Voice = { readonly oscillator: OscillatorNode; readonly gain: GainNode };
 

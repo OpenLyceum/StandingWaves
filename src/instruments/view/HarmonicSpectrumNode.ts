@@ -188,12 +188,12 @@ export class HarmonicSpectrumNode extends Node {
 
     plot.children = [this.ghostPath, this.socketsPath, this.otherBars, this.soundingBars, this.selectionOutline];
     this.message.centerX = options.viewWidth / 2;
-    this.message.top = HARMONIC_SPECTRUM_NODE_SETTINGS.TOP_TOP;
+    this.message.top = HARMONIC_SPECTRUM_NODE_SETTINGS.MESSAGE_TOP;
     this.frame.addChild(this.message);
     this.frame.addChild(hitArea);
 
     title.left = 0;
-    title.bottom = HARMONIC_SPECTRUM_NODE_SETTINGS.BOTTOM_BOTTOM;
+    title.bottom = HARMONIC_SPECTRUM_NODE_SETTINGS.TITLE_BOTTOM;
     hint.right = options.viewWidth;
     hint.bottom = title.bottom;
     this.addChild(title);

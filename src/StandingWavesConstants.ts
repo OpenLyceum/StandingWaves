@@ -286,7 +286,7 @@ export const STANDING_WAVES_PANEL_SETTINGS = {
 
 /** Settings for common/StandingWavesScreenIcons.ts. */
 export const STANDING_WAVES_SCREEN_ICONS_SETTINGS = {
-  CREATE_REFLECTION_ICON_WIDTH_FRAC: 0.09, // px
+  CREATE_REFLECTION_ICON_WIDTH_FRAC: 0.09, // fraction of pipe length
 
   /** Samples along each drawn curve; enough that a spindle reads as smooth. */
   CURVE_SAMPLES: 96,
@@ -324,7 +324,7 @@ export const STANDING_WAVES_SCREEN_ICONS_SETTINGS = {
 export const PIPE_MODAL_MODEL_SETTINGS = {
   /** Drive acceleration mps2 (m/s²). */
   DRIVE_ACCELERATION_MPS2: 250,
-  /** * Largest dimensionless step ωₕ·dt taken by the integrator. RK4 stays stable well past this; the bound is set for *accuracy*, so that a mode's phase does not creep over the thousands of cycles a build-up takes. */
+  /** Largest dimensionless step ωₕ·dt taken by the integrator. RK4 stays stable well past this; the bound is set for *accuracy*, so that a mode's phase does not creep over the thousands of cycles a build-up takes. */
   MAX_PHASE_STEP: 0.2,
   /** Hard cap on RK4 sub-steps per frame so a huge drive ω under fuzz cannot hang. */
   MAX_SUB_STEPS: 500,
@@ -430,7 +430,7 @@ export const CREATE_TIME_CONTROL_SETTINGS = {
 export const INSTRUMENT_PRESETS_SETTINGS = {
   /** The bore length shared by the flute and the clarinet (m). */
   WOODWIND_LENGTH_M: 0.6,
-  /** * Bore length of the two organ pipes (m): a 4-ft stop, the commonest organ pitch after 8 ft. Every preset must lie inside PIPE_LENGTH_RANGE_M, since it is written into the same pipeLengthProperty the Standing Waves slider drives. */
+  /** Bore length of the two organ pipes (m): a 4-ft stop, the commonest organ pitch after 8 ft. Every preset must lie inside PIPE_LENGTH_RANGE_M, since it is written into the same pipeLengthProperty the Standing Waves slider drives. */
   ORGAN_LENGTH_M: 1.22,
 } as const;
 
@@ -449,7 +449,7 @@ export const HARMONIC_SPECTRUM_NODE_SETTINGS = {
   TICK_FONT_SIZE: 10,
   /** Message font size (px). */
   MESSAGE_FONT_SIZE: 12,
-  /** * Bar width in view pixels. Narrow enough that a pipe's bars and its partner's outlines, which interleave one slot apart, stay separate on the stopped organ pipe, whose slots are closest (70 Hz, about 8 px). */
+  /** Bar width in view pixels. Narrow enough that a pipe's bars and its partner's outlines, which interleave one slot apart, stay separate on the stopped organ pipe, whose slots are closest (70 Hz, about 8 px). */
   BAR_WIDTH: 4,
   /** Gap between a sounding bar and its selection outline, in view pixels. */
   OUTLINE_PAD: 2,
@@ -459,23 +459,23 @@ export const HARMONIC_SPECTRUM_NODE_SETTINGS = {
   DIMMED_OPACITY: 0.35,
   /** How long the "no mode here" message stays up (ms of wall time). */
   MESSAGE_DURATION_MS: 2500,
-  /** * Top of the frequency axis (Hz). Fixed across every preset — a per-instrument axis would rescale under the learner and destroy the comparison the screen exists for. Wide enough to hold the first several harmonics of the longest pipe here. */
+  /** Top of the frequency axis (Hz). Fixed across every preset — a per-instrument axis would rescale under the learner and destroy the comparison the screen exists for. Wide enough to hold the first several harmonics of the longest pipe here. */
   MAX_FREQUENCY_HZ: 3500,
-  /** * Top of the amplitude axis. Heights are normalised against the pipe's own fundamental, so the tallest bar is 1; the margin above it leaves room inside the clipped plot for the selection outline. */
+  /** Top of the amplitude axis. Heights are normalised against the pipe's own fundamental, so the tallest bar is 1; the margin above it leaves room inside the clipped plot for the selection outline. */
   MAX_RELATIVE_AMPLITUDE: 1.12,
   /** Frame x spacing (px). */
   FRAME_X_SPACING: 500,
   /** Selection outline line width (px). */
   SELECTION_OUTLINE_LINE_WIDTH: 1.5,
-  /** Top top (px). */
-  TOP_TOP: 4,
-  /** Bottom bottom (px). */
-  BOTTOM_BOTTOM: -6,
+  /** Top inset for the "no mode here" message (px). */
+  MESSAGE_TOP: 4,
+  /** Bottom inset for the spectrum title / hint (px). */
+  TITLE_BOTTOM: -6,
 } as const;
 
 /** Settings for instruments/view/InstrumentToneGenerator.ts. */
 export const INSTRUMENT_TONE_GENERATOR_SETTINGS = {
-  /** * Sum of all partial gains. Bounding the sum, not each gain, bounds the waveform's peak however many partials the note has. */
+  /** Sum of all partial gains. Bounding the sum, not each gain, bounds the waveform's peak however many partials the note has. */
   TOTAL_GAIN: 0.3,
   /** Time constant of every gain and frequency change (s): fast, but click-free. */
   RAMP_TIME_CONSTANT_S: 0.02,
@@ -564,7 +564,7 @@ export const PHASE_MODEL_SETTINGS = {
   REFERENCE_POSITION_FRACTION: 0.35,
   /** Initial neighbour-pair position as a fraction of pipe length (dimensionless). */
   PAIR_POSITION_FRACTION: 0.65,
-  /** * Peak particle displacement (m). Arbitrary — the system is linear and nothing on this screen reads an absolute amplitude — but a real acoustic value keeps the derived velocity and pressure in a plausible range for the readouts. */
+  /** Peak particle displacement (m). Arbitrary — the system is linear and nothing on this screen reads an absolute amplitude — but a real acoustic value keeps the derived velocity and pressure in a plausible range for the readouts. */
   AMPLITUDE_M: 1e-3,
 } as const;
 
@@ -580,7 +580,7 @@ export const NEIGHBOUR_PAIR_NODE_SETTINGS = {
   DOT_RADIUS: 4.5,
   /** Peak velocity-arrow length, in view pixels. Short enough that the two arrows do not meet. */
   MAX_ARROW_LENGTH: 26,
-  /** * How far the gap must close or open, as a fraction of its own peak, before the caption calls the parcel squeezed or stretched rather than near its rest spacing. */
+  /** How far the gap must close or open, as a fraction of its own peak, before the caption calls the parcel squeezed or stretched rather than near its rest spacing. */
   STATE_THRESHOLD: 0.3,
   /** Arrow options head height (px). */
   ARROW_OPTIONS_HEAD_HEIGHT: 7,
@@ -682,7 +682,7 @@ export const STANDING_WAVES_PREFERENCES_NODE_SETTINGS = {
 
 /** Settings for reflection/model/ReflectionModel.ts. */
 export const REFLECTION_MODEL_SETTINGS = {
-  /** * Fraction of the pipe length within which the pulse counts as "at the far end". Roughly the half-width of the launched pulse, so the stage reads REFLECTING for about as long as the pulse is actually touching the boundary. */
+  /** Fraction of the pipe length within which the pulse counts as "at the far end". Roughly the half-width of the launched pulse, so the stage reads REFLECTING for about as long as the pulse is actually touching the boundary. */
   REFLECTION_ZONE_FRACTION: 0.12,
 } as const;
 
@@ -760,7 +760,7 @@ export const REFLECTION_SCREEN_VIEW_SETTINGS = {
 export const DRIVE_FREQUENCY_CONTROL_SETTINGS = {
   ITEM_3_SPACING: 6, // px
 
-  /** * The coarse arrows' step (Hz). Every resonance is f₁/Q₁ wide — about 14 Hz at the default pipe — so both arrow steps stay under it and neither can jump over a peak. */
+  /** The coarse arrows' step (Hz). Every resonance is f₁/Q₁ wide — about 14 Hz at the default pipe — so both arrow steps stay under it and neither can jump over a peak. */
   COARSE_STEP_HZ: 10,
   /** Tick length above the top of the track (view px), clear of the thumb's top. */
   TICK_LENGTH: 16,
@@ -849,7 +849,7 @@ export const STANDING_WAVES_SCREEN_VIEW_SETTINGS = {
   AXIS_TITLE_FONT_SIZE: 13,
   /** Particle row count (count). */
   PARTICLE_ROW_COUNT: 3,
-  /** * Headroom above the resonant amplitude. A little over 1: on resonance the pipe settles *at* that amplitude, and a scale of exactly 1 would clip it whenever the transient overshoots. */
+  /** Headroom above the resonant amplitude. A little over 1: on resonance the pipe settles *at* that amplitude, and a scale of exactly 1 would clip it whenever the transient overshoots. */
   TRACE_HEADROOM: 1.25,
   /** Velocity trace line width (px). */
   VELOCITY_TRACE_LINE_WIDTH: 1.5,

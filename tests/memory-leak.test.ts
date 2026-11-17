@@ -17,19 +17,27 @@
  * defect — a model that keeps calling into a discarded node.
  */
 
-import { StringProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { BooleanProperty, NumberProperty, StringProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { Range } from "scenerystack/dot";
 import { describe, expect, it } from "vitest";
 import { PipeModalModel } from "../src/common/model/PipeModalModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
+import { StandingWavesNumberControl } from "../src/common/view/StandingWavesNumberControl.js";
 import { InstrumentsModel } from "../src/instruments/model/InstrumentsModel.js";
 import { HarmonicSpectrumNode } from "../src/instruments/view/HarmonicSpectrumNode.js";
+import { InstrumentsScreenSummaryContent } from "../src/instruments/view/InstrumentsScreenSummaryContent.js";
 import { PhaseModel } from "../src/phase-relationships/model/PhaseModel.js";
 import { NeighbourPairNode } from "../src/phase-relationships/view/NeighbourPairNode.js";
+import { EquationReadoutNode } from "../src/phase-relationships/view/PhaseControlPanel.js";
+import { PhaseScreenSummaryContent } from "../src/phase-relationships/view/PhaseScreenSummaryContent.js";
+import { ReferenceMarkerNode } from "../src/phase-relationships/view/ReferenceMarkerNode.js";
 import { ReflectionModel } from "../src/reflection/model/ReflectionModel.js";
+import { ReflectionScreenSummaryContent } from "../src/reflection/view/ReflectionScreenSummaryContent.js";
 import { StandingWavesModel } from "../src/standing-waves/model/StandingWavesModel.js";
 import { DriveFrequencyControl } from "../src/standing-waves/view/DriveFrequencyControl.js";
 import { NodeMarkersNode } from "../src/standing-waves/view/NodeMarkersNode.js";
 import { OvertoneLadderNode } from "../src/standing-waves/view/OvertoneLadderNode.js";
+import { StandingWavesScreenSummaryContent } from "../src/standing-waves/view/StandingWavesScreenSummaryContent.js";
 import { describeDisposalLeaks, forceGC } from "./helpers/memoryLeak.js";
 
 function createAndDisposeTimeModel(): WeakRef<object> {
@@ -224,6 +232,16 @@ describe("Phase screen nodes release the model Properties they linked", () => {
   });
 });
 
+const instrumentsModel = new InstrumentsModel();
+const phaseModel = new PhaseModel();
+const reflectionModel = new ReflectionModel();
+const standingWavesModel = new StandingWavesModel();
+const numberValueProperty = new NumberProperty(1, { range: new Range(0, 10) });
+const markerPositionProperty = new NumberProperty(0.25, { range: new Range(0, 1) });
+const accessibleNameProperty = new StringProperty("value");
+const markerCaptionProperty = new StringProperty("marker");
+const markerVisibleProperty = new BooleanProperty(true);
+
 describeDisposalLeaks([
   { name: "InstrumentsModel", create: () => new InstrumentsModel() },
   { name: "PhaseModel", create: () => new PhaseModel() },
@@ -231,4 +249,52 @@ describeDisposalLeaks([
   { name: "StandingWavesModel", create: () => new StandingWavesModel() },
   { name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true },
   { name: "PipeModalModel", create: () => new PipeModalModel() },
+  {
+    name: "InstrumentsScreenSummaryContent",
+    create: () => new InstrumentsScreenSummaryContent(instrumentsModel),
+    keepAlive: () => [instrumentsModel],
+  },
+  {
+    name: "PhaseScreenSummaryContent",
+    create: () => new PhaseScreenSummaryContent(phaseModel),
+    keepAlive: () => [phaseModel],
+  },
+  {
+    name: "ReflectionScreenSummaryContent",
+    create: () => new ReflectionScreenSummaryContent(reflectionModel),
+    keepAlive: () => [reflectionModel],
+  },
+  {
+    name: "StandingWavesScreenSummaryContent",
+    create: () => new StandingWavesScreenSummaryContent(standingWavesModel),
+    keepAlive: () => [standingWavesModel],
+  },
+  {
+    name: "EquationReadoutNode",
+    create: () => new EquationReadoutNode(phaseModel),
+    keepAlive: () => [phaseModel],
+  },
+  {
+    name: "StandingWavesNumberControl",
+    create: () =>
+      new StandingWavesNumberControl("Value", numberValueProperty, new Range(0, 10), {
+        accessibleName: accessibleNameProperty,
+      }),
+    keepAlive: () => [numberValueProperty, accessibleNameProperty],
+  },
+  {
+    name: "ReferenceMarkerNode",
+    create: () =>
+      new ReferenceMarkerNode({
+        viewLength: 400,
+        positionRange: new Range(0, 1),
+        positionProperty: markerPositionProperty,
+        maxArrowLength: 40,
+        particleAmplitude: 17,
+        accessibleName: accessibleNameProperty,
+        caption: markerCaptionProperty,
+        visibleProperty: markerVisibleProperty,
+      }),
+    keepAlive: () => [markerPositionProperty, accessibleNameProperty, markerCaptionProperty, markerVisibleProperty],
+  },
 ]);

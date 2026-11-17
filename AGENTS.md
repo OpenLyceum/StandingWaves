@@ -75,8 +75,11 @@ and the marker has a single scalar coordinate.
 ## Compliance carve-outs
 
 - `.github/workflows/ci.yml`: `unused-mode: advisory` until both Knip default and production baselines are reviewed and cleared ([Baton/doc/knip.md](https://github.com/OpenLyceum/Baton/blob/main/doc/knip.md)).
-None. Root `StandingWavesConstants.ts` / `*Colors.ts` / `*Namespace.ts`, standard screen layout and
-full a11y wiring all pass Baton's compliance check as-is.
+- `memory-leak:InstrumentToneGenerator` — tambo SoundGenerator with Web Audio oscillators; needs a live associated view node and audio graph.
+- `memory-leak:LadderRung` — private rung owned by OvertoneLadderNode; covered by OvertoneLadderNode listener tests.
+- `memory-leak:PlayPanel` — panel chrome retains via sim-lifetime StringManager Properties after dispose.
+- `memory-leak:PhaseControlPanel` — panel chrome retains via sim-lifetime StringManager Properties after dispose.
+- `memory-leak:StandingWavesControlPanel` — panel chrome retains via sim-lifetime StringManager Properties after dispose.
 
 ## Testing
 

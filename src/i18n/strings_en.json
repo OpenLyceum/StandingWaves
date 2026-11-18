@@ -197,13 +197,14 @@
       "controls": {
         "instrument": "Instrument",
         "harmonic": "Harmonic to sound",
-        "harmonicHelp": "Use arrow keys to step through the harmonics this pipe can sound.",
+        "harmonicHelp": "Use arrow keys to step through the harmonics this pipe can sound. Home and End jump to the lowest and highest.",
         "harmonicResponse": "Harmonic {{harmonic}}, {{frequency}} hertz.",
         "noModeResponse": "No mode at harmonic {{harmonic}}: a stopped pipe has odd harmonics only.",
         "registerKey": "Register key",
         "playSound": "Play sound",
         "keyboardHelpTitle": "Harmonic Chart",
-        "keyboardHelpStep": "Choose a harmonic to sound"
+        "keyboardHelpStep": "Choose a harmonic to sound",
+        "keyboardHelpJump": "Jump to the lowest or highest harmonic"
       }
     }
   },

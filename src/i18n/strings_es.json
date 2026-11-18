@@ -197,13 +197,14 @@
       "controls": {
         "instrument": "Instrumento",
         "harmonic": "Armónico que suena",
-        "harmonicHelp": "Use las flechas para recorrer los armónicos que este tubo puede sonar.",
+        "harmonicHelp": "Use las flechas para recorrer los armónicos que este tubo puede sonar. Inicio y Fin saltan al más bajo y al más alto.",
         "harmonicResponse": "Armónico {{harmonic}}, {{frequency}} hercios.",
         "noModeResponse": "No hay modo en el armónico {{harmonic}}: un tubo tapado solo tiene armónicos impares.",
         "registerKey": "Llave de registro",
         "playSound": "Reproducir sonido",
         "keyboardHelpTitle": "Gráfico de armónicos",
-        "keyboardHelpStep": "Elegir el armónico que suena"
+        "keyboardHelpStep": "Elegir el armónico que suena",
+        "keyboardHelpJump": "Saltar al armónico más bajo o más alto"
       }
     }
   },

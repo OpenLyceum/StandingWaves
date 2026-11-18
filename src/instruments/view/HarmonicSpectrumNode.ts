@@ -55,6 +55,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import StandingWavesColors from "../../StandingWavesColors.js";
 import type { InstrumentsModel } from "../model/InstrumentsModel.js";
 import { type InstrumentPreset, specFor } from "../model/instrumentPresets.js";
+import { HarmonicSpectrumHotkeyData } from "./HarmonicSpectrumHotkeyData.js";
 
 const TITLE_FONT = new PhetFont({ size: HARMONIC_SPECTRUM_NODE_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
 const HINT_FONT = new PhetFont(HARMONIC_SPECTRUM_NODE_SETTINGS.HINT_FONT_SIZE);
@@ -222,7 +223,11 @@ export class HarmonicSpectrumNode extends Node {
     // to the ends of the visible ladder.
     hitArea.addInputListener(
       new KeyboardListener({
-        keys: ["arrowRight", "arrowUp", "arrowLeft", "arrowDown", "home", "end"] as const,
+        // The same HotkeyData the keyboard-help dialog renders.
+        keyStringProperties: [
+          ...HarmonicSpectrumHotkeyData.STEP.keyStringProperties,
+          ...HarmonicSpectrumHotkeyData.JUMP_TO_END.keyStringProperties,
+        ],
         fire: (_event, keysPressed) => {
           const harmonics = this.visibleHarmonics();
           const index = harmonics.indexOf(model.soundingHarmonicProperty.value);

@@ -197,13 +197,14 @@
       "controls": {
         "instrument": "Instrument",
         "harmonic": "Harmonique jouée",
-        "harmonicHelp": "Utilisez les flèches pour parcourir les harmoniques que ce tuyau peut produire.",
+        "harmonicHelp": "Utilisez les flèches pour parcourir les harmoniques que ce tuyau peut produire. Début et Fin vont à la plus basse et à la plus haute.",
         "harmonicResponse": "Harmonique {{harmonic}}, {{frequency}} hertz.",
         "noModeResponse": "Aucun mode à l'harmonique {{harmonic}} : un tuyau bouché n'a que des harmoniques impaires.",
         "registerKey": "Clé de registre",
         "playSound": "Jouer le son",
         "keyboardHelpTitle": "Diagramme des harmoniques",
-        "keyboardHelpStep": "Choisir l'harmonique jouée"
+        "keyboardHelpStep": "Choisir l'harmonique jouée",
+        "keyboardHelpJump": "Aller à l'harmonique la plus basse ou la plus haute"
       }
     }
   },

@@ -1,4 +1,4 @@
-import { INSTRUMENTSMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
+import { INSTRUMENTSMODEL_MANUAL_TIME_STEP, TIMER_OPTIONS } from "../../StandingWavesConstants.js";
 /**
  * InstrumentsModel.ts
  *
@@ -35,7 +35,7 @@ export type TonePartial = {
 };
 
 export class InstrumentsModel implements TModel {
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel(TIMER_OPTIONS);
 
   /** The air column. */
   public readonly pipe = new PipeModalModel({ modeCount: INSTRUMENTS_MODE_COUNT });
@@ -169,14 +169,14 @@ export class InstrumentsModel implements TModel {
       return;
     }
     const modelDt = this.toModelTime(dt);
-    this.timer.step(modelDt);
+    this.timer.advance(modelDt); // modelDt already carries the speed multiplier
     this.pipe.step(modelDt);
   }
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
     const modelDt = this.toModelTime(INSTRUMENTSMODEL_MANUAL_TIME_STEP.SECONDS);
-    this.timer.stepForward(modelDt);
+    this.timer.advance(modelDt);
     this.pipe.step(modelDt);
   }
 

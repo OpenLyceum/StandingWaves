@@ -7,7 +7,7 @@ import { CREATE_TIME_CONTROL_SETTINGS } from "../../StandingWavesConstants.js";
  * rather than past the right edge.
  */
 
-import { TimeControlNode, TimeSpeed } from "scenerystack/scenery-phet";
+import { TimeControlNode } from "scenerystack/scenery-phet";
 import {
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
   TIME_CONTROL_SPEED_RADIO_OPTIONS,
@@ -19,7 +19,7 @@ const SPEED_RADIO_SPACING: number = CREATE_TIME_CONTROL_SETTINGS.SPEED_RADIO_SPA
 export function createTimeControl(timer: TimeModel, stepListener: () => void): TimeControlNode {
   return new TimeControlNode(timer.isPlayingProperty, {
     timeSpeedProperty: timer.timeSpeedProperty,
-    timeSpeeds: [TimeSpeed.NORMAL, TimeSpeed.SLOW],
+    timeSpeeds: [...timer.timeSpeeds],
     speedRadioButtonGroupPlacement: "left",
     flowBoxSpacing: SPEED_RADIO_SPACING,
     ...TIME_CONTROL_SPEED_RADIO_OPTIONS,

@@ -10,6 +10,7 @@
 import { TimeSpeed } from "scenerystack/scenery-phet";
 import { describe, expect, it } from "vitest";
 import { TimeModel } from "../src/common/TimeModel.js";
+import { TIMER_OPTIONS } from "../src/StandingWavesConstants.js";
 
 describe("TimeModel", () => {
   it("starts paused at time 0 by default", () => {
@@ -20,7 +21,7 @@ describe("TimeModel", () => {
   });
 
   it("can start playing when constructed with initiallyPlaying", () => {
-    const model = new TimeModel(true);
+    const model = new TimeModel({ initiallyPlaying: true });
     expect(model.isPlayingProperty.value).toBe(true);
     model.dispose();
   });
@@ -33,7 +34,7 @@ describe("TimeModel", () => {
   });
 
   it("accumulates time while playing", () => {
-    const model = new TimeModel(true);
+    const model = new TimeModel({ initiallyPlaying: true });
     model.step(0.5);
     model.step(0.25);
     expect(model.timeProperty.value).toBeCloseTo(0.75);
@@ -51,7 +52,7 @@ describe("TimeModel", () => {
   });
 
   it("starts at Slow speed and restores it on reset", () => {
-    const model = new TimeModel(true);
+    const model = new TimeModel(TIMER_OPTIONS);
     expect(model.timeSpeedProperty.value).toBe(TimeSpeed.SLOW);
     expect(model.speedMultiplier).toBe(0.4);
     model.timeSpeedProperty.value = TimeSpeed.NORMAL;

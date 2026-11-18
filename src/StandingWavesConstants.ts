@@ -16,6 +16,7 @@
  */
 
 import { Range } from "scenerystack/dot";
+import { TimeSpeed } from "scenerystack/scenery-phet";
 import StandingWavesNamespace from "./StandingWavesNamespace.js";
 
 // ── Layout / chrome (screen pixels) ───────────────────────────────────────────
@@ -112,7 +113,17 @@ export const PHASE_TIME_SCALE = 1 / 400;
 export const INSTRUMENTS_TIME_SCALE = 1 / 300;
 
 /** Default Slow motion rate relative to each screen's normal clock rate. */
-export const SLOW_MOTION_MULTIPLIER = 0.4;
+const SLOW_MOTION_MULTIPLIER = 0.4;
+
+/** Every screen's timer: Normal and Slow speed radios (in display order), starting on Slow. */
+export const TIMER_OPTIONS = {
+  initiallyPlaying: true,
+  timeSpeedMultipliers: new Map([
+    [TimeSpeed.NORMAL, 1],
+    [TimeSpeed.SLOW, SLOW_MOTION_MULTIPLIER],
+  ]) as ReadonlyMap<TimeSpeed, number>,
+  initialTimeSpeed: TimeSpeed.SLOW,
+} as const;
 
 // ── Reflection screen: the mass-spring chain ──────────────────────────────────
 
@@ -918,6 +929,7 @@ StandingWavesNamespace.register("StandingWavesConstants", {
   PHASE_TIME_SCALE,
   INSTRUMENTS_TIME_SCALE,
   SLOW_MOTION_MULTIPLIER,
+  TIMER_OPTIONS,
   CHAIN_MASS_COUNT,
   PULSE_WIDTH_FRACTION,
   PULSE_AMPLITUDE_CELLS,

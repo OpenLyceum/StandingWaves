@@ -1,4 +1,8 @@
-import { REFLECTION_MODEL_SETTINGS, REFLECTIONMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
+import {
+  REFLECTION_MODEL_SETTINGS,
+  REFLECTIONMODEL_MANUAL_TIME_STEP,
+  TIMER_OPTIONS,
+} from "../../StandingWavesConstants.js";
 /**
  * ReflectionModel.ts
  *
@@ -55,7 +59,7 @@ export type PulseStage = (typeof PulseStage)[keyof typeof PulseStage];
 const REFLECTION_ZONE_FRACTION: number = REFLECTION_MODEL_SETTINGS.REFLECTION_ZONE_FRACTION;
 
 export class ReflectionModel implements TModel {
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel(TIMER_OPTIONS);
 
   /** The chain whose far end is rigid. */
   public readonly closedChain: SpringChainModel;
@@ -162,7 +166,7 @@ export class ReflectionModel implements TModel {
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
     const modelDt = this.toModelTime(REFLECTIONMODEL_MANUAL_TIME_STEP.SECONDS);
-    this.timer.stepForward(modelDt);
+    this.timer.advance(modelDt);
     this.advanceChains(modelDt);
   }
 
@@ -200,7 +204,7 @@ export class ReflectionModel implements TModel {
   }
 
   private advance(modelDt: number): void {
-    this.timer.step(modelDt);
+    this.timer.advance(modelDt); // modelDt already carries the speed multiplier
     this.advanceChains(modelDt);
   }
 

@@ -1,4 +1,4 @@
-import { PHASE_MODEL_SETTINGS, PHASEMODEL_MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
+import { PHASE_MODEL_SETTINGS, PHASEMODEL_MANUAL_TIME_STEP, TIMER_OPTIONS } from "../../StandingWavesConstants.js";
 /**
  * PhaseModel.ts
  *
@@ -65,7 +65,7 @@ const AMPLITUDE_M: number = PHASE_MODEL_SETTINGS.AMPLITUDE_M;
 const PAIR_SEPARATION_FRACTION = 1 / 12;
 
 export class PhaseModel implements TModel {
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel(TIMER_OPTIONS);
 
   /** Which way the wave travels. */
   public readonly directionProperty: Property<WaveDirection>;
@@ -217,14 +217,14 @@ export class PhaseModel implements TModel {
       return;
     }
     const modelDt = this.toModelTime(dt);
-    this.timer.step(modelDt);
+    this.timer.advance(modelDt); // modelDt already carries the speed multiplier
     this.advancePhase(modelDt);
   }
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
     const modelDt = this.toModelTime(PHASEMODEL_MANUAL_TIME_STEP.SECONDS);
-    this.timer.stepForward(modelDt);
+    this.timer.advance(modelDt);
     this.advancePhase(modelDt);
   }
 

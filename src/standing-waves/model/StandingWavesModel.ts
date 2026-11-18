@@ -1,4 +1,4 @@
-import { MANUAL_TIME_STEP } from "../../StandingWavesConstants.js";
+import { MANUAL_TIME_STEP, TIMER_OPTIONS } from "../../StandingWavesConstants.js";
 /**
  * StandingWavesModel.ts
  *
@@ -15,7 +15,7 @@ import { TimeModel } from "../../common/TimeModel.js";
 import { HARMONIC_TIME_SCALE, MAX_FRAME_DT_S } from "../../StandingWavesConstants.js";
 
 export class StandingWavesModel implements TModel {
-  public readonly timer = new TimeModel(true);
+  public readonly timer = new TimeModel(TIMER_OPTIONS);
 
   /** The air column: mode ladder, drive, and the modal amplitudes. */
   public readonly pipe = new PipeModalModel();
@@ -34,14 +34,14 @@ export class StandingWavesModel implements TModel {
       return;
     }
     const modelDt = this.toModelTime(dt);
-    this.timer.step(modelDt);
+    this.timer.advance(modelDt); // modelDt already carries the speed multiplier
     this.pipe.step(modelDt);
   }
 
   /** Advances one frame's worth of model time while paused. */
   public stepForward(): void {
     const modelDt = this.toModelTime(MANUAL_TIME_STEP.SECONDS);
-    this.timer.stepForward(modelDt);
+    this.timer.advance(modelDt);
     this.pipe.step(modelDt);
   }
 

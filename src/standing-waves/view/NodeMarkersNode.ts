@@ -68,8 +68,16 @@ export class NodeMarkersNode extends Node {
     const markerLayer = new Node();
     this.addChild(markerLayer);
 
+    // The captions are Texts bound to string Properties, so dropped markers stay reachable
+    // until disposed (removeAllChildren() alone leaked every rebuild's captions).
+    const clearMarkers = (): void => {
+      for (const child of markerLayer.children) {
+        child.disposeSubtree();
+      }
+    };
+
     const rebuild = (): void => {
-      markerLayer.removeAllChildren();
+      clearMarkers();
 
       const harmonic = pipe.standingModeProperty.value;
       if (harmonic < 1) {
@@ -106,7 +114,7 @@ export class NodeMarkersNode extends Node {
       pipe.standingModeProperty.unlink(rebuild);
       pipe.terminationProperty.unlink(rebuild);
       pipe.pipeLengthProperty.unlink(rebuild);
-      markerLayer.removeAllChildren();
+      clearMarkers();
     };
   }
 

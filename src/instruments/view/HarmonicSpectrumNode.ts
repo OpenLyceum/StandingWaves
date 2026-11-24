@@ -44,7 +44,7 @@ import { HARMONIC_SPECTRUM_NODE_SETTINGS } from "../../StandingWavesConstants.js
 
 import { DerivedProperty, stepTimer, type TimerListener, type TReadOnlyProperty } from "scenerystack/axon";
 import { BarPlot } from "scenerystack/bamboo";
-import { Range, toFixed, Vector2 } from "scenerystack/dot";
+import { Range, roundSymmetric, toFixed, Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { KeyboardListener, Node, Path, Rectangle, type SceneryEvent, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
@@ -322,7 +322,7 @@ export class HarmonicSpectrumNode extends Node {
    */
   private slotAt(frequency: number): number | null {
     const fundamental = this.model.pipe.fundamentalFrequencyProperty.value;
-    const slot = Math.round(frequency / fundamental);
+    const slot = roundSymmetric(frequency / fundamental);
     return slot >= 1 && slot <= this.slotCount() ? slot : null;
   }
 

@@ -145,7 +145,7 @@ export class PhaseScreenView extends ScreenView {
     // ── Traces ────────────────────────────────────────────────────────────────
     const xRange = new Range(0, model.pipeLength);
     const tickSpacing = model.pipeLength / 4;
-    const alwaysVisible = new BooleanProperty(true);
+    const alwaysVisibleProperty = new BooleanProperty(true);
 
     // The pressure strip is also the density strip, and says so when density is shown.
     const makeStrip = (
@@ -183,7 +183,7 @@ export class PhaseScreenView extends ScreenView {
           sample: (x) => model.velocityAt(x),
           fullScale: () => model.velocityAmplitude,
           caption: quantities.velocityStringProperty,
-          visibleProperty: alwaysVisible,
+          visibleProperty: alwaysVisibleProperty,
         },
       ],
       false,
@@ -299,7 +299,7 @@ export class PhaseScreenView extends ScreenView {
 
     this.disposePhaseScreenView = () => {
       model.referencePositionProperty.unlink(onReferencePosition);
-      alwaysVisible.dispose();
+      alwaysVisibleProperty.dispose();
       this.neighbourPair.dispose();
       summaryContent.dispose();
     };
